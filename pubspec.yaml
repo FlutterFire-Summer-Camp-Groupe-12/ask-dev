@@ -8,8 +8,12 @@ environment:
 
 dependencies:
   auto_route: ^11.1.0
+  cloud_firestore: ^6.9.0
   dio: ^5.11.1
   equatable: ^2.1.0
+  firebase_auth: ^6.6.1
+  firebase_core: ^4.14.0
+  firebase_storage: ^13.5.0
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
