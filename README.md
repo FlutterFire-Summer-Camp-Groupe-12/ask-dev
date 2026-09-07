@@ -1,7 +1,23 @@
 # ASK-DEV
+Une app mobile de questions/réponses minimaliste, inspirée de StackOverflow, permettant aux utilisateurs de poser des questions, d'y répondre et de retrouver l'information facilement.
 
-## Objectif
-Développer une plateforme de questions/réponses minimaliste, inspirée de StackOverflow, permettant aux utilisateurs de poser des questions, d'y répondre et de retrouver l'information facilement.
+**Début :** 2 septembre 2026
+
+**Fin prévue :** 16 septembre 2026
+
+
+## Membres de l’équipe :
+- NCUTI Abdoul
+- OUEDRAOGO Maïmounata
+- Ouattara Lacina Levi 
+- Elana Stacy
+- Darius Yassi HOUESSOU-KODE
+- DOMINICK Randriamanantena Grégoire
+- Diallo Thiernosadou
+
+**Chef d'équipe :** DOMINICK Randriamanantena Grégoire
+
+**Mentor :** David BONGOUADE
 
 ## Périmètre :
 

@@ -24,9 +24,19 @@ dependencies:
 dev_dependencies:
   auto_route_generator: ^10.5.0
   build_runner: ^2.15.1
+  flutter_launcher_icons: ^0.14.4
   flutter_lints: ^5.0.0
+  flutter_native_splash: ^2.4.7
   flutter_test:
     sdk: flutter
 
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/askdev_logo.png"
+  remove_alpha_ios: true
+
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/askdev_logo.png
