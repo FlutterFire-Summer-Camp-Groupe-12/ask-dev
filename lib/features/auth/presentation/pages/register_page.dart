@@ -8,14 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 @RoutePage()
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -29,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
 
   void _submit(AuthCubit cubit) {
     if (!_formKey.currentState!.validate()) return;
-    cubit.signInWithEmail(
+    cubit.signUpWithEmail(
       email: _emailController.text.trim(),
       password: _passwordController.text,
     );
@@ -55,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Connexion')),
+        appBar: AppBar(title: const Text('Inscription')),
         body: SafeArea(
           child: Center(
             child: SingleChildScrollView(
@@ -87,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
                                     width: 20,
                                     child: CircularProgressIndicator(strokeWidth: 2),
                                   )
-                                : const Text('Se connecter'),
+                                : const Text('Créer le compte'),
                           ),
                           const SizedBox(height: 12),
                           GoogleSignInButton(
@@ -98,8 +98,8 @@ class _LoginPageState extends State<LoginPage> {
                           TextButton(
                             onPressed: state.isSubmitting
                                 ? null
-                                : () => context.router.push(const RegisterRoute()),
-                            child: const Text("Pas encore de compte ? Inscrivez-vous"),
+                                : () => context.router.push(const LoginRoute()),
+                            child: const Text('Déjà un compte ? Connectez-vous'),
                           ),
                         ],
                       );

@@ -19,6 +19,7 @@ dependencies:
   flutter_bloc: ^9.1.1
   fpdart: ^1.2.0
   get_it: ^9.2.1
+  google_sign_in: 6.2.0
   logger: ^2.8.0
 
 dev_dependencies:

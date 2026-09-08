@@ -56,13 +56,13 @@ class DefaultFirebaseOptions {
     projectId: 'askdev-9dba1',
     storageBucket: 'askdev-9dba1.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyACRqxUx9RycTsTlQcvw_svNX3Cl_kbMyQ',
     appId: '1:410116228746:ios:63a1a402bda235e8770f73',
     messagingSenderId: '410116228746',
     projectId: 'askdev-9dba1',
     storageBucket: 'askdev-9dba1.firebasestorage.app',
+    iosClientId: '410116228746-dfctbrlrn69vcd34evc6ibfojjml7vcc.apps.googleusercontent.com',
     iosBundleId: 'com.example.askdev',
   );
 }

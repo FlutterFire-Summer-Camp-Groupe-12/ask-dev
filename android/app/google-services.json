@@ -12,7 +12,12 @@
           "package_name": "com.example.askdev"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "410116228746-v0b0uvcmbq8poeg54hr4l0hp1a9c67c6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDdsDINTZlHx5KxHuwB89hDUAeCHyJdg9c"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "410116228746-v0b0uvcmbq8poeg54hr4l0hp1a9c67c6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "410116228746-dfctbrlrn69vcd34evc6ibfojjml7vcc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.askdev"
+              }
+            }
+          ]
         }
       }
     }

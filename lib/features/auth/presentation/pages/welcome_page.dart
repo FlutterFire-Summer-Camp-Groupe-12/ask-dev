@@ -1,7 +1,10 @@
+import 'package:askdev/core/routes/app_router.dart';
+import 'package:askdev/core/session/auth_status.dart';
+import 'package:askdev/features/auth/presentation/manager/auth_cubit.dart';
+import 'package:askdev/features/auth/presentation/manager/auth_state.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../core/routes/app_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 @RoutePage()
 class WelcomePage extends StatelessWidget {
@@ -9,19 +12,25 @@ class WelcomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Spacer(flex: 2),
-              const _WelcomeLogo(),
-              const Spacer(flex: 2),
-              _WelcomeActions(context),
-              const Spacer(),
-            ],
+    return BlocListener<AuthCubit, AuthState>(
+      listenWhen: (previous, current) =>
+          current.status == AuthStatus.authenticated &&
+          previous.status != AuthStatus.authenticated,
+      listener: (context, state) => context.router.replace(const HomeRoute()),
+      child: Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Spacer(flex: 2),
+                const _WelcomeLogo(),
+                const Spacer(flex: 2),
+                _WelcomeActions(context),
+                const Spacer(),
+              ],
+            ),
           ),
         ),
       ),
@@ -58,7 +67,7 @@ class _WelcomeActions extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         OutlinedButton(
-          onPressed: () => context.router.push(const LoginRoute()),
+          onPressed: () => context.router.push(const RegisterRoute()),
           child: const Text('Inscription'),
         ),
       ],
