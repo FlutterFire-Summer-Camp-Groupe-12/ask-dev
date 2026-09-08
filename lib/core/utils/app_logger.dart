@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
@@ -80,10 +79,6 @@ class AppLogger {
   final Logger _logger;
   final AppLogLevel _level;
 
-  set level(AppLogLevel value) {
-    _level.value = value;
-    _logger.level = value.toLevel();
-  }
 
   AppLogLevel get level => _level;
 
