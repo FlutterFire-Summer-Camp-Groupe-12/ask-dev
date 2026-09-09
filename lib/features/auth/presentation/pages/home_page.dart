@@ -1,4 +1,5 @@
 import 'package:askdev/core/routes/app_router.dart';
+import 'package:askdev/core/utils/extensions_context.dart';
 import 'package:askdev/core/session/auth_status.dart';
 import 'package:askdev/features/auth/presentation/manager/auth_cubit.dart';
 import 'package:askdev/features/auth/presentation/manager/auth_state.dart';
@@ -23,9 +24,7 @@ class HomePage extends StatelessWidget {
         if (state.status == AuthStatus.unauthenticated) {
           context.router.replace(const WelcomeRoute());
         } else {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(SnackBar(content: Text(state.error!)));
+          context.showError(state.error!);
         }
       },
       child: Scaffold(
