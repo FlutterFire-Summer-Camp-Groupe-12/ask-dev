@@ -1,6 +1,5 @@
+import 'package:askdev/core/utils/validators.dart';
 import 'package:flutter/material.dart';
-
-const String _emailPattern = r'^[\w.+-]+@[\w-]+(\.[\w-]+)+$';
 
 class EmailField extends StatelessWidget {
   const EmailField({
@@ -24,12 +23,7 @@ class EmailField extends StatelessWidget {
         labelText: 'Email',
         prefixIcon: Icon(Icons.mail_outline),
       ),
-      validator: (value) {
-        final email = value?.trim() ?? '';
-        if (email.isEmpty) return 'Email requis';
-        if (!RegExp(_emailPattern).hasMatch(email)) return 'Email invalide';
-        return null;
-      },
+      validator: Validators.email,
     );
   }
 }
@@ -70,11 +64,7 @@ class _PasswordFieldState extends State<PasswordField> {
           tooltip: _obscureText ? 'Afficher le mot de passe' : 'Masquer le mot de passe',
         ),
       ),
-      validator: (value) {
-        if (value == null || value.isEmpty) return 'Mot de passe requis';
-        if (value.length < 6) return '6 caractères minimum';
-        return null;
-      },
+      validator: Validators.password,
     );
   }
 }
