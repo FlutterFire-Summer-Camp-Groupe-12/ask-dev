@@ -1,4 +1,4 @@
-import 'package:askdev/features/forum/domain/entities/user_profile.dart';
+import 'package:askdev/features/profile/domain/entities/user_profile.dart';
 import 'package:equatable/equatable.dart';
 
 class ProfileState extends Equatable {

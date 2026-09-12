@@ -1,5 +1,5 @@
-import 'package:askdev/features/forum/data/models/user_profile_model.dart';
-import 'package:askdev/features/forum/data/sources/user_remote_data_source.dart';
+import 'package:askdev/features/profile/data/models/user_profile_model.dart';
+import 'package:askdev/features/profile/data/sources/user_remote_data_source.dart';
 import 'package:askdev/features/profile/presentation/manager/profile_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

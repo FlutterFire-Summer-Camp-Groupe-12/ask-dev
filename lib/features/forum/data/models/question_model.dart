@@ -1,4 +1,4 @@
-import 'package:askdev/features/forum/data/models/firestore_json.dart';
+import 'package:askdev/core/utils/firestore_json.dart';
 import 'package:askdev/features/forum/domain/entities/question.dart';
 
 class QuestionModel extends Question {

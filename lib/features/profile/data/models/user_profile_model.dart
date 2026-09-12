@@ -1,5 +1,5 @@
-import 'package:askdev/features/forum/data/models/firestore_json.dart';
-import 'package:askdev/features/forum/domain/entities/user_profile.dart';
+import 'package:askdev/core/utils/firestore_json.dart';
+import 'package:askdev/features/profile/domain/entities/user_profile.dart';
 
 class UserProfileModel extends UserProfile {
   const UserProfileModel({

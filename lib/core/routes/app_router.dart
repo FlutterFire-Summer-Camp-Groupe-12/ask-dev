@@ -1,6 +1,5 @@
 import 'package:askdev/core/routes/guards/auth_guard.dart';
 import 'package:askdev/core/widgets/app_navigation_shell.dart';
-import 'package:askdev/core/widgets/tab_pages.dart';
 import 'package:askdev/dependency_injection/injection.dart';
 import 'package:askdev/features/auth/presentation/pages/home_page.dart';
 import 'package:askdev/features/auth/presentation/pages/login_page.dart';
@@ -8,6 +7,7 @@ import 'package:askdev/features/auth/presentation/pages/register_page.dart';
 import 'package:askdev/features/auth/presentation/pages/welcome_page.dart';
 import 'package:askdev/features/profile/presentation/pages/edit_profile_page.dart';
 import 'package:askdev/features/profile/presentation/pages/profile_page.dart';
+import 'package:askdev/features/search/presentation/pages/search_page.dart';
 import 'package:auto_route/auto_route.dart';
 
 part 'app_router.gr.dart';
