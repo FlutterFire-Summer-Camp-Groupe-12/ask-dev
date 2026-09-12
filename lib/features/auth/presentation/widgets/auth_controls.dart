@@ -28,6 +28,59 @@ class EmailField extends StatelessWidget {
   }
 }
 
+class PseudoField extends StatelessWidget {
+  const PseudoField({
+    super.key,
+    required this.controller,
+    required this.enabled,
+  });
+
+  final TextEditingController controller;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      enabled: enabled,
+      autocorrect: false,
+      textInputAction: TextInputAction.next,
+      decoration: const InputDecoration(
+        labelText: 'Pseudo',
+        prefixIcon: Icon(Icons.person_outline),
+      ),
+      validator: Validators.pseudo,
+    );
+  }
+}
+
+class IdentifierField extends StatelessWidget {
+  const IdentifierField({
+    super.key,
+    required this.controller,
+    required this.enabled,
+  });
+
+  final TextEditingController controller;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      enabled: enabled,
+      autocorrect: false,
+      keyboardType: TextInputType.emailAddress,
+      textInputAction: TextInputAction.next,
+      decoration: const InputDecoration(
+        labelText: 'Email ou pseudo',
+        prefixIcon: Icon(Icons.alternate_email),
+      ),
+      validator: Validators.identifier,
+    );
+  }
+}
+
 class PasswordField extends StatefulWidget {
   const PasswordField({
     super.key,

@@ -23,7 +23,13 @@ class _FakeRemoteDataSource implements AuthRemoteDataSource {
   }
 
   @override
-  Future<AuthUser> signUpWithEmail(String email, String password) async {
+  Future<AuthUser> signInWithIdentifier(String identifier, String password) async {
+    if (error != null) throw error!;
+    return user!;
+  }
+
+  @override
+  Future<AuthUser> signUpWithEmail(String email, String password, String pseudo) async {
     if (error != null) throw error!;
     return user!;
   }
@@ -45,7 +51,7 @@ void main() {
       final remote = _FakeRemoteDataSource(error: FirebaseAuthException(code: 'email-already-in-use'));
       final repository = AuthRepositoryImpl(remoteDataSource: remote);
 
-      final result = await repository.signUpWithEmail(email: 'a@b.com', password: 'secret');
+      final result = await repository.signUp(pseudo: 'devpro', email: 'a@b.com', password: 'secret');
 
       String message = '';
       result.fold((failure) => message = failure.message, (_) => fail('Expected failure'));
@@ -56,11 +62,11 @@ void main() {
       final remote = _FakeRemoteDataSource(error: FirebaseAuthException(code: 'wrong-password'));
       final repository = AuthRepositoryImpl(remoteDataSource: remote);
 
-      final result = await repository.signInWithEmail(email: 'a@b.com', password: 'incorrect');
+      final result = await repository.signIn(identifier: 'a@b.com', password: 'incorrect');
 
       String message = '';
       result.fold((failure) => message = failure.message, (_) => fail('Expected failure'));
-      expect(message, 'Email ou mot de passe incorrect.');
+      expect(message, 'Identifiant ou mot de passe incorrect.');
     });
 
     test('returns a cancelled Failure when Google sign-in returns null', () async {
@@ -78,7 +84,7 @@ void main() {
       final remote = _FakeRemoteDataSource()..user = user;
       final repository = AuthRepositoryImpl(remoteDataSource: remote);
 
-      final result = await repository.signInWithEmail(email: 'a@b.com', password: 'secret');
+      final result = await repository.signIn(identifier: 'a@b.com', password: 'secret');
 
       expect(result.isRight(), isTrue);
       expect(repository.status, AuthStatus.authenticated);
@@ -88,7 +94,7 @@ void main() {
     test('signOut clears user and sets unauthenticated status', () async {
       final remote = _FakeRemoteDataSource()..user = user;
       final repository = AuthRepositoryImpl(remoteDataSource: remote);
-      await repository.signInWithEmail(email: 'a@b.com', password: 'secret');
+      await repository.signIn(identifier: 'a@b.com', password: 'secret');
 
       final result = await repository.signOut();
 

@@ -15,8 +15,8 @@ class AppBottomNavigation extends StatelessWidget {
     return Container(
       height: 66,
       decoration: const BoxDecoration(
-        color: Color(0xFF0D0D0F),
-        border: Border(top: BorderSide(color: Colors.white12)),
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Colors.black12)),
       ),
       child: SafeArea(
         top: false,
@@ -38,18 +38,11 @@ class AppBottomNavigation extends StatelessWidget {
               onTap: () => onDestinationSelected(1),
             ),
             _BottomNavItem(
-              icon: Icons.add_circle_outline,
-              activeIcon: Icons.add_circle,
-              label: 'Publier',
-              active: currentIndex == 2,
-              onTap: () => onDestinationSelected(2),
-            ),
-            _BottomNavItem(
               icon: Icons.person_outline,
               activeIcon: Icons.person,
               label: 'Profil',
-              active: currentIndex == 3,
-              onTap: () => onDestinationSelected(3),
+              active: currentIndex == 2,
+              onTap: () => onDestinationSelected(2),
             ),
           ],
         ),
@@ -75,7 +68,7 @@ class _BottomNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = active ? Colors.white : Colors.white54;
+    final color = active ? Colors.black87 : Colors.black38;
 
     return Expanded(
       child: InkWell(

@@ -18,11 +18,13 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
+  final _pseudoController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   @override
   void dispose() {
+    _pseudoController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -30,7 +32,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
   void _submit(AuthCubit cubit) {
     if (!_formKey.currentState!.validate()) return;
-    cubit.signUpWithEmail(
+    cubit.signUp(
+      pseudo: _pseudoController.text.trim(),
       email: _emailController.text.trim(),
       password: _passwordController.text,
     );
@@ -48,7 +51,7 @@ class _RegisterPageState extends State<RegisterPage> {
       },
       listener: (context, state) {
         if (state.status == AuthStatus.authenticated) {
-          context.router.replace(const HomeRoute());
+          context.router.replace(const AppNavigationShellRoute());
         } else {
           context.showError(state.error!);
         }
@@ -70,6 +73,8 @@ class _RegisterPageState extends State<RegisterPage> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          PseudoField(controller: _pseudoController, enabled: !state.isSubmitting),
+                          const SizedBox(height: 16),
                           EmailField(controller: _emailController, enabled: !state.isSubmitting),
                           const SizedBox(height: 16),
                           PasswordField(

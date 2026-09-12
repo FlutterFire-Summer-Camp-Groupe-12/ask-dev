@@ -16,7 +16,7 @@ class WelcomePage extends StatelessWidget {
       listenWhen: (previous, current) =>
           current.status == AuthStatus.authenticated &&
           previous.status != AuthStatus.authenticated,
-      listener: (context, state) => context.router.replace(const HomeRoute()),
+      listener: (context, state) => context.router.replace(const AppNavigationShellRoute()),
       child: Scaffold(
         body: SafeArea(
           child: Padding(

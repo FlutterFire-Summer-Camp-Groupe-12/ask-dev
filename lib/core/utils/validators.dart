@@ -22,6 +22,21 @@ abstract final class Validators {
     return null;
   }
 
+  /// Valide un identifiant de connexion : email ou pseudo, requis.
+  static String? identifier(String? value) {
+    if ((value?.trim() ?? '').isEmpty) return 'Email ou pseudo requis';
+    return null;
+  }
+
+  /// Valide un pseudo : requis, d'au moins 3 caractères, sans espaces.
+  static String? pseudo(String? value) {
+    final pseudo = value?.trim() ?? '';
+    if (pseudo.isEmpty) return 'Pseudo requis';
+    if (pseudo.length < 3) return '3 caractères minimum';
+    if (pseudo.contains(RegExp(r'\s'))) return 'Le pseudo ne doit pas contenir d\'espaces';
+    return null;
+  }
+
   /// Valide un mot de passe : requis et d'au moins [minLength] caractères.
   ///
   /// Si [requireStrong] est vrai, le mot de passe doit aussi contenir une

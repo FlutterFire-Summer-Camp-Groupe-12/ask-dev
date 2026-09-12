@@ -41,19 +41,20 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, AuthUser>> signInWithEmail({
-    required String email,
+  Future<Either<Failure, AuthUser>> signIn({
+    required String identifier,
     required String password,
   }) {
-    return _run(() => _remoteDataSource.signInWithEmail(email, password));
+    return _run(() => _remoteDataSource.signInWithIdentifier(identifier, password));
   }
 
   @override
-  Future<Either<Failure, AuthUser>> signUpWithEmail({
+  Future<Either<Failure, AuthUser>> signUp({
+    required String pseudo,
     required String email,
     required String password,
   }) {
-    return _run(() => _remoteDataSource.signUpWithEmail(email, password));
+    return _run(() => _remoteDataSource.signUpWithEmail(email, password, pseudo));
   }
 
   @override
@@ -106,7 +107,7 @@ class AuthRepositoryImpl implements AuthRepository {
         case 'invalid-login-credentials':
         case 'user-not-found':
         case 'wrong-password':
-          return const Failure(message: 'Email ou mot de passe incorrect.');
+          return const Failure(message: 'Identifiant ou mot de passe incorrect.');
         case 'network-request-failed':
           return const Failure(message: 'Connexion réseau impossible.');
         case 'too-many-requests':

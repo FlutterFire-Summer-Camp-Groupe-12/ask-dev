@@ -25,12 +25,18 @@ class AuthCubit extends Cubit<AuthState> {
     });
   }
 
-  Future<void> signInWithEmail({required String email, required String password}) {
-    return _apply(() => _repository.signInWithEmail(email: email, password: password));
+  Future<void> signIn({required String identifier, required String password}) {
+    return _apply(() => _repository.signIn(identifier: identifier, password: password));
   }
 
-  Future<void> signUpWithEmail({required String email, required String password}) {
-    return _apply(() => _repository.signUpWithEmail(email: email, password: password));
+  Future<void> signUp({
+    required String pseudo,
+    required String email,
+    required String password,
+  }) {
+    return _apply(
+      () => _repository.signUp(pseudo: pseudo, email: email, password: password),
+    );
   }
 
   Future<void> signInWithGoogle() => _apply(_repository.signInWithGoogle);

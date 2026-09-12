@@ -7,6 +7,10 @@ import 'package:askdev/features/auth/data/sources/auth_remote_data_source.dart';
 import 'package:askdev/features/auth/data/sources/auth_remote_data_source_impl.dart';
 import 'package:askdev/features/auth/domain/repositories/auth_repository.dart';
 import 'package:askdev/features/auth/presentation/manager/auth_cubit.dart';
+import 'package:askdev/features/forum/data/sources/user_remote_data_source.dart';
+import 'package:askdev/features/forum/data/sources/user_remote_data_source_impl.dart';
+import 'package:askdev/features/profile/presentation/manager/profile_cubit.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -26,7 +30,11 @@ void configureDependencies() {
     () => AuthRemoteDataSourceImpl(
       firebaseAuth: FirebaseAuth.instance,
       googleSignIn: GoogleSignIn(),
+      userDataSource: sl<UserRemoteDataSource>(),
     ),
+  );
+  sl.registerLazySingleton<UserRemoteDataSource>(
+    () => UserRemoteDataSourceImpl(firestore: FirebaseFirestore.instance),
   );
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(remoteDataSource: sl<AuthRemoteDataSource>()),
@@ -37,5 +45,8 @@ void configureDependencies() {
   );
   sl.registerLazySingleton<AuthCubit>(
     () => AuthCubit(repository: sl<AuthRepository>()),
+  );
+  sl.registerLazySingleton<ProfileCubit>(
+    () => ProfileCubit(dataSource: sl<UserRemoteDataSource>()),
   );
 }

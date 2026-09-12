@@ -18,20 +18,20 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _identifierController = TextEditingController();
   final _passwordController = TextEditingController();
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _identifierController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   void _submit(AuthCubit cubit) {
     if (!_formKey.currentState!.validate()) return;
-    cubit.signInWithEmail(
-      email: _emailController.text.trim(),
+    cubit.signIn(
+      identifier: _identifierController.text.trim(),
       password: _passwordController.text,
     );
   }
@@ -48,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
       },
       listener: (context, state) {
         if (state.status == AuthStatus.authenticated) {
-          context.router.replace(const HomeRoute());
+          context.router.replace(const AppNavigationShellRoute());
         } else {
           context.showError(state.error!);
         }
@@ -70,7 +70,7 @@ class _LoginPageState extends State<LoginPage> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          EmailField(controller: _emailController, enabled: !state.isSubmitting),
+                          IdentifierField(controller: _identifierController, enabled: !state.isSubmitting),
                           const SizedBox(height: 16),
                           PasswordField(
                             controller: _passwordController,
