@@ -11,6 +11,22 @@
 part of 'app_router.dart';
 
 /// generated route for
+/// [AskQuestionPage]
+class AskQuestionRoute extends PageRouteInfo<void> {
+  const AskQuestionRoute({List<PageRouteInfo>? children})
+    : super(AskQuestionRoute.name, initialChildren: children);
+
+  static const String name = 'AskQuestionRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const AskQuestionPage();
+    },
+  );
+}
+
+/// generated route for
 /// [HomePage]
 class HomeRoute extends PageRouteInfo<void> {
   const HomeRoute({List<PageRouteInfo>? children})

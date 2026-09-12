@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../features/forum/presentation/pages/ask_question_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import 'app_bottom_navigation.dart';
 
@@ -16,7 +17,7 @@ class _AppNavigationShellState extends State<AppNavigationShell> {
   final List<Widget> _pages = const [
     _PlaceholderPage(title: 'Accueil', icon: Icons.home_outlined),
     _PlaceholderPage(title: 'Recherche', icon: Icons.search_outlined),
-    _PlaceholderPage(title: 'Publier', icon: Icons.add_circle_outline),
+    AskQuestionPage(),
     ProfilePage(),
   ];
 

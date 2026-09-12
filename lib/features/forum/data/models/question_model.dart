@@ -1,5 +1,7 @@
 import 'package:askdev/features/forum/data/models/firestore_json.dart';
 import 'package:askdev/features/forum/domain/entities/question.dart';
+import 'package:askdev/features/forum/domain/entities/question_status.dart';
+import 'package:askdev/features/forum/domain/entities/question_type.dart';
 
 class QuestionModel extends Question {
   const QuestionModel({
@@ -9,6 +11,9 @@ class QuestionModel extends Question {
     required super.authorId,
     required super.createdAt,
     required super.updatedAt,
+    super.type,
+    super.status,
+    super.tags,
     super.answersCount = 0,
     super.searchKeywords = const [],
   });
@@ -19,6 +24,9 @@ class QuestionModel extends Question {
       title: json['title'] as String,
       content: json['content'] as String,
       authorId: json['authorId'] as String,
+      type: QuestionType.fromStorage(json['type']),
+      status: QuestionStatus.fromStorage(json['status']),
+      tags: List<String>.from(json['tags'] as List? ?? const []),
       createdAt: requireFirestoreDate(json['createdAt'], 'createdAt'),
       updatedAt: requireFirestoreDate(json['updatedAt'], 'updatedAt'),
       answersCount: json['answersCount'] as int? ?? 0,
@@ -31,6 +39,9 @@ class QuestionModel extends Question {
         'title': title,
         'content': content,
         'authorId': authorId,
+        'type': type.storageKey,
+        'status': status.storageKey,
+        'tags': tags,
         'createdAt': createdAt,
         'updatedAt': updatedAt,
         'answersCount': answersCount,

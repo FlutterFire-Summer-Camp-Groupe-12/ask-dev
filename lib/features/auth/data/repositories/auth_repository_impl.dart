@@ -25,6 +25,9 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthUser? get currentUser => _currentUser;
 
   @override
+  String? get currentUserId => _currentUser?.uid;
+
+  @override
   Stream<AuthStatus> get statusStream {
     final existing = _controller;
     if (existing != null) return existing.stream;
