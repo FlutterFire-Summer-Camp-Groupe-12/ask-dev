@@ -4,6 +4,7 @@ import 'package:askdev/features/auth/presentation/pages/home_page.dart';
 import 'package:askdev/features/auth/presentation/pages/login_page.dart';
 import 'package:askdev/features/auth/presentation/pages/register_page.dart';
 import 'package:askdev/features/auth/presentation/pages/welcome_page.dart';
+import 'package:askdev/features/forum/presentation/pages/questions_home_page.dart';
 import 'package:auto_route/auto_route.dart';
 
 part 'app_router.gr.dart';
@@ -19,5 +20,6 @@ class AppRouter extends RootStackRouter {
         AutoRoute(path: '/login', page: LoginRoute.page),
         AutoRoute(path: '/register', page: RegisterRoute.page),
         AutoRoute(path: '/home', page: HomeRoute.page, guards: [sl<AuthGuard>()]),
+        AutoRoute(path: '/questions', page: QuestionsHomeRoute.page, guards: [sl<AuthGuard>()]),
       ];
 }

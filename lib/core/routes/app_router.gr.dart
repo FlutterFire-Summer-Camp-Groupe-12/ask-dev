@@ -43,6 +43,22 @@ class LoginRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [QuestionsHomePage]
+class QuestionsHomeRoute extends PageRouteInfo<void> {
+  const QuestionsHomeRoute({List<PageRouteInfo>? children})
+    : super(QuestionsHomeRoute.name, initialChildren: children);
+
+  static const String name = 'QuestionsHomeRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const QuestionsHomePage();
+    },
+  );
+}
+
+/// generated route for
 /// [RegisterPage]
 class RegisterRoute extends PageRouteInfo<void> {
   const RegisterRoute({List<PageRouteInfo>? children})
