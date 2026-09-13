@@ -27,6 +27,22 @@ class AppNavigationShellRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [AskQuestionPage]
+class AskQuestionRoute extends PageRouteInfo<void> {
+  const AskQuestionRoute({List<PageRouteInfo>? children})
+    : super(AskQuestionRoute.name, initialChildren: children);
+
+  static const String name = 'AskQuestionRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const AskQuestionPage();
+    },
+  );
+}
+
+/// generated route for
 /// [EditProfilePage]
 class EditProfileRoute extends PageRouteInfo<void> {
   const EditProfileRoute({List<PageRouteInfo>? children})
@@ -38,22 +54,6 @@ class EditProfileRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const EditProfilePage();
-    },
-  );
-}
-
-/// generated route for
-/// [HomePage]
-class HomeRoute extends PageRouteInfo<void> {
-  const HomeRoute({List<PageRouteInfo>? children})
-    : super(HomeRoute.name, initialChildren: children);
-
-  static const String name = 'HomeRoute';
-
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const HomePage();
     },
   );
 }
@@ -86,6 +86,22 @@ class ProfileRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const ProfilePage();
+    },
+  );
+}
+
+/// generated route for
+/// [QuestionsHomePage]
+class QuestionsHomeRoute extends PageRouteInfo<void> {
+  const QuestionsHomeRoute({List<PageRouteInfo>? children})
+    : super(QuestionsHomeRoute.name, initialChildren: children);
+
+  static const String name = 'QuestionsHomeRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const QuestionsHomePage();
     },
   );
 }
