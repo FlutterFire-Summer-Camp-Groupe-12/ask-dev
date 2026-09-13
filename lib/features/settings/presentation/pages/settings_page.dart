@@ -15,61 +15,80 @@ class SettingsPage extends StatelessWidget {
     final user = context.watch<AuthCubit>().state.user;
     final themeMode = context.watch<SettingsCubit>().state;
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        title: const Text(
-          'Réglages',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        ),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Réglages')),
       body: SafeArea(
         top: false,
         child: ListView(
+          padding: const EdgeInsets.symmetric(vertical: 8),
           children: [
-            const _SectionHeader('Votre compte'),
-            ListTile(
-              leading: CircleAvatar(
-                backgroundColor: colors.surfaceContainerHighest,
-                backgroundImage: user?.photoUrl != null
-                    ? NetworkImage(user!.photoUrl!)
-                    : null,
-                child: user?.photoUrl == null
-                    ? Icon(Icons.person, color: colors.onSurfaceVariant)
-                    : null,
-              ),
-              title: Text(user?.displayName ?? user?.email ?? 'Utilisateur'),
-              subtitle: user?.email != null ? Text(user!.email!) : null,
-              trailing: Icon(Icons.chevron_right, color: colors.onSurfaceVariant),
-              onTap: () => context.router.root.push(const ProfileRoute()),
-            ),
-            const Divider(height: 28),
-            const _SectionHeader('Apparence'),
-            SwitchListTile(
-              secondary: Icon(
-                Icons.dark_mode_outlined,
-                color: colors.onSurfaceVariant,
-              ),
-              title: const Text('Mode sombre'),
-              value: themeMode == ThemeMode.dark,
-              onChanged: (enabled) =>
-                  context.read<SettingsCubit>().toggleDark(enabled: enabled),
-            ),
-            const Divider(height: 28),
-            const _SectionHeader('Session'),
-            ListTile(
-              leading: Icon(Icons.logout, color: colors.error),
-              title: Text(
-                'Se déconnecter',
-                style: TextStyle(
-                  color: colors.error,
-                  fontWeight: FontWeight.w600,
+            _SectionCard(
+              header: 'Votre compte',
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: colors.surfaceContainerHighest,
+                  backgroundImage: user?.photoUrl != null
+                      ? NetworkImage(user!.photoUrl!)
+                      : null,
+                  child: user?.photoUrl == null
+                      ? Icon(Icons.person, color: colors.onSurfaceVariant)
+                      : null,
                 ),
+                title: Text(user?.displayName ?? user?.email ?? 'Utilisateur'),
+                subtitle: user?.email != null ? Text(user!.email!) : null,
+                trailing: Icon(
+                  Icons.chevron_right,
+                  color: colors.onSurfaceVariant,
+                ),
+                onTap: () => context.router.root.push(const ProfileRoute()),
               ),
-              onTap: () => context.read<AuthCubit>().signOut(),
+            ),
+            _SectionCard(
+              header: 'Apparence',
+              child: SwitchListTile(
+                secondary: Icon(
+                  Icons.dark_mode_outlined,
+                  color: colors.onSurfaceVariant,
+                ),
+                title: const Text('Mode sombre'),
+                value: themeMode == ThemeMode.dark,
+                onChanged: (enabled) =>
+                    context.read<SettingsCubit>().toggleDark(enabled: enabled),
+              ),
+            ),
+            _SectionCard(
+              header: 'Session',
+              child: ListTile(
+                leading: Icon(Icons.logout, color: colors.error),
+                title: Text(
+                  'Se déconnecter',
+                  style: TextStyle(
+                    color: colors.error,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                onTap: () => context.read<AuthCubit>().signOut(),
+              ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SectionCard extends StatelessWidget {
+  const _SectionCard({required this.header, required this.child});
+
+  final String header;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [_SectionHeader(header), child],
       ),
     );
   }
@@ -83,7 +102,7 @@ class _SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
       child: Text(
         label,
         style: TextStyle(

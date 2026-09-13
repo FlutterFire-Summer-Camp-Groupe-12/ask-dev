@@ -41,7 +41,8 @@ class _LoginPageState extends State<LoginPage> {
     final cubit = context.read<AuthCubit>();
     return BlocListener<AuthCubit, AuthState>(
       listenWhen: (previous, current) {
-        final becameAuthenticated = current.status == AuthStatus.authenticated &&
+        final becameAuthenticated =
+            current.status == AuthStatus.authenticated &&
             previous.status != AuthStatus.authenticated;
         final failed = current.error != null && previous.error != current.error;
         return becameAuthenticated || failed;
@@ -58,51 +59,68 @@ class _LoginPageState extends State<LoginPage> {
         body: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(16),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 420),
-                child: Form(
-                  key: _formKey,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  child: BlocBuilder<AuthCubit, AuthState>(
-                    builder: (context, state) {
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          IdentifierField(controller: _identifierController, enabled: !state.isSubmitting),
-                          const SizedBox(height: 16),
-                          PasswordField(
-                            controller: _passwordController,
-                            enabled: !state.isSubmitting,
-                            onSubmitted: () => _submit(cubit),
-                          ),
-                          const SizedBox(height: 24),
-                          FilledButton(
-                            onPressed: state.isSubmitting ? null : () => _submit(cubit),
-                            child: state.isSubmitting
-                                ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                  )
-                                : const Text('Se connecter'),
-                          ),
-                          const SizedBox(height: 12),
-                          GoogleSignInButton(
-                            onPressed: cubit.signInWithGoogle,
-                            enabled: !state.isSubmitting,
-                          ),
-                          const SizedBox(height: 12),
-                          TextButton(
-                            onPressed: state.isSubmitting
-                                ? null
-                                : () => context.router.push(const RegisterRoute()),
-                            child: const Text("Pas encore de compte ? Inscrivez-vous"),
-                          ),
-                        ],
-                      );
-                    },
+                child: Card(
+                  margin: EdgeInsets.zero,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Form(
+                      key: _formKey,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      child: BlocBuilder<AuthCubit, AuthState>(
+                        builder: (context, state) {
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              IdentifierField(
+                                controller: _identifierController,
+                                enabled: !state.isSubmitting,
+                              ),
+                              const SizedBox(height: 16),
+                              PasswordField(
+                                controller: _passwordController,
+                                enabled: !state.isSubmitting,
+                                onSubmitted: () => _submit(cubit),
+                              ),
+                              const SizedBox(height: 24),
+                              FilledButton(
+                                onPressed: state.isSubmitting
+                                    ? null
+                                    : () => _submit(cubit),
+                                child: state.isSubmitting
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Text('Se connecter'),
+                              ),
+                              const SizedBox(height: 12),
+                              GoogleSignInButton(
+                                onPressed: cubit.signInWithGoogle,
+                                enabled: !state.isSubmitting,
+                              ),
+                              const SizedBox(height: 12),
+                              TextButton(
+                                onPressed: state.isSubmitting
+                                    ? null
+                                    : () => context.router.push(
+                                        const RegisterRoute(),
+                                      ),
+                                child: const Text(
+                                  "Pas encore de compte ? Inscrivez-vous",
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ),
               ),
