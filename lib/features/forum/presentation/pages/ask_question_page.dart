@@ -84,8 +84,6 @@ class _AskQuestionViewState extends State<AskQuestionView> {
       listener: _onStateChanged,
       child: Scaffold(
         appBar: AppBar(
-          elevation: 0,
-          centerTitle: true,
           leading: IconButton(
             onPressed: () => Navigator.maybePop(context),
             icon: const Icon(Icons.close),
@@ -93,10 +91,7 @@ class _AskQuestionViewState extends State<AskQuestionView> {
             color: Theme.of(context).colorScheme.onSurfaceVariant,
             tooltip: 'Fermer',
           ),
-          title: const Text(
-            'Poser une question',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          ),
+          title: const Text('Poser une question'),
         ),
         body: SafeArea(
           top: false,
@@ -183,7 +178,8 @@ class _AskQuestionViewState extends State<AskQuestionView> {
             ),
             decoration: questionFieldDecoration(
               colors: colors,
-              hintText: 'ex. Pourquoi mon BlocProvider ne trouve pas le cubit ?',
+              hintText:
+                  'ex. Pourquoi mon BlocProvider ne trouve pas le cubit ?',
               hasError: error != null,
             ),
           ),
@@ -244,10 +240,7 @@ class _AskQuestionViewState extends State<AskQuestionView> {
                     contentPadding: const EdgeInsets.all(14),
                     hintText:
                         'Décrivez le problème, puis ce que vous attendiez…',
-                    hintStyle: TextStyle(
-                      color: colors.outline,
-                      fontSize: 13,
-                    ),
+                    hintStyle: TextStyle(color: colors.outline, fontSize: 13),
                   ),
                 ),
               ],
@@ -322,10 +315,7 @@ class _AskQuestionViewState extends State<AskQuestionView> {
                   )
                 : const Text(
                     'Publier la question',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                   ),
           ),
         );
@@ -391,7 +381,9 @@ class _WritingTips extends StatelessWidget {
           ),
           children: [
             _Tip('Résumez le problème dans le titre, en une phrase.'),
-            _Tip('Décrivez ce que vous avez déjà essayé et le résultat obtenu.'),
+            _Tip(
+              'Décrivez ce que vous avez déjà essayé et le résultat obtenu.',
+            ),
             _Tip('Ajoutez le code minimal qui reproduit le problème.'),
             _Tip('Collez le message d\'erreur complet, pas un résumé.'),
           ],
@@ -416,11 +408,7 @@ class _Tip extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 5, right: 8),
-            child: Icon(
-              Icons.circle,
-              size: 5,
-              color: colors.onSurfaceVariant,
-            ),
+            child: Icon(Icons.circle, size: 5, color: colors.onSurfaceVariant),
           ),
           Expanded(
             child: Text(

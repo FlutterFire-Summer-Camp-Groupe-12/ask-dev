@@ -69,72 +69,82 @@ class _EditProfilePageState extends State<EditProfilePage> {
         body: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(16),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 500),
-                child: Form(
-                  key: _formKey,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  child: BlocBuilder<ProfileCubit, ProfileState>(
-                    builder: (context, state) {
-                      final isSaving = state.isSaving;
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          TextFormField(
-                            controller: _pseudoController,
-                            enabled: !isSaving,
-                            autocorrect: false,
-                            decoration: const InputDecoration(
-                              labelText: 'Pseudo',
-                              prefixIcon: Icon(Icons.person_outline),
-                            ),
-                            validator: Validators.pseudo,
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _bioController,
-                            enabled: !isSaving,
-                            maxLines: 3,
-                            decoration: const InputDecoration(
-                              labelText: 'Bio',
-                              alignLabelWithHint: true,
-                              prefixIcon: Icon(Icons.info_outline),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          _TopicInput(
-                            enabled: !isSaving,
-                            initialTopics: _topics,
-                            canAddMore: _topics.length < _maxTopics,
-                            onAdded: (topic) {
-                              setState(() {
-                                if (!_topics.contains(topic)) {
-                                  _topics.add(topic);
-                                }
-                              });
-                            },
-                            onRemoved: (topic) {
-                              setState(() {
-                                _topics.remove(topic);
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 28),
-                          FilledButton(
-                            onPressed: isSaving ? null : () => _submit(cubit),
-                            child: isSaving
-                                ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                  )
-                                : const Text('Enregistrer'),
-                          ),
-                        ],
-                      );
-                    },
+                child: Card(
+                  margin: EdgeInsets.zero,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Form(
+                      key: _formKey,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      child: BlocBuilder<ProfileCubit, ProfileState>(
+                        builder: (context, state) {
+                          final isSaving = state.isSaving;
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              TextFormField(
+                                controller: _pseudoController,
+                                enabled: !isSaving,
+                                autocorrect: false,
+                                decoration: const InputDecoration(
+                                  labelText: 'Pseudo',
+                                  prefixIcon: Icon(Icons.person_outline),
+                                ),
+                                validator: Validators.pseudo,
+                              ),
+                              const SizedBox(height: 16),
+                              TextFormField(
+                                controller: _bioController,
+                                enabled: !isSaving,
+                                maxLines: 3,
+                                decoration: const InputDecoration(
+                                  labelText: 'Bio',
+                                  alignLabelWithHint: true,
+                                  prefixIcon: Icon(Icons.info_outline),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              _TopicInput(
+                                enabled: !isSaving,
+                                initialTopics: _topics,
+                                canAddMore: _topics.length < _maxTopics,
+                                onAdded: (topic) {
+                                  setState(() {
+                                    if (!_topics.contains(topic)) {
+                                      _topics.add(topic);
+                                    }
+                                  });
+                                },
+                                onRemoved: (topic) {
+                                  setState(() {
+                                    _topics.remove(topic);
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: 28),
+                              FilledButton(
+                                onPressed: isSaving
+                                    ? null
+                                    : () => _submit(cubit),
+                                child: isSaving
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Text('Enregistrer'),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -196,8 +206,9 @@ class _TopicInputState extends State<_TopicInput> {
               for (final topic in widget.initialTopics)
                 InputChip(
                   label: Text(topic),
-                  onDeleted:
-                      widget.enabled ? () => widget.onRemoved(topic) : null,
+                  onDeleted: widget.enabled
+                      ? () => widget.onRemoved(topic)
+                      : null,
                 ),
             ],
           ),

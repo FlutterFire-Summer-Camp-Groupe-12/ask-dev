@@ -21,10 +21,10 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     final user = context.read<AuthCubit>().state.user;
     context.read<ProfileCubit>().loadProfile(
-          user?.uid ?? '',
-          fallbackPseudo: user?.displayName,
-          fallbackEmail: user?.email,
-        );
+      user?.uid ?? '',
+      fallbackPseudo: user?.displayName,
+      fallbackEmail: user?.email,
+    );
   }
 
   @override
@@ -32,16 +32,10 @@ class _ProfilePageState extends State<ProfilePage> {
     final colors = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        title: const Text(
-          'Profil',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        ),
-        centerTitle: true,
+        title: const Text('Profil'),
         actions: [
           IconButton(
-            onPressed: () =>
-                context.router.root.push(const EditProfileRoute()),
+            onPressed: () => context.router.root.push(const EditProfileRoute()),
             icon: const Icon(Icons.edit_outlined),
             iconSize: 20,
             color: colors.onSurfaceVariant,
@@ -65,9 +59,7 @@ class _ProfilePageState extends State<ProfilePage> {
             }
             final profile = state.profile;
             if (profile == null) {
-              return const Center(
-                child: Text('Profil indisponible'),
-              );
+              return const Center(child: Text('Profil indisponible'));
             }
             final topics = profile.topics;
             final bio = profile.bio?.trim() ?? '';
@@ -84,9 +76,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           height: 72,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(
-                              color: colors.outlineVariant,
-                            ),
+                            border: Border.all(color: colors.outlineVariant),
                           ),
                           child: CircleAvatar(
                             backgroundColor: colors.surfaceContainerHighest,
@@ -122,71 +112,79 @@ class _ProfilePageState extends State<ProfilePage> {
                         const SizedBox(height: 5),
                         Text(
                           'Membre depuis ${profile.createdAt.format('MMMM yyyy')}',
-                          style: TextStyle(
-                            color: colors.outline,
-                            fontSize: 10,
-                          ),
+                          style: TextStyle(color: colors.outline, fontSize: 10),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 22),
-                  Divider(color: colors.outlineVariant, height: 1),
-                  const SizedBox(height: 18),
-                  Row(
-                    children: [
-                      _ProfileStat(
-                        value: '0',
-                        label: 'Questions',
-                      ),
-                      _VerticalDivider(),
-                      _ProfileStat(value: '0', label: 'Réponses'),
-                      _VerticalDivider(),
-                      _ProfileStat(value: '0', label: 'Meilleures'),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Divider(color: colors.outlineVariant, height: 1),
-                  const SizedBox(height: 20),
-                  Text(
-                    'À propos',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: colors.onSurface,
-                    ),
-                  ),
-                  const SizedBox(height: 9),
-                  Text(
-                    bio.isEmpty ? 'Aucune bio renseignée.' : bio,
-                    style: TextStyle(
-                      color: bio.isEmpty
-                          ? colors.outline
-                          : colors.onSurface,
-                      fontSize: 12,
-                      height: 1.45,
-                    ),
-                  ),
-                  if (topics.isNotEmpty) ...[
-                    const SizedBox(height: 20),
-                    Text(
-                      'Topics',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: colors.onSurface,
+                  Card(
+                    margin: const EdgeInsets.symmetric(vertical: 2),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: Row(
+                        children: [
+                          const _ProfileStat(value: '0', label: 'Questions'),
+                          _VerticalDivider(),
+                          const _ProfileStat(value: '0', label: 'Réponses'),
+                          _VerticalDivider(),
+                          const _ProfileStat(value: '0', label: 'Meilleures'),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 7,
-                      children: [
-                        for (final topic in topics) _TopicChip(label: topic),
-                      ],
+                  ),
+                  const SizedBox(height: 14),
+                  Card(
+                    margin: const EdgeInsets.symmetric(vertical: 2),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'À propos',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: colors.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 9),
+                          Text(
+                            bio.isEmpty ? 'Aucune bio renseignée.' : bio,
+                            style: TextStyle(
+                              color: bio.isEmpty
+                                  ? colors.outline
+                                  : colors.onSurface,
+                              fontSize: 12,
+                              height: 1.45,
+                            ),
+                          ),
+                          if (topics.isNotEmpty) ...[
+                            const SizedBox(height: 20),
+                            Text(
+                              'Topics',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: colors.onSurface,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Wrap(
+                              spacing: 6,
+                              runSpacing: 7,
+                              children: [
+                                for (final topic in topics)
+                                  _TopicChip(label: topic),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
                     ),
-                  ],
-                  const SizedBox(height: 24),
+                  ),
+                  const SizedBox(height: 14),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
