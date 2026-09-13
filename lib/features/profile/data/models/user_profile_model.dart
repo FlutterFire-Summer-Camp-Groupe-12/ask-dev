@@ -8,7 +8,7 @@ class UserProfileModel extends UserProfile {
     required super.createdAt,
     super.email,
     super.avatarUrl,
-    super.skills = const [],
+    super.topics = const [],
     super.bio,
   });
 
@@ -19,7 +19,9 @@ class UserProfileModel extends UserProfile {
       email: json['email'] as String?,
       avatarUrl: json['avatarUrl'] as String?,
       createdAt: requireFirestoreDate(json['createdAt'], 'createdAt'),
-      skills: List<String>.from(json['skills'] as List? ?? const []),
+      topics: List<String>.from(
+        (json['topics'] ?? json['skills']) as List? ?? const [],
+      ),
       bio: json['bio'] as String?,
     );
   }
@@ -30,7 +32,7 @@ class UserProfileModel extends UserProfile {
         'email': email,
         'avatarUrl': avatarUrl,
         'createdAt': createdAt,
-        'skills': skills,
+        'topics': topics,
         'bio': bio,
       };
 }

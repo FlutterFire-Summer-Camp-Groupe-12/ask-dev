@@ -2,11 +2,9 @@ import 'package:askdev/core/themes/app_colors.dart';
 import 'package:askdev/core/utils/extensions_context.dart';
 import 'package:askdev/core/utils/responsive.dart';
 import 'package:askdev/dependency_injection/injection.dart';
-import 'package:askdev/features/forum/domain/entities/question_status.dart';
 import 'package:askdev/features/forum/presentation/manager/ask_question_cubit.dart';
 import 'package:askdev/features/forum/presentation/manager/ask_question_state.dart';
 import 'package:askdev/features/forum/presentation/widgets/markdown_toolbar.dart';
-import 'package:askdev/features/forum/presentation/widgets/post_destination_selector.dart';
 import 'package:askdev/features/forum/presentation/widgets/question_form_section.dart';
 import 'package:askdev/features/forum/presentation/widgets/question_type_dropdown.dart';
 import 'package:askdev/features/forum/presentation/widgets/tag_input_field.dart';
@@ -15,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Formulaire de création d'une question, repris de la page « Ask a question »
-/// de Stack Overflow : type, titre, description Markdown, tags, destination.
+/// de Stack Overflow : type, titre, description Markdown, tags.
 @RoutePage()
 class AskQuestionPage extends StatelessWidget {
   const AskQuestionPage({super.key});
@@ -67,11 +65,7 @@ class _AskQuestionViewState extends State<AskQuestionView> {
     if (published != null) {
       _titleController.clear();
       _contentController.clear();
-      context.showSuccess(
-        published.status == QuestionStatus.review
-            ? 'Question envoyée en relecture privée.'
-            : 'Question publiée. Bonne chance !',
-      );
+      context.showSuccess('Question publiée. Bonne chance !');
       return;
     }
     final error = state.error;
@@ -133,8 +127,6 @@ class _AskQuestionViewState extends State<AskQuestionView> {
                   _buildContentSection(cubit),
                   const SizedBox(height: 22),
                   _buildTagsSection(cubit),
-                  const SizedBox(height: 22),
-                  _buildDestinationSection(cubit),
                   const SizedBox(height: 26),
                   _buildSubmitButton(cubit),
                 ],
@@ -302,32 +294,10 @@ class _AskQuestionViewState extends State<AskQuestionView> {
     );
   }
 
-  Widget _buildDestinationSection(AskQuestionCubit cubit) {
-    return BlocBuilder<AskQuestionCubit, AskQuestionState>(
-      buildWhen: (previous, current) =>
-          previous.status != current.status ||
-          previous.isSubmitting != current.isSubmitting,
-      builder: (context, state) {
-        return QuestionFormSection(
-          label: 'Où publier votre question',
-          hint:
-              'Vous pouvez demander des retours privés avant de rendre la '
-              'question publique.',
-          child: PostDestinationSelector(
-            status: state.status,
-            onChanged: cubit.statusChanged,
-            enabled: !state.isSubmitting,
-          ),
-        );
-      },
-    );
-  }
-
   Widget _buildSubmitButton(AskQuestionCubit cubit) {
     return BlocBuilder<AskQuestionCubit, AskQuestionState>(
       buildWhen: (previous, current) =>
-          previous.isSubmitting != current.isSubmitting ||
-          previous.status != current.status,
+          previous.isSubmitting != current.isSubmitting,
       builder: (context, state) {
         return SizedBox(
           height: 46,
@@ -350,11 +320,9 @@ class _AskQuestionViewState extends State<AskQuestionView> {
                       color: Colors.white,
                     ),
                   )
-                : Text(
-                    state.status == QuestionStatus.review
-                        ? 'Envoyer en relecture'
-                        : 'Publier la question',
-                    style: const TextStyle(
+                : const Text(
+                    'Publier la question',
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),

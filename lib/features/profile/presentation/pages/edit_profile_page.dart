@@ -6,6 +6,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+const _maxTopics = 15;
+
 @RoutePage()
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -18,7 +20,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
   final _pseudoController = TextEditingController();
   final _bioController = TextEditingController();
-  final _skillsController = TextEditingController();
+  late final List<String> _topics = <String>[];
   bool _initialized = false;
 
   @override
@@ -30,7 +32,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     if (profile != null) {
       _pseudoController.text = profile.pseudo;
       _bioController.text = profile.bio ?? '';
-      _skillsController.text = profile.skills.join(', ');
+      _topics = List.of(profile.topics);
     }
   }
 
@@ -38,21 +40,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void dispose() {
     _pseudoController.dispose();
     _bioController.dispose();
-    _skillsController.dispose();
     super.dispose();
   }
 
   void _submit(ProfileCubit cubit) {
     if (!_formKey.currentState!.validate()) return;
-    final skills = _skillsController.text
-        .split(',')
-        .map((s) => s.trim())
-        .where((s) => s.isNotEmpty)
-        .toList();
     cubit.updateProfile(
       pseudo: _pseudoController.text,
       bio: _bioController.text,
-      skills: skills,
+      topics: _topics,
     );
   }
 
@@ -108,13 +104,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _skillsController,
+                          _TopicInput(
                             enabled: !isSaving,
-                            decoration: const InputDecoration(
-                              labelText: 'Compétences (séparées par des virgules)',
-                              prefixIcon: Icon(Icons.code_outlined),
-                            ),
+                            initialTopics: _topics,
+                            canAddMore: _topics.length < _maxTopics,
+                            onAdded: (topic) {
+                              setState(() {
+                                if (!_topics.contains(topic)) {
+                                  _topics.add(topic);
+                                }
+                              });
+                            },
+                            onRemoved: (topic) {
+                              setState(() {
+                                _topics.remove(topic);
+                              });
+                            },
                           ),
                           const SizedBox(height: 28),
                           FilledButton(
@@ -139,4 +144,87 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
     );
   }
+}
+
+/// Saisie des topics sous forme de chips ajoutables un à un.
+class _TopicInput extends StatefulWidget {
+  const _TopicInput({
+    required this.initialTopics,
+    required this.canAddMore,
+    required this.onAdded,
+    required this.onRemoved,
+    this.enabled = true,
+  });
+
+  final List<String> initialTopics;
+  final bool canAddMore;
+  final ValueChanged<String> onAdded;
+  final ValueChanged<String> onRemoved;
+  final bool enabled;
+
+  @override
+  State<_TopicInput> createState() => _TopicInputState();
+}
+
+class _TopicInputState extends State<_TopicInput> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _add(String raw) {
+    final topic = _cleaned(raw);
+    if (topic.isEmpty) return;
+    _controller.clear();
+    widget.onAdded(topic);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (widget.initialTopics.isNotEmpty) ...[
+          Wrap(
+            spacing: 6,
+            runSpacing: 7,
+            children: [
+              for (final topic in widget.initialTopics)
+                InputChip(
+                  label: Text(topic),
+                  onDeleted:
+                      widget.enabled ? () => widget.onRemoved(topic) : null,
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+        ],
+        TextField(
+          controller: _controller,
+          enabled: widget.enabled && widget.canAddMore,
+          decoration: InputDecoration(
+            labelText: 'Topics',
+            hintText: widget.canAddMore
+                ? 'Ajouter un topic (Entrée)'
+                : 'Limite de $_maxTopics topics atteinte',
+            prefixIcon: Icon(Icons.tag, color: colors.onSurfaceVariant),
+          ),
+          onSubmitted: widget.enabled && widget.canAddMore ? _add : null,
+        ),
+      ],
+    );
+  }
+}
+
+String _cleaned(String raw) {
+  final trimmed = raw
+      .trim()
+      .replaceAll(',', '')
+      .replaceAll(RegExp(r'\s+'), ' ')
+      .trim();
+  return trimmed;
 }

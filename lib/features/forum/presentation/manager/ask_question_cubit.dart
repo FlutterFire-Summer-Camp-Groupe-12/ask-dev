@@ -23,9 +23,6 @@ class AskQuestionCubit extends Cubit<AskQuestionState> {
 
   void contentChanged(String content) => emit(state.copyWith(content: content));
 
-  void statusChanged(QuestionStatus status) =>
-      emit(state.copyWith(status: status));
-
   /// Ajoute un tag normalisé (minuscules, espaces remplacés par des tirets).
   ///
   /// Les doublons, les entrées vides et tout ajout au-delà de
@@ -61,7 +58,8 @@ class AskQuestionCubit extends Cubit<AskQuestionState> {
         title: state.title.trim(),
         content: state.content.trim(),
         type: state.type,
-        status: state.status,
+        // ponytail: on ne choisit plus la destination : publication directe.
+        status: QuestionStatus.published,
         tags: state.tags,
       ),
     );

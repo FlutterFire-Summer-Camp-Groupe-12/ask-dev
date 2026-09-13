@@ -18,6 +18,7 @@ import 'package:askdev/features/forum/presentation/manager/question_list_cubit.d
 import 'package:askdev/features/profile/data/sources/user_remote_data_source.dart';
 import 'package:askdev/features/profile/data/sources/user_remote_data_source_impl.dart';
 import 'package:askdev/features/profile/presentation/manager/profile_cubit.dart';
+import 'package:askdev/features/settings/presentation/manager/settings_cubit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
@@ -57,6 +58,7 @@ void configureDependencies() {
   sl.registerLazySingleton<ProfileCubit>(
     () => ProfileCubit(dataSource: sl<UserRemoteDataSource>()),
   );
+  sl.registerLazySingleton<SettingsCubit>(SettingsCubit.new);
   sl.registerLazySingleton<QuestionRemoteDataSource>(
     () => QuestionRemoteDataSourceImpl(firestore: FirebaseFirestore.instance),
   );

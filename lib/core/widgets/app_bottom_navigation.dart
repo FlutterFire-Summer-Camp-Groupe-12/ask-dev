@@ -12,11 +12,12 @@ class AppBottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Container(
       height: 66,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.black12)),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        border: Border(top: BorderSide(color: colors.outlineVariant)),
       ),
       child: SafeArea(
         top: false,
@@ -31,25 +32,18 @@ class AppBottomNavigation extends StatelessWidget {
               onTap: () => onDestinationSelected(0),
             ),
             _BottomNavItem(
-              icon: Icons.search_outlined,
-              activeIcon: Icons.search,
-              label: 'Recherche',
+              icon: Icons.add_circle_outline,
+              activeIcon: Icons.add_circle,
+              label: 'Publier',
               active: currentIndex == 1,
               onTap: () => onDestinationSelected(1),
             ),
             _BottomNavItem(
-              icon: Icons.add_circle_outline,
-              activeIcon: Icons.add_circle,
-              label: 'Publier',
+              icon: Icons.settings_outlined,
+              activeIcon: Icons.settings,
+              label: 'Réglages',
               active: currentIndex == 2,
               onTap: () => onDestinationSelected(2),
-            ),
-            _BottomNavItem(
-              icon: Icons.person_outline,
-              activeIcon: Icons.person,
-              label: 'Profil',
-              active: currentIndex == 3,
-              onTap: () => onDestinationSelected(3),
             ),
           ],
         ),
@@ -75,7 +69,8 @@ class _BottomNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = active ? Colors.black87 : Colors.black38;
+    final colors = Theme.of(context).colorScheme;
+    final color = active ? colors.onSurface : colors.onSurfaceVariant;
 
     return Expanded(
       child: InkWell(

@@ -7,7 +7,7 @@ class UserProfile extends Equatable {
     required this.createdAt,
     this.email,
     this.avatarUrl,
-    this.skills = const [],
+    this.topics = const [],
     this.bio,
   });
 
@@ -16,9 +16,9 @@ class UserProfile extends Equatable {
   final String? email;
   final String? avatarUrl;
   final DateTime createdAt;
-  final List<String> skills;
+  final List<String> topics;
   final String? bio;
 
   @override
-  List<Object?> get props => [uid, pseudo, email, avatarUrl, createdAt, skills, bio];
+  List<Object?> get props => [uid, pseudo, email, avatarUrl, createdAt, topics, bio];
 }

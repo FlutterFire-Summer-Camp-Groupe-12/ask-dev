@@ -8,7 +8,7 @@ import 'package:askdev/features/forum/presentation/pages/ask_question_page.dart'
 import 'package:askdev/features/forum/presentation/pages/questions_home_page.dart';
 import 'package:askdev/features/profile/presentation/pages/edit_profile_page.dart';
 import 'package:askdev/features/profile/presentation/pages/profile_page.dart';
-import 'package:askdev/features/search/presentation/pages/search_page.dart';
+import 'package:askdev/features/settings/presentation/pages/settings_page.dart';
 import 'package:auto_route/auto_route.dart';
 
 part 'app_router.gr.dart';
@@ -25,14 +25,18 @@ class AppRouter extends RootStackRouter {
         AutoRoute(path: '/register', page: RegisterRoute.page),
         AutoRoute(path: '/edit-profile', page: EditProfileRoute.page),
         AutoRoute(
+          path: '/profile',
+          page: ProfileRoute.page,
+          guards: [sl<AuthGuard>()],
+        ),
+        AutoRoute(
           path: '/home',
           page: AppNavigationShellRoute.page,
           guards: [sl<AuthGuard>()],
           children: [
             AutoRoute(path: 'accueil', page: QuestionsHomeRoute.page, initial: true),
-            AutoRoute(path: 'recherche', page: SearchRoute.page),
             AutoRoute(path: 'publier', page: AskQuestionRoute.page),
-            AutoRoute(path: 'profil', page: ProfileRoute.page),
+            AutoRoute(path: 'reglages', page: SettingsRoute.page),
           ],
         ),
       ];

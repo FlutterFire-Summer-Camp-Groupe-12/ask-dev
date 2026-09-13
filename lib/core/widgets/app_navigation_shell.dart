@@ -14,9 +14,8 @@ class AppNavigationShellPage extends StatelessWidget {
 
   static const _routes = [
     QuestionsHomeRoute(),
-    SearchRoute(),
     AskQuestionRoute(),
-    ProfileRoute(),
+    SettingsRoute(),
   ];
 
   @override
