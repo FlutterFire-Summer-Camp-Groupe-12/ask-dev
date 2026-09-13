@@ -1,4 +1,3 @@
-import 'package:askdev/core/themes/app_colors.dart';
 import 'package:askdev/features/forum/presentation/widgets/question_form_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -70,6 +69,7 @@ class _TagInputFieldState extends State<TagInputField> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final suggestions = _visibleSuggestions;
 
     return Column(
@@ -97,7 +97,7 @@ class _TagInputFieldState extends State<TagInputField> {
           onChanged: (_) => setState(() {}),
           onSubmitted: _submit,
           textInputAction: TextInputAction.done,
-          style: const TextStyle(color: AppColors.textPrimary, fontSize: 13),
+          style: TextStyle(color: colors.onSurface, fontSize: 13),
           inputFormatters: [
             // Un espace ou une virgule valide le tag en cours.
             FilteringTextInputFormatter.deny(
@@ -106,15 +106,16 @@ class _TagInputFieldState extends State<TagInputField> {
             ),
           ],
           decoration: questionFieldDecoration(
+            colors: colors,
             hintText: _isFull
                 ? '${widget.maxTags} tags maximum atteints'
                 : 'ex. (flutter dart firebase)',
             hasError: widget.hasError,
           ).copyWith(
-            prefixIcon: const Icon(
+            prefixIcon: Icon(
               Icons.search,
               size: 18,
-              color: AppColors.textMuted,
+              color: colors.onSurfaceVariant,
             ),
             prefixIconConstraints: const BoxConstraints.tightFor(
               width: 38,
@@ -125,7 +126,7 @@ class _TagInputFieldState extends State<TagInputField> {
                 : IconButton(
                     onPressed: () => _submit(_controller.text),
                     icon: const Icon(Icons.add, size: 18),
-                    color: AppColors.accent,
+                    color: colors.primary,
                     tooltip: 'Ajouter ce tag',
                   ),
           ),
@@ -157,27 +158,28 @@ class _SelectedTagChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.only(left: 10, right: 4, top: 4, bottom: 4),
       decoration: BoxDecoration(
-        color: AppColors.accent.withValues(alpha: 0.14),
+        color: colors.primary.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: AppColors.accent.withValues(alpha: 0.45)),
+        border: Border.all(color: colors.primary.withValues(alpha: 0.45)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             label,
-            style: const TextStyle(color: AppColors.accent, fontSize: 12),
+            style: TextStyle(color: colors.primary, fontSize: 12),
           ),
           const SizedBox(width: 2),
           InkWell(
             onTap: onRemoved,
             borderRadius: BorderRadius.circular(10),
-            child: const Padding(
-              padding: EdgeInsets.all(2),
-              child: Icon(Icons.close, size: 14, color: AppColors.accent),
+            child: Padding(
+              padding: const EdgeInsets.all(2),
+              child: Icon(Icons.close, size: 14, color: colors.primary),
             ),
           ),
         ],
@@ -194,19 +196,20 @@ class _SuggestionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(6),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: AppColors.surfaceHigh,
+          color: colors.surfaceContainer,
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: colors.outlineVariant),
         ),
         child: Text(
           label,
-          style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+          style: TextStyle(color: colors.onSurfaceVariant, fontSize: 12),
         ),
       ),
     );

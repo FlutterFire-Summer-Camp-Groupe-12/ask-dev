@@ -1,4 +1,3 @@
-import 'package:askdev/core/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 
 /// Barre d'outils Markdown posée au-dessus du champ de description.
@@ -18,11 +17,12 @@ class MarkdownToolbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surfaceHigh,
-        border: Border(bottom: BorderSide(color: AppColors.border)),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainer,
+        border: Border(bottom: BorderSide(color: colors.outlineVariant)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -150,11 +150,12 @@ class _ToolbarButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return IconButton(
       onPressed: onPressed,
       icon: Icon(icon, size: 18),
-      color: AppColors.textSecondary,
-      disabledColor: AppColors.textFaint,
+      color: colors.onSurfaceVariant,
+      disabledColor: colors.outline,
       tooltip: tooltip,
       visualDensity: VisualDensity.compact,
       constraints: const BoxConstraints.tightFor(width: 34, height: 34),
@@ -172,7 +173,7 @@ class _ToolbarDivider extends StatelessWidget {
       width: 1,
       height: 18,
       margin: const EdgeInsets.symmetric(horizontal: 5),
-      color: AppColors.border,
+      color: Theme.of(context).colorScheme.outlineVariant,
     );
   }
 }

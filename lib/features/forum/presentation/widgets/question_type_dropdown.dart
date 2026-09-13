@@ -1,4 +1,3 @@
-import 'package:askdev/core/themes/app_colors.dart';
 import 'package:askdev/features/forum/domain/entities/question_type.dart';
 import 'package:askdev/features/forum/presentation/widgets/question_form_section.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +16,7 @@ class QuestionTypeDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return DropdownButtonFormField<QuestionType>(
       initialValue: value,
       onChanged: enabled
@@ -25,11 +25,11 @@ class QuestionTypeDropdown extends StatelessWidget {
             }
           : null,
       isExpanded: true,
-      dropdownColor: AppColors.surfaceHigh,
+      dropdownColor: colors.surfaceContainer,
       borderRadius: BorderRadius.circular(8),
-      icon: const Icon(Icons.unfold_more, size: 18, color: AppColors.textMuted),
-      style: const TextStyle(color: AppColors.textPrimary, fontSize: 13),
-      decoration: questionFieldDecoration(),
+      icon: Icon(Icons.unfold_more, size: 18, color: colors.onSurfaceVariant),
+      style: TextStyle(color: colors.onSurface, fontSize: 13),
+      decoration: questionFieldDecoration(colors: colors),
       items: [
         for (final type in QuestionType.values)
           DropdownMenuItem<QuestionType>(
@@ -38,8 +38,8 @@ class QuestionTypeDropdown extends StatelessWidget {
               type.label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
+              style: TextStyle(
+                color: colors.onSurface,
                 fontSize: 13,
               ),
             ),
@@ -53,8 +53,8 @@ class QuestionTypeDropdown extends StatelessWidget {
               type.label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
+              style: TextStyle(
+                color: colors.onSurface,
                 fontSize: 13,
               ),
             ),

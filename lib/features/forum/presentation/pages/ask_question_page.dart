@@ -1,4 +1,3 @@
-import 'package:askdev/core/themes/app_colors.dart';
 import 'package:askdev/core/utils/extensions_context.dart';
 import 'package:askdev/core/utils/responsive.dart';
 import 'package:askdev/dependency_injection/injection.dart';
@@ -84,25 +83,19 @@ class _AskQuestionViewState extends State<AskQuestionView> {
           (current.error != null && previous.error != current.error),
       listener: _onStateChanged,
       child: Scaffold(
-        backgroundColor: AppColors.background,
         appBar: AppBar(
-          backgroundColor: AppColors.background,
           elevation: 0,
           centerTitle: true,
           leading: IconButton(
             onPressed: () => Navigator.maybePop(context),
             icon: const Icon(Icons.close),
             iconSize: 20,
-            color: AppColors.textPrimary,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
             tooltip: 'Fermer',
           ),
           title: const Text(
             'Poser une question',
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
         ),
         body: SafeArea(
@@ -164,6 +157,7 @@ class _AskQuestionViewState extends State<AskQuestionView> {
           previous.showErrors != current.showErrors ||
           previous.isSubmitting != current.isSubmitting,
       builder: (context, state) {
+        final colors = Theme.of(context).colorScheme;
         final error = state.showErrors ? state.titleError : null;
         return QuestionFormSection(
           label: 'Titre',
@@ -182,12 +176,13 @@ class _AskQuestionViewState extends State<AskQuestionView> {
             textInputAction: TextInputAction.next,
             minLines: 1,
             maxLines: 2,
-            style: const TextStyle(
-              color: AppColors.textPrimary,
+            style: TextStyle(
+              color: colors.onSurface,
               fontSize: 14,
               height: 1.4,
             ),
             decoration: questionFieldDecoration(
+              colors: colors,
               hintText: 'ex. Pourquoi mon BlocProvider ne trouve pas le cubit ?',
               hasError: error != null,
             ),
@@ -204,6 +199,7 @@ class _AskQuestionViewState extends State<AskQuestionView> {
           previous.showErrors != current.showErrors ||
           previous.isSubmitting != current.isSubmitting,
       builder: (context, state) {
+        final colors = Theme.of(context).colorScheme;
         final error = state.showErrors ? state.contentError : null;
         return QuestionFormSection(
           label: 'Description',
@@ -218,10 +214,10 @@ class _AskQuestionViewState extends State<AskQuestionView> {
           ),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: colors.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: error != null ? AppColors.danger : AppColors.border,
+                color: error != null ? colors.error : colors.outlineVariant,
               ),
             ),
             child: Column(
@@ -238,18 +234,18 @@ class _AskQuestionViewState extends State<AskQuestionView> {
                   maxLines: null,
                   keyboardType: TextInputType.multiline,
                   textCapitalization: TextCapitalization.sentences,
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
+                  style: TextStyle(
+                    color: colors.onSurface,
                     fontSize: 13,
                     height: 1.5,
                   ),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.all(14),
+                    contentPadding: const EdgeInsets.all(14),
                     hintText:
                         'Décrivez le problème, puis ce que vous attendiez…',
                     hintStyle: TextStyle(
-                      color: AppColors.textFaint,
+                      color: colors.outline,
                       fontSize: 13,
                     ),
                   ),
@@ -278,7 +274,10 @@ class _AskQuestionViewState extends State<AskQuestionView> {
           error: error,
           trailing: Text(
             '${state.tags.length}/${AskQuestionState.maxTags}',
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              fontSize: 11,
+            ),
           ),
           child: TagInputField(
             tags: state.tags,
@@ -299,25 +298,26 @@ class _AskQuestionViewState extends State<AskQuestionView> {
       buildWhen: (previous, current) =>
           previous.isSubmitting != current.isSubmitting,
       builder: (context, state) {
+        final colors = Theme.of(context).colorScheme;
         return SizedBox(
           height: 46,
           child: FilledButton(
             onPressed: state.isSubmitting ? null : cubit.submit,
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.accent,
-              disabledBackgroundColor: AppColors.accent.withValues(alpha: 0.4),
-              foregroundColor: Colors.white,
+              backgroundColor: colors.primary,
+              disabledBackgroundColor: colors.primary.withValues(alpha: 0.4),
+              foregroundColor: colors.onPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
             child: state.isSubmitting
-                ? const SizedBox(
+                ? SizedBox(
                     height: 20,
                     width: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Colors.white,
+                      color: colors.onPrimary,
                     ),
                   )
                 : const Text(
@@ -343,11 +343,12 @@ class _CharacterCounter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final reached = current >= minimum;
     return Text(
       '$current/$minimum',
       style: TextStyle(
-        color: reached ? AppColors.accent : AppColors.textMuted,
+        color: reached ? colors.primary : colors.onSurfaceVariant,
         fontSize: 11,
         fontWeight: reached ? FontWeight.w600 : FontWeight.w400,
       ),
@@ -361,28 +362,29 @@ class _WritingTips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: colors.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: colors.outlineVariant),
       ),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: const ExpansionTile(
-          tilePadding: EdgeInsets.symmetric(horizontal: 14),
-          childrenPadding: EdgeInsets.fromLTRB(14, 0, 14, 12),
-          iconColor: AppColors.textMuted,
-          collapsedIconColor: AppColors.textMuted,
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 14),
+          childrenPadding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+          iconColor: colors.onSurfaceVariant,
+          collapsedIconColor: colors.onSurfaceVariant,
           leading: Icon(
             Icons.lightbulb_outline,
             size: 18,
-            color: AppColors.accent,
+            color: colors.primary,
           ),
           title: Text(
             'Écrire une bonne question',
             style: TextStyle(
-              color: AppColors.textPrimary,
+              color: colors.onSurface,
               fontSize: 13,
               fontWeight: FontWeight.w600,
             ),
@@ -406,20 +408,25 @@ class _Tip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 5, right: 8),
-            child: Icon(Icons.circle, size: 5, color: AppColors.textMuted),
+          Padding(
+            padding: const EdgeInsets.only(top: 5, right: 8),
+            child: Icon(
+              Icons.circle,
+              size: 5,
+              color: colors.onSurfaceVariant,
+            ),
           ),
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(
-                color: AppColors.textSecondary,
+              style: TextStyle(
+                color: colors.onSurfaceVariant,
                 fontSize: 12,
                 height: 1.45,
               ),

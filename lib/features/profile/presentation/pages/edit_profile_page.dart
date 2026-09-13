@@ -20,7 +20,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
   final _pseudoController = TextEditingController();
   final _bioController = TextEditingController();
-  late final List<String> _topics = <String>[];
+  List<String> _topics = <String>[];
   bool _initialized = false;
 
   @override
