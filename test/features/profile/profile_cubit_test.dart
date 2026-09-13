@@ -31,20 +31,20 @@ void main() {
     expect(profile.email, 'dev@example.com');
   });
 
-  test('updateProfile trims skills, drops empties and persists', () async {
+  test('updateProfile trims topics, drops empties and persists', () async {
     final source = _FakeUserDataSource();
     final cubit = ProfileCubit(dataSource: source);
     await cubit.loadProfile('u1', fallbackPseudo: 'devpro');
     await cubit.updateProfile(
       pseudo: '  devpro  ',
       bio: '  Biographie  ',
-      skills: ['  Flutter  ', ' ', 'Dart'],
+      topics: ['  Flutter  ', ' ', 'Dart'],
     );
 
     final profile = cubit.state.profile;
     expect(profile?.pseudo, 'devpro');
     expect(profile?.bio, 'Biographie');
-    expect(profile?.skills, ['Flutter', 'Dart']);
-    expect(source.saved?.skills, ['Flutter', 'Dart']);
+    expect(profile?.topics, ['Flutter', 'Dart']);
+    expect(source.saved?.topics, ['Flutter', 'Dart']);
   });
 }

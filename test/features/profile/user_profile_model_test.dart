@@ -22,7 +22,7 @@ void main() {
       expect(model.email, 'devpro@example.com');
       expect(model.avatarUrl, 'gs://bucket/avatars/a.png');
       expect(model.createdAt, timestamp.toDate());
-      expect(model.skills, ['flutter', 'firebase']);
+      expect(model.topics, ['flutter', 'firebase']);
       expect(model.bio, 'Développeur Flutter');
     });
 
@@ -35,7 +35,7 @@ void main() {
 
       expect(model.email, isNull);
       expect(model.avatarUrl, isNull);
-      expect(model.skills, isEmpty);
+      expect(model.topics, isEmpty);
       expect(model.bio, isNull);
     });
 
@@ -65,8 +65,19 @@ void main() {
       expect(back.pseudo, model.pseudo);
       expect(back.email, model.email);
       expect(back.createdAt, model.createdAt);
-      expect(back.skills, model.skills);
+      expect(back.topics, model.topics);
       expect(back.bio, model.bio);
+    });
+
+    test('fromJson reads legacy "skills" key as topics', () {
+      final model = UserProfileModel.fromJson({
+        'uid': 'u1',
+        'pseudo': 'devpro',
+        'createdAt': timestamp,
+        'skills': ['flutter', 'firebase'],
+      });
+
+      expect(model.topics, ['flutter', 'firebase']);
     });
 
     test('fromJson throws FormatException when createdAt is missing', () {

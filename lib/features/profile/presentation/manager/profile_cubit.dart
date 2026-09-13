@@ -35,7 +35,7 @@ class ProfileCubit extends Cubit<ProfileState> {
   Future<void> updateProfile({
     required String pseudo,
     required String bio,
-    required List<String> skills,
+    required List<String> topics,
   }) async {
     final current = state.profile;
     if (current == null || state.isSaving) return;
@@ -47,7 +47,7 @@ class ProfileCubit extends Cubit<ProfileState> {
         email: current.email,
         avatarUrl: current.avatarUrl,
         createdAt: current.createdAt,
-        skills: skills.map((s) => s.trim()).where((s) => s.isNotEmpty).toList(),
+        topics: topics.map((s) => s.trim()).where((s) => s.isNotEmpty).toList(),
         bio: bio.trim(),
       );
       await _dataSource.saveUserProfile(updated);

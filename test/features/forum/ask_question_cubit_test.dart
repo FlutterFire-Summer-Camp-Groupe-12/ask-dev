@@ -160,7 +160,6 @@ void main() {
       final repository = _FakeQuestionRepository();
       final cubit = buildCubit(repository);
       fillValidForm(cubit);
-      cubit.statusChanged(QuestionStatus.published);
 
       await cubit.submit();
 

@@ -3,6 +3,7 @@ import 'package:askdev/core/themes/app_theme.dart';
 import 'package:askdev/dependency_injection/injection.dart';
 import 'package:askdev/features/auth/presentation/manager/auth_cubit.dart';
 import 'package:askdev/features/profile/presentation/manager/profile_cubit.dart';
+import 'package:askdev/features/settings/presentation/manager/settings_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -16,13 +17,17 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider<AuthCubit>(create: (context) => sl<AuthCubit>()),
         BlocProvider<ProfileCubit>(create: (context) => sl<ProfileCubit>()),
+        BlocProvider<SettingsCubit>(create: (context) => sl<SettingsCubit>()),
       ],
-      child: MaterialApp.router(
-        title: 'askdev',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme().light,
-        themeMode: ThemeMode.light,
-        routerConfig: appRouter.config(),
+      child: BlocBuilder<SettingsCubit, ThemeMode>(
+        builder: (context, themeMode) => MaterialApp.router(
+          title: 'askdev',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme().light,
+          darkTheme: AppTheme().dark,
+          themeMode: themeMode,
+          routerConfig: appRouter.config(),
+        ),
       ),
     );
   }

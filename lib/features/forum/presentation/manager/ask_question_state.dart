@@ -1,5 +1,4 @@
 import 'package:askdev/features/forum/domain/entities/question.dart';
-import 'package:askdev/features/forum/domain/entities/question_status.dart';
 import 'package:askdev/features/forum/domain/entities/question_type.dart';
 import 'package:equatable/equatable.dart';
 
@@ -9,7 +8,6 @@ class AskQuestionState extends Equatable {
     this.title = '',
     this.content = '',
     this.tags = const [],
-    this.status = QuestionStatus.review,
     this.showErrors = false,
     this.isSubmitting = false,
     this.error,
@@ -25,7 +23,6 @@ class AskQuestionState extends Equatable {
   final String title;
   final String content;
   final List<String> tags;
-  final QuestionStatus status;
 
   /// Vrai une fois que l'utilisateur a tenté d'envoyer : les erreurs de
   /// saisie ne s'affichent pas avant.
@@ -71,7 +68,6 @@ class AskQuestionState extends Equatable {
     String? title,
     String? content,
     List<String>? tags,
-    QuestionStatus? status,
     bool? showErrors,
     bool? isSubmitting,
     Object? error = _unset,
@@ -82,7 +78,6 @@ class AskQuestionState extends Equatable {
       title: title ?? this.title,
       content: content ?? this.content,
       tags: tags ?? this.tags,
-      status: status ?? this.status,
       showErrors: showErrors ?? this.showErrors,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       error: identical(error, _unset) ? this.error : error as String?,
@@ -97,7 +92,6 @@ class AskQuestionState extends Equatable {
         title,
         content,
         tags,
-        status,
         showErrors,
         isSubmitting,
         error,

@@ -29,6 +29,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -43,14 +44,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 context.router.root.push(const EditProfileRoute()),
             icon: const Icon(Icons.edit_outlined),
             iconSize: 20,
-            color: Colors.black54,
+            color: colors.onSurfaceVariant,
             tooltip: 'Modifier le profil',
           ),
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.more_vert),
             iconSize: 21,
-            color: Colors.black54,
+            color: colors.onSurfaceVariant,
             tooltip: 'Plus d’options',
           ),
         ],
@@ -68,7 +69,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Text('Profil indisponible'),
               );
             }
-            final skills = profile.skills;
+            final topics = profile.topics;
             final bio = profile.bio?.trim() ?? '';
             return SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(20, 5, 20, 30),
@@ -83,17 +84,19 @@ class _ProfilePageState extends State<ProfilePage> {
                           height: 72,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.black12),
+                            border: Border.all(
+                              color: colors.outlineVariant,
+                            ),
                           ),
                           child: CircleAvatar(
-                            backgroundColor: Colors.grey.shade200,
+                            backgroundColor: colors.surfaceContainerHighest,
                             backgroundImage: profile.avatarUrl != null
                                 ? NetworkImage(profile.avatarUrl!)
                                 : null,
                             child: profile.avatarUrl == null
-                                ? const Icon(
+                                ? Icon(
                                     Icons.person,
-                                    color: Colors.black38,
+                                    color: colors.onSurfaceVariant,
                                     size: 38,
                                   )
                                 : null,
@@ -102,67 +105,84 @@ class _ProfilePageState extends State<ProfilePage> {
                         const SizedBox(height: 12),
                         Text(
                           profile.pseudo,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w600,
+                            color: colors.onSurface,
                           ),
                         ),
                         const SizedBox(height: 3),
                         Text(
                           '@${profile.pseudo}',
-                          style: const TextStyle(
-                            color: Colors.black54,
+                          style: TextStyle(
+                            color: colors.onSurfaceVariant,
                             fontSize: 12,
                           ),
                         ),
                         const SizedBox(height: 5),
                         Text(
                           'Membre depuis ${profile.createdAt.format('MMMM yyyy')}',
-                          style: const TextStyle(color: Colors.black38, fontSize: 10),
+                          style: TextStyle(
+                            color: colors.outline,
+                            fontSize: 10,
+                          ),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 22),
-                  const Divider(color: Colors.black12, height: 1),
+                  Divider(color: colors.outlineVariant, height: 1),
                   const SizedBox(height: 18),
-                  const Row(
+                  Row(
                     children: [
-                      Expanded(child: _ProfileStat(value: '0', label: 'Questions')),
+                      _ProfileStat(
+                        value: '0',
+                        label: 'Questions',
+                      ),
                       _VerticalDivider(),
-                      Expanded(child: _ProfileStat(value: '0', label: 'Réponses')),
+                      _ProfileStat(value: '0', label: 'Réponses'),
                       _VerticalDivider(),
-                      Expanded(child: _ProfileStat(value: '0', label: 'Meilleures')),
+                      _ProfileStat(value: '0', label: 'Meilleures'),
                     ],
                   ),
                   const SizedBox(height: 20),
-                  const Divider(color: Colors.black12, height: 1),
+                  Divider(color: colors.outlineVariant, height: 1),
                   const SizedBox(height: 20),
-                  const Text(
+                  Text(
                     'À propos',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: colors.onSurface,
+                    ),
                   ),
                   const SizedBox(height: 9),
                   Text(
                     bio.isEmpty ? 'Aucune bio renseignée.' : bio,
                     style: TextStyle(
-                      color: bio.isEmpty ? Colors.black38 : Colors.black87,
+                      color: bio.isEmpty
+                          ? colors.outline
+                          : colors.onSurface,
                       fontSize: 12,
                       height: 1.45,
                     ),
                   ),
-                  if (skills.isNotEmpty) ...[
+                  if (topics.isNotEmpty) ...[
                     const SizedBox(height: 20),
-                    const Text(
-                      'Compétences',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                    Text(
+                      'Topics',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: colors.onSurface,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     Wrap(
                       spacing: 6,
                       runSpacing: 7,
                       children: [
-                        for (final skill in skills) _SkillChip(label: skill),
+                        for (final topic in topics) _TopicChip(label: topic),
                       ],
                     ),
                   ],
@@ -170,15 +190,19 @@ class _ProfilePageState extends State<ProfilePage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Questions récentes',
-                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: colors.onSurface,
+                        ),
                       ),
                       IconButton(
                         onPressed: () {},
                         icon: const Icon(Icons.chevron_right),
                         iconSize: 20,
-                        color: Colors.black45,
+                        color: colors.onSurfaceVariant,
                         tooltip: 'Voir les questions',
                       ),
                     ],
@@ -202,16 +226,21 @@ class _ProfileStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Column(
       children: [
         Text(
           value,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: colors.onSurface,
+          ),
         ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: const TextStyle(color: Colors.black54, fontSize: 10),
+          style: TextStyle(color: colors.onSurfaceVariant, fontSize: 10),
         ),
       ],
     );
@@ -223,27 +252,32 @@ class _VerticalDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(height: 30, width: 1, color: Colors.black12);
+    return Container(
+      height: 30,
+      width: 1,
+      color: Theme.of(context).colorScheme.outlineVariant,
+    );
   }
 }
 
-class _SkillChip extends StatelessWidget {
-  const _SkillChip({required this.label});
+class _TopicChip extends StatelessWidget {
+  const _TopicChip({required this.label});
 
   final String label;
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: colors.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black12, width: 0.8),
+        border: Border.all(color: colors.outlineVariant, width: 0.8),
       ),
       child: Text(
         label,
-        style: const TextStyle(color: Colors.black87, fontSize: 10),
+        style: TextStyle(color: colors.onSurface, fontSize: 10),
       ),
     );
   }

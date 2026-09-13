@@ -1,4 +1,4 @@
-/// Destination de publication choisie à la fin du formulaire.
+/// Statut de visibilité d'une question publiée.
 enum QuestionStatus {
   /// Relecture privée : la question n'apparaît pas encore dans le fil public.
   review('review', 'Relecture privée', 'Recevoir des retours avant la publication.'),
