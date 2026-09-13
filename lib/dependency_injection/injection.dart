@@ -7,6 +7,14 @@ import 'package:askdev/features/auth/data/sources/auth_remote_data_source.dart';
 import 'package:askdev/features/auth/data/sources/auth_remote_data_source_impl.dart';
 import 'package:askdev/features/auth/domain/repositories/auth_repository.dart';
 import 'package:askdev/features/auth/presentation/manager/auth_cubit.dart';
+import 'package:askdev/features/forum/data/repositories/question_repository_impl.dart';
+import 'package:askdev/features/forum/data/sources/question_remote_data_source.dart';
+import 'package:askdev/features/forum/data/sources/question_remote_data_source_impl.dart';
+import 'package:askdev/features/forum/domain/repositories/question_repository.dart';
+import 'package:askdev/features/forum/domain/usecases/create_question.dart';
+import 'package:askdev/features/forum/domain/usecases/get_recent_questions.dart';
+import 'package:askdev/features/forum/presentation/manager/ask_question_cubit.dart';
+import 'package:askdev/features/forum/presentation/manager/question_list_cubit.dart';
 import 'package:askdev/features/profile/data/sources/user_remote_data_source.dart';
 import 'package:askdev/features/profile/data/sources/user_remote_data_source_impl.dart';
 import 'package:askdev/features/profile/presentation/manager/profile_cubit.dart';
@@ -48,5 +56,29 @@ void configureDependencies() {
   );
   sl.registerLazySingleton<ProfileCubit>(
     () => ProfileCubit(dataSource: sl<UserRemoteDataSource>()),
+  );
+  sl.registerLazySingleton<QuestionRemoteDataSource>(
+    () => QuestionRemoteDataSourceImpl(firestore: FirebaseFirestore.instance),
+  );
+  sl.registerLazySingleton<QuestionRepository>(
+    () => QuestionRepositoryImpl(
+      remoteDataSource: sl<QuestionRemoteDataSource>(),
+    ),
+  );
+  sl.registerLazySingleton<GetRecentQuestions>(
+    () => GetRecentQuestions(sl<QuestionRepository>()),
+  );
+  sl.registerLazySingleton<CreateQuestion>(
+    () => CreateQuestion(repository: sl<QuestionRepository>()),
+  );
+  sl.registerFactory<QuestionListCubit>(
+    () => QuestionListCubit(sl<GetRecentQuestions>()),
+  );
+  // Un cubit par ouverture du formulaire : chaque brouillon repart vide.
+  sl.registerFactory<AskQuestionCubit>(
+    () => AskQuestionCubit(
+      createQuestion: sl<CreateQuestion>(),
+      authGateway: sl<AuthGateway>(),
+    ),
   );
 }

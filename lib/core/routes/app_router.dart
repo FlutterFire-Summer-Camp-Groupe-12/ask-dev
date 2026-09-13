@@ -1,10 +1,11 @@
 import 'package:askdev/core/routes/guards/auth_guard.dart';
 import 'package:askdev/core/widgets/app_navigation_shell.dart';
 import 'package:askdev/dependency_injection/injection.dart';
-import 'package:askdev/features/auth/presentation/pages/home_page.dart';
 import 'package:askdev/features/auth/presentation/pages/login_page.dart';
 import 'package:askdev/features/auth/presentation/pages/register_page.dart';
 import 'package:askdev/features/auth/presentation/pages/welcome_page.dart';
+import 'package:askdev/features/forum/presentation/pages/ask_question_page.dart';
+import 'package:askdev/features/forum/presentation/pages/questions_home_page.dart';
 import 'package:askdev/features/profile/presentation/pages/edit_profile_page.dart';
 import 'package:askdev/features/profile/presentation/pages/profile_page.dart';
 import 'package:askdev/features/search/presentation/pages/search_page.dart';
@@ -28,8 +29,9 @@ class AppRouter extends RootStackRouter {
           page: AppNavigationShellRoute.page,
           guards: [sl<AuthGuard>()],
           children: [
-            AutoRoute(path: 'accueil', page: HomeRoute.page, initial: true),
+            AutoRoute(path: 'accueil', page: QuestionsHomeRoute.page, initial: true),
             AutoRoute(path: 'recherche', page: SearchRoute.page),
+            AutoRoute(path: 'publier', page: AskQuestionRoute.page),
             AutoRoute(path: 'profil', page: ProfileRoute.page),
           ],
         ),
