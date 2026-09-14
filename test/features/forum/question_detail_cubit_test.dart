@@ -88,6 +88,28 @@ class _FakeQuestionRepository implements QuestionRepository {
     if (failure != null) return left(failure);
     return right(_answer('a-new', authorId: draft.authorId));
   }
+
+  @override
+  Future<Either<Failure, Answer>> updateAnswer(
+    String questionId,
+    String answerId,
+    String content,
+  ) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, Unit>> deleteAnswer(
+    String questionId,
+    String answerId,
+  ) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Stream<Either<Failure, List<Answer>>> watchAnswers(String questionId) {
+    throw UnimplementedError();
+  }
 }
 
 class _FakeAuthGateway implements AuthGateway {

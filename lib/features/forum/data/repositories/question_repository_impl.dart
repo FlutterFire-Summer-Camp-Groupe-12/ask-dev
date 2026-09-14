@@ -66,6 +66,41 @@ class QuestionRepositoryImpl implements QuestionRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, Answer>> updateAnswer(
+    String questionId,
+    String answerId,
+    String content,
+  ) async {
+    try {
+      return right(
+        await _remoteDataSource.updateAnswer(questionId, answerId, content),
+      );
+    } catch (error) {
+      return left(_toFailure(error));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> deleteAnswer(
+    String questionId,
+    String answerId,
+  ) async {
+    try {
+      await _remoteDataSource.deleteAnswer(questionId, answerId);
+      return right(unit);
+    } catch (error) {
+      return left(_toFailure(error));
+    }
+  }
+
+  @override
+  Stream<Either<Failure, List<Answer>>> watchAnswers(String questionId) {
+    return _remoteDataSource
+        .watchAnswers(questionId)
+        .map<Either<Failure, List<Answer>>>((answers) => right(answers));
+  }
+
   Failure _toFailure(Object error) {
     if (error is FirebaseException) {
       switch (error.code) {
