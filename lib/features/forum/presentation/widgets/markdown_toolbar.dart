@@ -22,7 +22,7 @@ class MarkdownToolbar extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainer,
         border: Border(bottom: BorderSide(color: colors.outlineVariant)),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,

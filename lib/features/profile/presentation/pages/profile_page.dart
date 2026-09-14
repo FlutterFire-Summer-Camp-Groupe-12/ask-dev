@@ -1,5 +1,6 @@
 import 'package:askdev/core/routes/app_router.dart';
 import 'package:askdev/core/utils/type_extensions.dart';
+import 'package:askdev/core/widgets/empty_state.dart';
 import 'package:askdev/features/auth/presentation/manager/auth_cubit.dart';
 import 'package:askdev/features/profile/presentation/manager/profile_cubit.dart';
 import 'package:askdev/features/profile/presentation/manager/profile_state.dart';
@@ -37,15 +38,11 @@ class _ProfilePageState extends State<ProfilePage> {
           IconButton(
             onPressed: () => context.router.root.push(const EditProfileRoute()),
             icon: const Icon(Icons.edit_outlined),
-            iconSize: 20,
-            color: colors.onSurfaceVariant,
             tooltip: 'Modifier le profil',
           ),
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.more_vert),
-            iconSize: 21,
-            color: colors.onSurfaceVariant,
             tooltip: 'Plus d’options',
           ),
         ],
@@ -59,7 +56,12 @@ class _ProfilePageState extends State<ProfilePage> {
             }
             final profile = state.profile;
             if (profile == null) {
-              return const Center(child: Text('Profil indisponible'));
+              return const Center(
+                child: EmptyState(
+                  icon: Icons.person_off_outlined,
+                  title: 'Profil indisponible',
+                ),
+              );
             }
             final topics = profile.topics;
             final bio = profile.bio?.trim() ?? '';
@@ -96,7 +98,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         Text(
                           profile.pseudo,
                           style: TextStyle(
-                            fontSize: 17,
+                            fontSize: 20,
                             fontWeight: FontWeight.w600,
                             color: colors.onSurface,
                           ),
@@ -112,14 +114,16 @@ class _ProfilePageState extends State<ProfilePage> {
                         const SizedBox(height: 5),
                         Text(
                           'Membre depuis ${profile.createdAt.format('MMMM yyyy')}',
-                          style: TextStyle(color: colors.outline, fontSize: 10),
+                          style: TextStyle(
+                            color: colors.onSurfaceVariant,
+                            fontSize: 12,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 22),
+                  const SizedBox(height: 24),
                   Card(
-                    margin: const EdgeInsets.symmetric(vertical: 2),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       child: Row(
@@ -133,9 +137,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
                   Card(
-                    margin: const EdgeInsets.symmetric(vertical: 2),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
@@ -144,7 +147,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           Text(
                             'À propos',
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: colors.onSurface,
                             ),
@@ -154,9 +157,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             bio.isEmpty ? 'Aucune bio renseignée.' : bio,
                             style: TextStyle(
                               color: bio.isEmpty
-                                  ? colors.outline
+                                  ? colors.onSurfaceVariant
                                   : colors.onSurface,
-                              fontSize: 12,
+                              fontSize: 14,
                               height: 1.45,
                             ),
                           ),
@@ -165,7 +168,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             Text(
                               'Topics',
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: colors.onSurface,
                               ),
@@ -176,7 +179,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               runSpacing: 7,
                               children: [
                                 for (final topic in topics)
-                                  _TopicChip(label: topic),
+                                  Chip(label: Text(topic)),
                               ],
                             ),
                           ],
@@ -184,14 +187,14 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'Questions récentes',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: colors.onSurface,
                         ),
@@ -206,6 +209,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                   ),
                   const SizedBox(height: 8),
+                  const EmptyState(
+                    icon: Icons.forum_outlined,
+                    message: 'Aucune question pour le moment.',
+                    compact: true,
+                  ),
                 ],
               ),
             );
@@ -225,22 +233,24 @@ class _ProfileStat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return Column(
-      children: [
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: colors.onSurface,
+    return Expanded(
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: colors.onSurface,
+            ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(color: colors.onSurfaceVariant, fontSize: 10),
-        ),
-      ],
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(color: colors.onSurfaceVariant, fontSize: 12),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -254,29 +264,6 @@ class _VerticalDivider extends StatelessWidget {
       height: 30,
       width: 1,
       color: Theme.of(context).colorScheme.outlineVariant,
-    );
-  }
-}
-
-class _TopicChip extends StatelessWidget {
-  const _TopicChip({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: colors.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colors.outlineVariant, width: 0.8),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(color: colors.onSurface, fontSize: 10),
-      ),
     );
   }
 }

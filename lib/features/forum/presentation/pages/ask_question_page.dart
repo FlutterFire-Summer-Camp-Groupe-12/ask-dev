@@ -211,7 +211,7 @@ class _AskQuestionViewState extends State<AskQuestionView> {
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: colors.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: error != null ? colors.error : colors.outlineVariant,
               ),
@@ -301,7 +301,7 @@ class _AskQuestionViewState extends State<AskQuestionView> {
               disabledBackgroundColor: colors.primary.withValues(alpha: 0.4),
               foregroundColor: colors.onPrimary,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
             child: state.isSubmitting

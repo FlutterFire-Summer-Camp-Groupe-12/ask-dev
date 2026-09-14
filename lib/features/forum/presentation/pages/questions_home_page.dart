@@ -1,3 +1,4 @@
+import 'package:askdev/core/widgets/empty_state.dart';
 import 'package:askdev/features/forum/domain/entities/question.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -54,11 +55,6 @@ class _QuestionsHomePageState extends State<QuestionsHomePage> {
                               setState(() => _query = '');
                             },
                           ),
-                    filled: true,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none,
-                    ),
                     contentPadding: EdgeInsets.zero,
                   ),
                 ),
@@ -104,7 +100,23 @@ class _QuestionsHomePageState extends State<QuestionsHomePage> {
 
   Widget _buildList(List<Question> questions) {
     if (questions.isEmpty) {
-      return const Center(child: Text('Aucune question pour le moment.'));
+      return Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: EmptyState(
+            icon: Icons.forum_outlined,
+            title: 'Aucune question pour le moment',
+            message: 'Soyez le premier à lancer la discussion.',
+            action: FilledButton.icon(
+              onPressed: () {
+                AutoTabsRouter.of(context).setActiveIndex(1);
+              },
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text('Poser une question'),
+            ),
+          ),
+        ),
+      );
     }
     final q = _query.trim().toLowerCase();
     // ponytail: recherche côté client sur les questions déjà chargées
@@ -115,7 +127,16 @@ class _QuestionsHomePageState extends State<QuestionsHomePage> {
                 question.searchKeywords.any((keyword) => keyword.contains(q)))
             .toList();
     if (filtered.isEmpty) {
-      return Center(child: Text('Aucun résultat pour « $q ».'));
+      return Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: EmptyState(
+            icon: Icons.search_off,
+            title: 'Aucun résultat',
+            message: 'Aucune question ne correspond à « $q ».',
+          ),
+        ),
+      );
     }
     return ListView.builder(
       padding: const EdgeInsets.all(12),

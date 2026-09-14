@@ -103,6 +103,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 maxLines: 3,
                                 decoration: const InputDecoration(
                                   labelText: 'Bio',
+                                  hintText:
+                                      'Parlez de vous, votre parcours, vos projets…',
                                   alignLabelWithHint: true,
                                   prefixIcon: Icon(Icons.info_outline),
                                 ),

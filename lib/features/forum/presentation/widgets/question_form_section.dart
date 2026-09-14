@@ -94,7 +94,7 @@ InputDecoration questionFieldDecoration({
   EdgeInsets contentPadding = const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
 }) {
   OutlineInputBorder border(Color color, double width) => OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: color, width: width),
       );
 

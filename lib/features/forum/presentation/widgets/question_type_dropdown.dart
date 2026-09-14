@@ -26,7 +26,7 @@ class QuestionTypeDropdown extends StatelessWidget {
           : null,
       isExpanded: true,
       dropdownColor: colors.surfaceContainer,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(12),
       icon: Icon(Icons.unfold_more, size: 18, color: colors.onSurfaceVariant),
       style: TextStyle(color: colors.onSurface, fontSize: 13),
       decoration: questionFieldDecoration(colors: colors),

@@ -70,7 +70,7 @@ class _BottomNavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final color = active ? colors.onSurface : colors.onSurfaceVariant;
+    final color = active ? colors.primary : colors.onSurfaceVariant;
 
     return Expanded(
       child: InkWell(

@@ -1,4 +1,6 @@
 import 'package:askdev/core/routes/app_router.dart';
+import 'package:askdev/core/widgets/destructive_button.dart';
+import 'package:askdev/core/widgets/section_header.dart';
 import 'package:askdev/features/auth/presentation/manager/auth_cubit.dart';
 import 'package:askdev/features/settings/presentation/manager/settings_cubit.dart';
 import 'package:auto_route/auto_route.dart';
@@ -57,16 +59,12 @@ class SettingsPage extends StatelessWidget {
             ),
             _SectionCard(
               header: 'Session',
-              child: ListTile(
-                leading: Icon(Icons.logout, color: colors.error),
-                title: Text(
-                  'Se déconnecter',
-                  style: TextStyle(
-                    color: colors.error,
-                    fontWeight: FontWeight.w600,
-                  ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                child: DestructiveButton(
+                  label: 'Se déconnecter',
+                  onPressed: () => context.read<AuthCubit>().signOut(),
                 ),
-                onTap: () => context.read<AuthCubit>().signOut(),
               ),
             ),
           ],
@@ -88,28 +86,7 @@ class _SectionCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [_SectionHeader(header), child],
-      ),
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader(this.label);
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: Theme.of(context).colorScheme.primary,
-        ),
+        children: [SectionHeader(header), child],
       ),
     );
   }
