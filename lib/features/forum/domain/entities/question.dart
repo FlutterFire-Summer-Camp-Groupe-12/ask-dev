@@ -43,4 +43,20 @@ class Question extends Equatable {
         answersCount,
         searchKeywords,
       ];
+
+  Question copyWith({int? answersCount}) {
+    return Question(
+      id: id,
+      title: title,
+      content: content,
+      authorId: authorId,
+      type: type,
+      status: status,
+      tags: tags,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      answersCount: answersCount ?? this.answersCount,
+      searchKeywords: searchKeywords,
+    );
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:askdev/core/widgets/empty_state.dart';
+import 'package:askdev/core/routes/app_router.dart';
 import 'package:askdev/features/forum/domain/entities/question.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -147,9 +148,9 @@ class _QuestionsHomePageState extends State<QuestionsHomePage> {
           padding: const EdgeInsets.only(bottom: 8),
           child: QuestionCard(
             question: question,
-            onTap: () {
-              // TODO: navigation vers le détail, une fois la route créée
-            },
+            onTap: () => context.router.push(
+              QuestionDetailRoute(questionId: question.id),
+            ),
           ),
         );
       },

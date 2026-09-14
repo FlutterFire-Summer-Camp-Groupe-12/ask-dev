@@ -12,6 +12,9 @@ import 'package:askdev/features/forum/data/sources/question_remote_data_source.d
 import 'package:askdev/features/forum/data/sources/question_remote_data_source_impl.dart';
 import 'package:askdev/features/forum/domain/repositories/question_repository.dart';
 import 'package:askdev/features/forum/domain/usecases/create_question.dart';
+import 'package:askdev/features/forum/domain/usecases/create_answer.dart';
+import 'package:askdev/features/forum/domain/usecases/get_answers.dart';
+import 'package:askdev/features/forum/domain/usecases/get_question_by_id.dart';
 import 'package:askdev/features/forum/domain/usecases/get_recent_questions.dart';
 import 'package:askdev/features/forum/presentation/manager/ask_question_cubit.dart';
 import 'package:askdev/features/forum/presentation/manager/question_list_cubit.dart';
@@ -72,6 +75,15 @@ void configureDependencies() {
   );
   sl.registerLazySingleton<CreateQuestion>(
     () => CreateQuestion(repository: sl<QuestionRepository>()),
+  );
+  sl.registerLazySingleton<GetQuestionById>(
+    () => GetQuestionById(sl<QuestionRepository>()),
+  );
+  sl.registerLazySingleton<GetAnswers>(
+    () => GetAnswers(sl<QuestionRepository>()),
+  );
+  sl.registerLazySingleton<CreateAnswer>(
+    () => CreateAnswer(sl<QuestionRepository>()),
   );
   sl.registerFactory<QuestionListCubit>(
     () => QuestionListCubit(sl<GetRecentQuestions>()),

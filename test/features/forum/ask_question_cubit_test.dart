@@ -1,6 +1,8 @@
 import 'package:askdev/core/error/failure.dart';
 import 'package:askdev/core/session/auth_status.dart';
 import 'package:askdev/core/session/auth_gateway.dart';
+import 'package:askdev/features/forum/domain/entities/answer.dart';
+import 'package:askdev/features/forum/domain/entities/answer_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question.dart';
 import 'package:askdev/features/forum/domain/entities/question_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question_status.dart';
@@ -21,6 +23,24 @@ class _FakeQuestionRepository implements QuestionRepository {
   @override
   Future<Either<Failure, List<Question>>> getRecentQuestions() async {
     return right(const []);
+  }
+
+  @override
+  Future<Either<Failure, Question>> getQuestionById(String id) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, List<Answer>>> getAnswers(String questionId) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, Answer>> createAnswer(
+    String questionId,
+    AnswerDraft draft,
+  ) async {
+    throw UnimplementedError();
   }
 
   @override

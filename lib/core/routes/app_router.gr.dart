@@ -91,6 +91,53 @@ class ProfileRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [QuestionDetailPage]
+class QuestionDetailRoute extends PageRouteInfo<QuestionDetailRouteArgs> {
+  QuestionDetailRoute({
+    Key? key,
+    required String questionId,
+    List<PageRouteInfo>? children,
+  }) : super(
+         QuestionDetailRoute.name,
+         args: QuestionDetailRouteArgs(key: key, questionId: questionId),
+         initialChildren: children,
+       );
+
+  static const String name = 'QuestionDetailRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<QuestionDetailRouteArgs>();
+      return QuestionDetailPage(key: args.key, questionId: args.questionId);
+    },
+  );
+}
+
+class QuestionDetailRouteArgs {
+  const QuestionDetailRouteArgs({this.key, required this.questionId});
+
+  final Key? key;
+
+  final String questionId;
+
+  @override
+  String toString() {
+    return 'QuestionDetailRouteArgs{key: $key, questionId: $questionId}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! QuestionDetailRouteArgs) return false;
+    return key == other.key && questionId == other.questionId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ questionId.hashCode;
+}
+
+/// generated route for
 /// [QuestionsHomePage]
 class QuestionsHomeRoute extends PageRouteInfo<void> {
   const QuestionsHomeRoute({List<PageRouteInfo>? children})

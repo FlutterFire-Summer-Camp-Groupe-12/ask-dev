@@ -5,11 +5,13 @@ import 'package:askdev/features/auth/presentation/pages/login_page.dart';
 import 'package:askdev/features/auth/presentation/pages/register_page.dart';
 import 'package:askdev/features/auth/presentation/pages/welcome_page.dart';
 import 'package:askdev/features/forum/presentation/pages/ask_question_page.dart';
+import 'package:askdev/features/forum/presentation/pages/question_detail_page.dart';
 import 'package:askdev/features/forum/presentation/pages/questions_home_page.dart';
 import 'package:askdev/features/profile/presentation/pages/edit_profile_page.dart';
 import 'package:askdev/features/profile/presentation/pages/profile_page.dart';
 import 'package:askdev/features/settings/presentation/pages/settings_page.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/foundation.dart' show Key;
 
 part 'app_router.gr.dart';
 
@@ -24,6 +26,11 @@ class AppRouter extends RootStackRouter {
         AutoRoute(path: '/login', page: LoginRoute.page),
         AutoRoute(path: '/register', page: RegisterRoute.page),
         AutoRoute(path: '/edit-profile', page: EditProfileRoute.page),
+        AutoRoute(
+          path: '/question/:questionId',
+          page: QuestionDetailRoute.page,
+          guards: [sl<AuthGuard>()],
+        ),
         AutoRoute(
           path: '/profile',
           page: ProfileRoute.page,
