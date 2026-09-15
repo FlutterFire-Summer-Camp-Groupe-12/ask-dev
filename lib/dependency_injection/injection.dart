@@ -16,6 +16,7 @@ import 'package:askdev/features/forum/domain/usecases/create_answer.dart';
 import 'package:askdev/features/forum/domain/usecases/get_answers.dart';
 import 'package:askdev/features/forum/domain/usecases/get_question_by_id.dart';
 import 'package:askdev/features/forum/domain/usecases/get_recent_questions.dart';
+import 'package:askdev/features/forum/domain/usecases/search_questions.dart';
 import 'package:askdev/features/forum/presentation/manager/ask_question_cubit.dart';
 import 'package:askdev/features/forum/presentation/manager/question_list_cubit.dart';
 import 'package:askdev/features/profile/data/sources/user_remote_data_source.dart';
@@ -85,8 +86,14 @@ void configureDependencies() {
   sl.registerLazySingleton<CreateAnswer>(
     () => CreateAnswer(sl<QuestionRepository>()),
   );
+  sl.registerLazySingleton<SearchQuestions>(
+    () => SearchQuestions(sl<QuestionRepository>()),
+  );
   sl.registerFactory<QuestionListCubit>(
-    () => QuestionListCubit(sl<GetRecentQuestions>()),
+    () => QuestionListCubit(
+      getRecentQuestions: sl<GetRecentQuestions>(),
+      searchQuestions: sl<SearchQuestions>(),
+    ),
   );
   // Un cubit par ouverture du formulaire : chaque brouillon repart vide.
   sl.registerFactory<AskQuestionCubit>(

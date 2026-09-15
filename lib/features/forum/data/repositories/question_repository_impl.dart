@@ -5,6 +5,8 @@ import 'package:askdev/features/forum/domain/entities/answer.dart';
 import 'package:askdev/features/forum/domain/entities/answer_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question.dart';
 import 'package:askdev/features/forum/domain/entities/question_draft.dart';
+import 'package:askdev/features/forum/domain/entities/question_slice.dart';
+import 'package:askdev/features/forum/domain/search/search_text.dart';
 import 'package:askdev/features/forum/domain/repositories/question_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fpdart/fpdart.dart';
@@ -16,14 +18,38 @@ class QuestionRepositoryImpl implements QuestionRepository {
   final QuestionRemoteDataSource _remoteDataSource;
 
   @override
-  Future<Either<Failure, List<Question>>> getRecentQuestions() async {
+  Future<Either<Failure, QuestionSlice>> getRecentQuestions({
+    String? startAfter,
+    int limit = QuestionRepository.pageSize,
+  }) async {
     try {
-      final questions = await _remoteDataSource.getRecentQuestions();
-      return right(questions);
-    } on ServerException catch (e) {
-      return left(ServerFailure(message: e.toString()));
-    } catch (e) {
-      return left(ServerFailure(message: e.toString()));
+      return right(
+        await _remoteDataSource.getRecentQuestions(
+          startAfter: startAfter,
+          limit: limit,
+        ),
+      );
+    } catch (error) {
+      return left(_toFailure(error));
+    }
+  }
+
+  @override
+  Future<Either<Failure, QuestionSlice>> searchQuestions(
+    SearchQuery query, {
+    String? startAfter,
+    int limit = QuestionRepository.pageSize,
+  }) async {
+    try {
+      return right(
+        await _remoteDataSource.searchQuestions(
+          query,
+          startAfter: startAfter,
+          limit: limit,
+        ),
+      );
+    } catch (error) {
+      return left(_toFailure(error));
     }
   }
 
@@ -67,11 +93,20 @@ class QuestionRepositoryImpl implements QuestionRepository {
   }
 
   Failure _toFailure(Object error) {
+    if (error is NotFoundException) {
+      return ServerFailure(message: error.toString());
+    }
     if (error is FirebaseException) {
       switch (error.code) {
         case 'permission-denied':
           return const ServerFailure(
             message: "Vous n'avez pas les droits pour effectuer cette action.",
+          );
+        case 'failed-precondition':
+          // Index composite manquant : le message Firestore contient le lien
+          // de création, utile en développement.
+          return ServerFailure(
+            message: error.message ?? 'Index Firestore manquant.',
           );
         case 'unavailable':
         case 'network-request-failed':

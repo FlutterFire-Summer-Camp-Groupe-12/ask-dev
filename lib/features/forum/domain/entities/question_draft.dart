@@ -1,5 +1,6 @@
 import 'package:askdev/features/forum/domain/entities/question_status.dart';
 import 'package:askdev/features/forum/domain/entities/question_type.dart';
+import 'package:askdev/features/forum/domain/search/search_text.dart';
 import 'package:equatable/equatable.dart';
 
 /// Question saisie par l'utilisateur, avant enregistrement.
@@ -23,19 +24,13 @@ class QuestionDraft extends Equatable {
   final QuestionStatus status;
   final List<String> tags;
 
-  /// Mots-clés utilisés par la recherche Firestore (`array-contains`).
-  ///
-  /// Le titre et les tags sont découpés, passés en minuscules et dédupliqués.
-  /// Les mots d'une seule lettre sont ignorés, la liste est plafonnée à 30
-  /// entrées pour rester sous la limite de taille d'un document.
-  List<String> get searchKeywords {
-    final words = <String>{};
-    for (final word in '$title ${tags.join(' ')}'.toLowerCase().split(RegExp(r'[^a-z0-9+#.]+'))) {
-      if (word.length > 1) words.add(word);
-      if (words.length >= 30) break;
-    }
-    return words.toList(growable: false);
-  }
+  /// Mots-clés utilisés par la recherche Firestore (`array-contains`),
+  /// tirés du titre, des tags et de la description. Voir [SearchText].
+  List<String> get searchKeywords => SearchText.buildKeywords(
+        title: title,
+        tags: tags,
+        content: content,
+      );
 
   @override
   List<Object?> get props => [authorId, title, content, type, status, tags];

@@ -5,7 +5,9 @@ import 'package:askdev/features/forum/domain/entities/answer.dart';
 import 'package:askdev/features/forum/domain/entities/answer_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question.dart';
 import 'package:askdev/features/forum/domain/entities/question_draft.dart';
+import 'package:askdev/features/forum/domain/entities/question_slice.dart';
 import 'package:askdev/features/forum/domain/repositories/question_repository.dart';
+import 'package:askdev/features/forum/domain/search/search_text.dart';
 import 'package:askdev/features/forum/domain/usecases/create_answer.dart';
 import 'package:askdev/features/forum/domain/usecases/get_answers.dart';
 import 'package:askdev/features/forum/domain/usecases/get_question_by_id.dart';
@@ -73,8 +75,20 @@ class _FakeQuestionRepository implements QuestionRepository {
   }
 
   @override
-  Future<Either<Failure, List<Question>>> getRecentQuestions() async {
-    return right(<Question>[question ?? _question()]);
+  Future<Either<Failure, QuestionSlice>> getRecentQuestions({
+    String? startAfter,
+    int limit = QuestionRepository.pageSize,
+  }) async {
+    return right(QuestionSlice(questions: [question ?? _question()]));
+  }
+
+  @override
+  Future<Either<Failure, QuestionSlice>> searchQuestions(
+    SearchQuery query, {
+    String? startAfter,
+    int limit = QuestionRepository.pageSize,
+  }) async {
+    return right(QuestionSlice.empty);
   }
 
   @override

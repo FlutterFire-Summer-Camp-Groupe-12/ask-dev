@@ -2,10 +2,22 @@ import 'package:askdev/features/forum/data/models/answer_model.dart';
 import 'package:askdev/features/forum/data/models/question_model.dart';
 import 'package:askdev/features/forum/domain/entities/answer_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question_draft.dart';
+import 'package:askdev/features/forum/domain/entities/question_slice.dart';
+import 'package:askdev/features/forum/domain/search/search_text.dart';
 
 abstract class QuestionRemoteDataSource {
-  /// Liste les dernières questions du fil public.
-  Future<List<QuestionModel>> getRecentQuestions();
+  /// Page du fil public, triée par date de création décroissante.
+  Future<QuestionSlice> getRecentQuestions({
+    String? startAfter,
+    required int limit,
+  });
+
+  /// Page de résultats de recherche, triée par date de création décroissante.
+  Future<QuestionSlice> searchQuestions(
+    SearchQuery query, {
+    String? startAfter,
+    required int limit,
+  });
 
   /// Crée le document Firestore correspondant à [draft].
   Future<QuestionModel> createQuestion(QuestionDraft draft);

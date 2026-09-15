@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 
 import '../../../../core/error/failure.dart';
-import '../entities/question.dart';
+import '../entities/question_slice.dart';
 import '../repositories/question_repository.dart';
 
 class GetRecentQuestions {
@@ -9,7 +9,7 @@ class GetRecentQuestions {
 
   final QuestionRepository repository;
 
-  Future<Either<Failure, List<Question>>> call() {
-    return repository.getRecentQuestions();
+  Future<Either<Failure, QuestionSlice>> call({String? startAfter}) {
+    return repository.getRecentQuestions(startAfter: startAfter);
   }
 }

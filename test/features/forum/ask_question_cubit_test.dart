@@ -5,9 +5,11 @@ import 'package:askdev/features/forum/domain/entities/answer.dart';
 import 'package:askdev/features/forum/domain/entities/answer_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question.dart';
 import 'package:askdev/features/forum/domain/entities/question_draft.dart';
+import 'package:askdev/features/forum/domain/entities/question_slice.dart';
 import 'package:askdev/features/forum/domain/entities/question_status.dart';
 import 'package:askdev/features/forum/domain/entities/question_type.dart';
 import 'package:askdev/features/forum/domain/repositories/question_repository.dart';
+import 'package:askdev/features/forum/domain/search/search_text.dart';
 import 'package:askdev/features/forum/domain/usecases/create_question.dart';
 import 'package:askdev/features/forum/presentation/manager/ask_question_cubit.dart';
 import 'package:askdev/features/forum/presentation/manager/ask_question_state.dart';
@@ -21,8 +23,20 @@ class _FakeQuestionRepository implements QuestionRepository {
   QuestionDraft? lastDraft;
 
   @override
-  Future<Either<Failure, List<Question>>> getRecentQuestions() async {
-    return right(const []);
+  Future<Either<Failure, QuestionSlice>> getRecentQuestions({
+    String? startAfter,
+    int limit = QuestionRepository.pageSize,
+  }) async {
+    return right(QuestionSlice.empty);
+  }
+
+  @override
+  Future<Either<Failure, QuestionSlice>> searchQuestions(
+    SearchQuery query, {
+    String? startAfter,
+    int limit = QuestionRepository.pageSize,
+  }) async {
+    return right(QuestionSlice.empty);
   }
 
   @override
@@ -104,11 +118,11 @@ void main() {
   }
 
   group('QuestionDraft', () {
-    test('searchKeywords lowercases and merges title and tags', () {
+    test('searchKeywords merges title, tags and content', () {
       const draft = QuestionDraft(
         authorId: 'u1',
         title: 'Injecter un Cubit avec GetIt',
-        content: 'peu importe',
+        content: 'Le BlocProvider renvoie une erreur.',
         type: QuestionType.howTo,
         status: QuestionStatus.published,
         tags: ['flutter', 'get-it'],
@@ -116,8 +130,18 @@ void main() {
 
       expect(
         draft.searchKeywords,
-        containsAll(<String>['injecter', 'un', 'cubit', 'avec', 'getit', 'flutter', 'get', 'it']),
+        containsAll(<String>[
+          'injecter',
+          'cubit',
+          'getit',
+          'flutter',
+          'get-it',
+          'get',
+          'blocprovider',
+          'erreur',
+        ]),
       );
+      expect(draft.searchKeywords, isNot(contains('un')));
     });
 
     test('searchKeywords drops single-character words', () {
@@ -130,7 +154,9 @@ void main() {
         tags: [],
       );
 
-      expect(draft.searchKeywords, ['flutter']);
+      expect(draft.searchKeywords, contains('flutter'));
+      expect(draft.searchKeywords, isNot(contains('a')));
+      expect(draft.searchKeywords, isNot(contains('b')));
     });
   });
 

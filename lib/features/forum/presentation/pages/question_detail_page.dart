@@ -1,6 +1,7 @@
 import 'package:askdev/core/session/auth_gateway.dart';
 import 'package:askdev/core/utils/extensions_context.dart';
 import 'package:askdev/core/utils/type_extensions.dart';
+import 'package:askdev/core/widgets/markdown/app_markdown.dart';
 import 'package:askdev/core/widgets/empty_state.dart';
 import 'package:askdev/dependency_injection/injection.dart';
 import 'package:askdev/features/forum/domain/entities/answer.dart';
@@ -13,7 +14,6 @@ import 'package:askdev/features/forum/presentation/manager/question_detail_state
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 
 @RoutePage()
 class QuestionDetailPage extends StatelessWidget {
@@ -171,7 +171,6 @@ class _QuestionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final theme = Theme.of(context);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -213,11 +212,7 @@ class _QuestionCard extends StatelessWidget {
             const SizedBox(height: 14),
             Divider(height: 1, color: colors.outlineVariant),
             const SizedBox(height: 10),
-            MarkdownBody(
-              data: question.content,
-              selectable: true,
-              styleSheet: _markdownStyle(theme),
-            ),
+            AppMarkdown(data: question.content),
           ],
         ),
       ),
@@ -245,11 +240,7 @@ class _AnswerCard extends StatelessWidget {
               style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
             ),
             const SizedBox(height: 8),
-            MarkdownBody(
-              data: answer.content,
-              selectable: true,
-              styleSheet: _markdownStyle(theme),
-            ),
+            AppMarkdown(data: answer.content),
           ],
         ),
       ),
@@ -312,28 +303,4 @@ class _AnswerComposer extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Apparence du markdown alignée sur le thème de l'app (corps 14, hauteur
-/// confortable, palette issue du ColorScheme).
-MarkdownStyleSheet _markdownStyle(ThemeData theme) {
-  final colors = theme.colorScheme;
-  return MarkdownStyleSheet.fromTheme(theme).copyWith(
-    p: TextStyle(fontSize: 14, height: 1.5, color: colors.onSurface),
-    blockquote: TextStyle(
-      fontSize: 14,
-      height: 1.5,
-      color: colors.onSurfaceVariant,
-      fontStyle: FontStyle.italic,
-    ),
-    code: TextStyle(
-      fontSize: 13,
-      backgroundColor: colors.surfaceContainerHighest,
-      color: colors.onSurface,
-    ),
-    codeblockDecoration: BoxDecoration(
-      color: colors.surfaceContainerHighest,
-      borderRadius: BorderRadius.circular(12),
-    ),
-  );
 }
