@@ -1,4 +1,5 @@
 import 'package:askdev/core/themes/app_tokens.dart';
+import 'package:askdev/core/utils/markdown.dart';
 import 'package:askdev/core/utils/extensions_context.dart';
 import 'package:askdev/dependency_injection/injection.dart';
 import 'package:askdev/features/forum/domain/entities/question.dart';
@@ -6,6 +7,7 @@ import 'package:askdev/features/forum/domain/entities/question_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question_type.dart';
 import 'package:askdev/features/forum/domain/usecases/update_question.dart';
 import 'package:askdev/features/forum/presentation/manager/ask_question_state.dart';
+import 'package:askdev/features/forum/presentation/widgets/image_attachment.dart';
 import 'package:askdev/features/forum/presentation/widgets/question_form.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +59,7 @@ class _EditQuestionPageState extends State<EditQuestionPage> {
   }
 
   String? get _contentError {
-    final length = _contentController.text.trim().length;
+    final length = stripMarkdown(_contentController.text).trim().length;
     if (length == 0) return 'Description requise';
     if (length < AskQuestionState.contentMinLength) {
       return '${AskQuestionState.contentMinLength} caractères minimum';
@@ -145,6 +147,7 @@ class _EditQuestionPageState extends State<EditQuestionPage> {
             titleError: _showErrors ? _titleError : null,
             contentError: _showErrors ? _contentError : null,
             tagsError: _showErrors ? _tagsError : null,
+            onRequestImage: () => pickAndUploadImage(context),
             enabled: !_isSaving,
           ),
         ],

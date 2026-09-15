@@ -3,6 +3,7 @@ import 'package:askdev/core/utils/extensions_context.dart';
 import 'package:askdev/dependency_injection/injection.dart';
 import 'package:askdev/features/forum/presentation/manager/ask_question_cubit.dart';
 import 'package:askdev/features/forum/presentation/manager/ask_question_state.dart';
+import 'package:askdev/features/forum/presentation/widgets/image_attachment.dart';
 import 'package:askdev/features/forum/presentation/widgets/question_form.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -111,6 +112,7 @@ class _AskQuestionViewState extends State<AskQuestionView> {
                   titleError: showErrors ? state.titleError : null,
                   contentError: showErrors ? state.contentError : null,
                   tagsError: showErrors ? state.tagsError : null,
+                  onRequestImage: () => pickAndUploadImage(context),
                   enabled: !state.isSubmitting,
                 ),
               ],

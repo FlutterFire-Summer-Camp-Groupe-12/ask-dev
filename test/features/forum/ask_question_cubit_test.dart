@@ -255,6 +255,21 @@ void main() {
       },
     );
 
+    test('an image link alone does not satisfy the minimum length', () async {
+      final repository = _FakeQuestionRepository();
+      final cubit = buildCubit(repository)
+        ..titleChanged(validTitle)
+        ..tagAdded('flutter')
+        ..contentChanged(
+          '![capture](https://firebasestorage.example/post_images/u1/1.png)',
+        );
+
+      await cubit.submit();
+
+      expect(cubit.state.contentError, isNotNull);
+      expect(repository.lastDraft, isNull);
+    });
+
     test('sends a trimmed draft and resets the form on success', () async {
       final repository = _FakeQuestionRepository();
       final cubit = buildCubit(repository);

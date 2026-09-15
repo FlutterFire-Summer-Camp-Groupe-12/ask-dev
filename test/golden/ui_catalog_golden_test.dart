@@ -222,6 +222,7 @@ void main() => runApp(const MyApp());
                 onTagAdded: (_) {},
                 onTagRemoved: (_) {},
                 contentError: '220 caractères minimum',
+                onRequestImage: () async => null,
               ),
             ],
           ),

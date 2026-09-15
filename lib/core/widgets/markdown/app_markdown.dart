@@ -25,6 +25,10 @@ class AppMarkdown extends StatelessWidget {
       selectable: selectable,
       styleSheet: _styleSheet(Theme.of(context)),
       builders: {'code': _CodeElementBuilder(selectable: selectable)},
+      sizedImageBuilder: (config) => MarkdownImage(
+        url: config.uri.toString(),
+        alt: config.alt ?? config.title,
+      ),
     );
   }
 
@@ -74,6 +78,113 @@ class AppMarkdown extends StatelessWidget {
       ),
       pPadding: const EdgeInsets.only(bottom: AppSpacing.xxs),
       blockSpacing: AppSpacing.md,
+    );
+  }
+}
+
+/// Image jointe à une question ou une réponse : hauteur plafonnée, coins
+/// arrondis, et plein écran au toucher.
+class MarkdownImage extends StatelessWidget {
+  const MarkdownImage({super.key, required this.url, this.alt});
+
+  /// Au-delà, l'image serait plus haute que l'écran sur téléphone.
+  static const double maxHeight = 320;
+
+  final String url;
+  final String? alt;
+
+  void _openFullScreen(BuildContext context) {
+    Navigator.of(context).push(
+      DialogRoute<void>(
+        context: context,
+        barrierColor: Colors.black87,
+        builder: (dialogContext) => Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            foregroundColor: Colors.white,
+            title: alt == null ? null : Text(alt!),
+            leading: IconButton(
+              onPressed: () => Navigator.of(dialogContext).maybePop(),
+              icon: const Icon(Icons.close_rounded),
+              tooltip: 'Fermer',
+            ),
+          ),
+          body: InteractiveViewer(
+            minScale: 0.8,
+            maxScale: 4,
+            child: Center(child: Image.network(url)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+      child: Semantics(
+        button: true,
+        label: alt ?? 'Image jointe',
+        child: GestureDetector(
+          onTap: () => _openFullScreen(context),
+          child: ClipRRect(
+            borderRadius: AppRadius.mdAll,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: maxHeight),
+              child: Image.network(
+                url,
+                fit: BoxFit.contain,
+                alignment: Alignment.centerLeft,
+                loadingBuilder: (context, child, progress) {
+                  if (progress == null) return child;
+                  return _ImagePlaceholder(
+                    color: colors.surfaceContainer,
+                    child: const CircularProgressIndicator(strokeWidth: 2),
+                  );
+                },
+                errorBuilder: (context, error, stack) => _ImagePlaceholder(
+                  color: colors.surfaceContainer,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.broken_image_outlined,
+                        size: 18,
+                        color: colors.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(
+                        'Image indisponible',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ImagePlaceholder extends StatelessWidget {
+  const _ImagePlaceholder({required this.color, required this.child});
+
+  final Color color;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 160,
+      alignment: Alignment.center,
+      color: color,
+      child: child,
     );
   }
 }

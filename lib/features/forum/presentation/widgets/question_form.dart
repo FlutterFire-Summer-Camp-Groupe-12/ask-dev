@@ -1,4 +1,5 @@
 import 'package:askdev/core/themes/app_tokens.dart';
+import 'package:askdev/core/utils/markdown.dart';
 import 'package:askdev/features/forum/domain/entities/question_type.dart';
 import 'package:askdev/features/forum/presentation/manager/ask_question_state.dart';
 import 'package:askdev/features/forum/presentation/widgets/markdown_toolbar.dart';
@@ -42,6 +43,7 @@ class QuestionFormFields extends StatelessWidget {
     this.titleError,
     this.contentError,
     this.tagsError,
+    this.onRequestImage,
     this.enabled = true,
   });
 
@@ -57,6 +59,10 @@ class QuestionFormFields extends StatelessWidget {
   final String? titleError;
   final String? contentError;
   final String? tagsError;
+
+  /// Ajoute le bouton d'image à la barre Markdown. Voir
+  /// `pickAndUploadImage`.
+  final Future<String?> Function()? onRequestImage;
   final bool enabled;
 
   @override
@@ -112,6 +118,8 @@ class QuestionFormFields extends StatelessWidget {
           trailing: _CharacterCounter(
             controller: contentController,
             minimum: AskQuestionState.contentMinLength,
+            // Même mesure que la validation : sans la syntaxe Markdown.
+            measure: (text) => stripMarkdown(text).trim().length,
           ),
           child: DecoratedBox(
             decoration: BoxDecoration(
@@ -128,6 +136,7 @@ class QuestionFormFields extends StatelessWidget {
                 MarkdownToolbar(
                   controller: contentController,
                   enabled: enabled,
+                  onRequestImage: onRequestImage,
                 ),
                 TextField(
                   controller: contentController,
@@ -182,10 +191,17 @@ class QuestionFormFields extends StatelessWidget {
 /// Compteur « saisis / minimum » qui suit le contrôleur sans reconstruire
 /// le formulaire.
 class _CharacterCounter extends StatelessWidget {
-  const _CharacterCounter({required this.controller, required this.minimum});
+  const _CharacterCounter({
+    required this.controller,
+    required this.minimum,
+    this.measure,
+  });
 
   final TextEditingController controller;
   final int minimum;
+
+  /// Par défaut, le texte saisi tel quel.
+  final int Function(String text)? measure;
 
   @override
   Widget build(BuildContext context) {
@@ -193,7 +209,7 @@ class _CharacterCounter extends StatelessWidget {
     return ValueListenableBuilder<TextEditingValue>(
       valueListenable: controller,
       builder: (context, value, _) {
-        final current = value.text.trim().length;
+        final current = measure?.call(value.text) ?? value.text.trim().length;
         final reached = current >= minimum;
         return Text(
           reached ? '$current' : '$current/$minimum',

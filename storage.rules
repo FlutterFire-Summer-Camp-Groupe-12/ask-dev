@@ -1,0 +1,30 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Une image ne peut être déposée que par son auteur, dans son propre
+    // dossier, et seulement si c'est bien une image de moins de 5 Mo.
+    function isOwnImage(userId) {
+      return request.auth != null
+          && request.auth.uid == userId
+          && request.resource.size < 5 * 1024 * 1024
+          && request.resource.contentType.matches('image/.*');
+    }
+
+    // Images jointes aux questions et aux réponses.
+    match /post_images/{userId}/{imageId} {
+      allow read: if request.auth != null;
+      allow write: if isOwnImage(userId);
+    }
+
+    // Photos de profil.
+    match /avatars/{userId}/{imageId} {
+      allow read: if request.auth != null;
+      allow write: if isOwnImage(userId);
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

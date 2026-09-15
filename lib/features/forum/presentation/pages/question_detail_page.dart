@@ -21,6 +21,7 @@ import 'package:askdev/features/forum/domain/usecases/update_answer.dart';
 import 'package:askdev/features/forum/domain/usecases/update_question.dart';
 import 'package:askdev/features/forum/presentation/manager/question_detail_cubit.dart';
 import 'package:askdev/features/forum/presentation/manager/question_detail_state.dart';
+import 'package:askdev/features/forum/presentation/widgets/image_attachment.dart';
 import 'package:askdev/features/forum/presentation/widgets/markdown_toolbar.dart';
 import 'package:askdev/features/forum/presentation/widgets/question_card.dart';
 import 'package:auto_route/auto_route.dart';
@@ -435,7 +436,10 @@ class _AnswerCardState extends State<_AnswerCard> {
                 ),
                 child: Column(
                   children: [
-                    MarkdownToolbar(controller: _editController),
+                    MarkdownToolbar(
+                      controller: _editController,
+                      onRequestImage: () => pickAndUploadImage(context),
+                    ),
                     TextField(
                       controller: _editController,
                       minLines: 3,
@@ -535,6 +539,7 @@ class _AnswerComposerState extends State<_AnswerComposer> {
                 MarkdownToolbar(
                   controller: widget.controller,
                   enabled: !widget.isSubmitting,
+                  onRequestImage: () => pickAndUploadImage(context),
                   borderRadius: AppRadius.mdAll,
                 ),
               if (_focusNode.hasFocus) const SizedBox(height: AppSpacing.sm),
