@@ -6,9 +6,11 @@ import 'package:askdev/core/widgets/empty_state.dart';
 import 'package:askdev/dependency_injection/injection.dart';
 import 'package:askdev/features/forum/domain/entities/answer.dart';
 import 'package:askdev/features/forum/domain/entities/question.dart';
+import 'package:askdev/features/forum/domain/repositories/question_repository.dart';
 import 'package:askdev/features/forum/domain/usecases/create_answer.dart';
-import 'package:askdev/features/forum/domain/usecases/get_answers.dart';
+import 'package:askdev/features/forum/domain/usecases/delete_answer.dart';
 import 'package:askdev/features/forum/domain/usecases/get_question_by_id.dart';
+import 'package:askdev/features/forum/domain/usecases/update_answer.dart';
 import 'package:askdev/features/forum/presentation/manager/question_detail_cubit.dart';
 import 'package:askdev/features/forum/presentation/manager/question_detail_state.dart';
 import 'package:auto_route/auto_route.dart';
@@ -27,8 +29,10 @@ class QuestionDetailPage extends StatelessWidget {
       create: (_) => QuestionDetailCubit(
         questionId: questionId,
         getQuestionById: sl<GetQuestionById>(),
-        getAnswers: sl<GetAnswers>(),
         createAnswer: sl<CreateAnswer>(),
+        updateAnswer: sl<UpdateAnswer>(),
+        deleteAnswer: sl<DeleteAnswer>(),
+        repository: sl<QuestionRepository>(),
         authGateway: sl<AuthGateway>(),
       )..load(),
       child: const _QuestionDetailView(),
@@ -58,6 +62,29 @@ class _QuestionDetailViewState extends State<_QuestionDetailView> {
     }
   }
 
+  Future<void> _confirmDelete(BuildContext context, QuestionDetailCubit cubit, String answerId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Supprimer cette réponse ?'),
+        content: const Text('Cette action est irréversible.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Annuler'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Supprimer'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      cubit.removeAnswer(answerId);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -70,7 +97,9 @@ class _QuestionDetailViewState extends State<_QuestionDetailView> {
         }
         return previous.published != current.published ||
             (current.answerError != null &&
-                previous.answerError != current.answerError);
+                previous.answerError != current.answerError) ||
+            (current.answerActionError != null &&
+                previous.answerActionError != current.answerActionError);
       },
       listener: (context, state) {
         if (state is! QuestionDetailLoaded) return;
@@ -80,7 +109,12 @@ class _QuestionDetailViewState extends State<_QuestionDetailView> {
           return;
         }
         final error = state.answerError;
-        if (error != null) context.showError(error);
+        if (error != null) {
+          context.showError(error);
+          return;
+        }
+        final actionError = state.answerActionError;
+        if (actionError != null) context.showError(actionError);
       },
       child: Scaffold(
         appBar: AppBar(title: const Text('Question')),
@@ -112,6 +146,7 @@ class _QuestionDetailViewState extends State<_QuestionDetailView> {
                   :final question,
                   :final answers,
                   :final isSubmitting,
+                  :final editingAnswerId,
                 ) =>
                   Column(
                     children: [
@@ -142,7 +177,17 @@ class _QuestionDetailViewState extends State<_QuestionDetailView> {
                               for (final answer in answers)
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 8),
-                                  child: _AnswerCard(answer: answer),
+                                  child: _AnswerCard(
+                                    key: ValueKey(answer.id),
+                                    answer: answer,
+                                    isOwn: cubit.isOwnAnswer(answer),
+                                    isEditing: editingAnswerId == answer.id,
+                                    onEditPressed: () => cubit.startEditing(answer.id),
+                                    onCancelEdit: () => cubit.startEditing(null),
+                                    onSaveEdit: (content) => cubit.editAnswer(answer.id, content),
+                                    onDeletePressed: () =>
+                                        _confirmDelete(context, cubit, answer.id),
+                                  ),
                                 ),
                           ],
                         ),
@@ -220,10 +265,52 @@ class _QuestionCard extends StatelessWidget {
   }
 }
 
-class _AnswerCard extends StatelessWidget {
-  const _AnswerCard({required this.answer});
+class _AnswerCard extends StatefulWidget {
+  const _AnswerCard({
+    super.key,
+    required this.answer,
+    required this.isOwn,
+    required this.isEditing,
+    required this.onEditPressed,
+    required this.onCancelEdit,
+    required this.onSaveEdit,
+    required this.onDeletePressed,
+  });
 
   final Answer answer;
+  final bool isOwn;
+  final bool isEditing;
+  final VoidCallback onEditPressed;
+  final VoidCallback onCancelEdit;
+  final ValueChanged<String> onSaveEdit;
+  final VoidCallback onDeletePressed;
+
+  @override
+  State<_AnswerCard> createState() => _AnswerCardState();
+}
+
+class _AnswerCardState extends State<_AnswerCard> {
+  late final TextEditingController _editController;
+
+  @override
+  void initState() {
+    super.initState();
+    _editController = TextEditingController(text: widget.answer.content);
+  }
+
+  @override
+  void didUpdateWidget(covariant _AnswerCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isEditing && !oldWidget.isEditing) {
+      _editController.text = widget.answer.content;
+    }
+  }
+
+  @override
+  void dispose() {
+    _editController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -235,12 +322,55 @@ class _AnswerCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              answer.createdAt.timeAgo(),
-              style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
+Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    widget.answer.createdAt.timeAgo(),
+                    style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
+                  ),
+                ),
+                if (widget.isOwn && !widget.isEditing) ...[
+                  IconButton(
+                    icon: const Icon(Icons.edit_outlined, size: 18),
+                    tooltip: 'Modifier',
+                    onPressed: widget.onEditPressed,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline, size: 18),
+                    tooltip: 'Supprimer',
+                    onPressed: widget.onDeletePressed,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ],
+              ],
             ),
-            const SizedBox(height: 8),
-            AppMarkdown(data: answer.content),
+            const SizedBox(height: 4),
+            if (widget.isEditing) ...[
+              TextField(
+                controller: _editController,
+                minLines: 2,
+                maxLines: 6,
+                textCapitalization: TextCapitalization.sentences,
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: widget.onCancelEdit,
+                    child: const Text('Annuler'),
+                  ),
+                  const SizedBox(width: 4),
+                  FilledButton(
+                    onPressed: () => widget.onSaveEdit(_editController.text),
+                    child: const Text('Enregistrer'),
+                  ),
+                ],
+              ),
+            ] else
+              AppMarkdown(data: widget.answer.content),
           ],
         ),
       ),

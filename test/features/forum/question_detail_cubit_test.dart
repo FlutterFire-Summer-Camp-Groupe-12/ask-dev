@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:askdev/core/error/failure.dart';
 import 'package:askdev/core/session/auth_status.dart';
 import 'package:askdev/core/session/auth_gateway.dart';
@@ -9,8 +11,9 @@ import 'package:askdev/features/forum/domain/entities/question_slice.dart';
 import 'package:askdev/features/forum/domain/repositories/question_repository.dart';
 import 'package:askdev/features/forum/domain/search/search_text.dart';
 import 'package:askdev/features/forum/domain/usecases/create_answer.dart';
-import 'package:askdev/features/forum/domain/usecases/get_answers.dart';
+import 'package:askdev/features/forum/domain/usecases/delete_answer.dart';
 import 'package:askdev/features/forum/domain/usecases/get_question_by_id.dart';
+import 'package:askdev/features/forum/domain/usecases/update_answer.dart';
 import 'package:askdev/features/forum/presentation/manager/question_detail_cubit.dart';
 import 'package:askdev/features/forum/presentation/manager/question_detail_state.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -31,10 +34,10 @@ Question _question({int answersCount = 0}) {
   );
 }
 
-Answer _answer(String id, {String authorId = 'u1'}) {
+Answer _answer(String id, {String authorId = 'u1', String content = 'Réponse'}) {
   return Answer(
     id: id,
-    content: 'Réponse $id',
+    content: '$content $id',
     authorId: authorId,
     createdAt: _now.add(Duration(hours: id.hashCode % 5)),
     updatedAt: _now,
@@ -44,18 +47,31 @@ Answer _answer(String id, {String authorId = 'u1'}) {
 class _FakeQuestionRepository implements QuestionRepository {
   _FakeQuestionRepository({
     this.question,
-    this.answers = const [],
+    List<Answer> answers = const [],
     this.questionFailure,
     this.answerFailure,
-  });
+    this.updateFailure,
+    this.deleteFailure,
+  }) : _answersController = StreamController<Either<Failure, List<Answer>>>.broadcast() {
+    _answers = List.of(answers);
+  }
 
   final Question? question;
-  final List<Answer> answers;
   final Failure? questionFailure;
   final Failure? answerFailure;
+  final Failure? updateFailure;
+  final Failure? deleteFailure;
+
+  late List<Answer> _answers;
+  final StreamController<Either<Failure, List<Answer>>> _answersController;
 
   AnswerDraft? lastDraft;
   String? lastQuestionId;
+  String? lastUpdatedAnswerId;
+  String? lastUpdatedContent;
+  String? lastDeletedAnswerId;
+
+  void _emitAnswers() => _answersController.add(right(List.of(_answers)));
 
   @override
   Future<Either<Failure, Question>> getQuestionById(String id) async {
@@ -66,7 +82,14 @@ class _FakeQuestionRepository implements QuestionRepository {
 
   @override
   Future<Either<Failure, List<Answer>>> getAnswers(String questionId) async {
-    return right(answers);
+    return right(_answers);
+  }
+
+  @override
+  Stream<Either<Failure, List<Answer>>> watchAnswers(String questionId) {
+    // Émet l'état courant dès l'abonnement, comme le ferait Firestore.
+    Future.microtask(_emitAnswers);
+    return _answersController.stream;
   }
 
   @override
@@ -100,7 +123,50 @@ class _FakeQuestionRepository implements QuestionRepository {
     lastDraft = draft;
     final failure = answerFailure;
     if (failure != null) return left(failure);
-    return right(_answer('a-new', authorId: draft.authorId));
+    final answer = _answer('a-new', authorId: draft.authorId, content: draft.content);
+    _answers = [..._answers, answer];
+    _emitAnswers();
+    return right(answer);
+  }
+
+  @override
+  Future<Either<Failure, Answer>> updateAnswer(
+    String questionId,
+    String answerId,
+    String content,
+  ) async {
+    lastUpdatedAnswerId = answerId;
+    lastUpdatedContent = content;
+    final failure = updateFailure;
+    if (failure != null) return left(failure);
+
+    final index = _answers.indexWhere((a) => a.id == answerId);
+    final updated = Answer(
+      id: answerId,
+      content: content,
+      authorId: _answers[index].authorId,
+      createdAt: _answers[index].createdAt,
+      updatedAt: _now,
+    );
+    _answers = [
+      for (final a in _answers) if (a.id == answerId) updated else a,
+    ];
+    _emitAnswers();
+    return right(updated);
+  }
+
+  @override
+  Future<Either<Failure, Unit>> deleteAnswer(
+    String questionId,
+    String answerId,
+  ) async {
+    lastDeletedAnswerId = answerId;
+    final failure = deleteFailure;
+    if (failure != null) return left(failure);
+
+    _answers = _answers.where((a) => a.id != answerId).toList();
+    _emitAnswers();
+    return right(unit);
   }
 }
 
@@ -125,20 +191,23 @@ QuestionDetailCubit _buildCubit(
   return QuestionDetailCubit(
     questionId: 'q1',
     getQuestionById: GetQuestionById(repository),
-    getAnswers: GetAnswers(repository),
     createAnswer: CreateAnswer(repository),
+    updateAnswer: UpdateAnswer(repository),
+    deleteAnswer: DeleteAnswer(repository),
+    repository: repository,
     authGateway: _FakeAuthGateway(userId),
   );
 }
 
 void main() {
   group('QuestionDetailCubit load', () {
-    test('charges la question et ses réponses', () async {
+    test('charge la question et s’abonne aux réponses en temps réel', () async {
       final cubit = _buildCubit(
         _FakeQuestionRepository(question: _question(), answers: [_answer('a1')]),
       );
 
       await cubit.load();
+      await Future<void>.delayed(Duration.zero);
 
       final state = cubit.state;
       expect(state, isA<QuestionDetailLoaded>());
@@ -150,8 +219,7 @@ void main() {
     test('émet une erreur quand la question est introuvable', () async {
       final cubit = _buildCubit(
         _FakeQuestionRepository(
-          questionFailure:
-              const ServerFailure(message: 'Question inexistante'),
+          questionFailure: const ServerFailure(message: 'Question inexistante'),
         ),
       );
 
@@ -166,6 +234,7 @@ void main() {
       final repository = _FakeQuestionRepository(question: _question());
       final cubit = _buildCubit(repository);
       await cubit.load();
+      await Future<void>.delayed(Duration.zero);
 
       await cubit.submitAnswer('   ');
 
@@ -173,18 +242,19 @@ void main() {
       expect((cubit.state as QuestionDetailLoaded).answerError, isNotNull);
     });
 
-    test('envoie un brouillon nettoyé, ajoute la réponse et incrémente le compteur', () async {
+    test('envoie un brouillon nettoyé et publie la réponse', () async {
       final repository = _FakeQuestionRepository(question: _question());
       final cubit = _buildCubit(repository);
       await cubit.load();
+      await Future<void>.delayed(Duration.zero);
 
       await cubit.submitAnswer('   Voici ma réponse.  ');
+      await Future<void>.delayed(Duration.zero);
 
       expect(repository.lastQuestionId, 'q1');
       expect(repository.lastDraft?.content, 'Voici ma réponse.');
       expect(repository.lastDraft?.authorId, 'u1');
       final state = cubit.state as QuestionDetailLoaded;
-      expect(state.question.answersCount, 1);
       expect(state.answers, hasLength(1));
       expect(state.published?.id, 'a-new');
       expect(state.isSubmitting, isFalse);
@@ -198,6 +268,7 @@ void main() {
       );
       final cubit = _buildCubit(repository);
       await cubit.load();
+      await Future<void>.delayed(Duration.zero);
 
       await cubit.submitAnswer('Ma réponse');
 
@@ -212,11 +283,84 @@ void main() {
       final repository = _FakeQuestionRepository(question: _question());
       final cubit = _buildCubit(repository, userId: null);
       await cubit.load();
+      await Future<void>.delayed(Duration.zero);
 
       await cubit.submitAnswer('Ma réponse');
 
       expect(repository.lastDraft, isNull);
       expect((cubit.state as QuestionDetailLoaded).answerError, isNotNull);
+    });
+  });
+
+  group('QuestionDetailCubit editAnswer', () {
+    test('modifie une réponse dont on est l’auteur', () async {
+      final repository = _FakeQuestionRepository(
+        question: _question(),
+        answers: [_answer('a1', authorId: 'u1')],
+      );
+      final cubit = _buildCubit(repository, userId: 'u1');
+      await cubit.load();
+      await Future<void>.delayed(Duration.zero);
+
+      await cubit.editAnswer('a1', 'Contenu modifié');
+      await Future<void>.delayed(Duration.zero);
+
+      expect(repository.lastUpdatedAnswerId, 'a1');
+      expect(repository.lastUpdatedContent, 'Contenu modifié');
+      final state = cubit.state as QuestionDetailLoaded;
+      expect(state.answerActionError, isNull);
+    });
+
+    test('refuse de modifier la réponse d’un autre utilisateur', () async {
+      final repository = _FakeQuestionRepository(
+        question: _question(),
+        answers: [_answer('a1', authorId: 'quelquun-dautre')],
+      );
+      final cubit = _buildCubit(repository, userId: 'u1');
+      await cubit.load();
+      await Future<void>.delayed(Duration.zero);
+
+      await cubit.editAnswer('a1', 'Contenu modifié');
+
+      expect(repository.lastUpdatedAnswerId, isNull);
+      final state = cubit.state as QuestionDetailLoaded;
+      expect(state.answerActionError, isNotNull);
+    });
+  });
+
+  group('QuestionDetailCubit removeAnswer', () {
+    test('supprime une réponse dont on est l’auteur', () async {
+      final repository = _FakeQuestionRepository(
+        question: _question(),
+        answers: [_answer('a1', authorId: 'u1')],
+      );
+      final cubit = _buildCubit(repository, userId: 'u1');
+      await cubit.load();
+      await Future<void>.delayed(Duration.zero);
+
+      await cubit.removeAnswer('a1');
+      await Future<void>.delayed(Duration.zero);
+
+      expect(repository.lastDeletedAnswerId, 'a1');
+      final state = cubit.state as QuestionDetailLoaded;
+      expect(state.answers, isEmpty);
+    });
+
+    test('refuse de supprimer la réponse d’un autre utilisateur', () async {
+      final repository = _FakeQuestionRepository(
+        question: _question(),
+        answers: [_answer('a1', authorId: 'quelquun-dautre')],
+      );
+      final cubit = _buildCubit(repository, userId: 'u1');
+      await cubit.load();
+      await Future<void>.delayed(Duration.zero);
+
+      await cubit.removeAnswer('a1');
+
+      expect(repository.lastDeletedAnswerId, isNull);
+      final state = cubit.state as QuestionDetailLoaded;
+      expect(state.answerActionError, isNotNull);
+      expect(state.answers, hasLength(1));
     });
   });
 }

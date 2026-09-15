@@ -58,6 +58,28 @@ class _FakeQuestionRepository implements QuestionRepository {
   }
 
   @override
+  Future<Either<Failure, Answer>> updateAnswer(
+    String questionId,
+    String answerId,
+    String content,
+  ) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, Unit>> deleteAnswer(
+    String questionId,
+    String answerId,
+  ) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Stream<Either<Failure, List<Answer>>> watchAnswers(String questionId) {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<Either<Failure, Question>> createQuestion(QuestionDraft draft) async {
     lastDraft = draft;
     final error = failure;

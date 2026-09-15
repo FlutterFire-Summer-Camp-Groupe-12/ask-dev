@@ -189,4 +189,53 @@ class QuestionRemoteDataSourceImpl implements QuestionRemoteDataSource {
 
     return answer;
   }
+
+  @override
+  Future<AnswerModel> updateAnswer(
+    String questionId,
+    String answerId,
+    String content,
+  ) async {
+    final document = _answersOf(questionId).doc(answerId);
+    final snapshot = await document.get();
+    final current = AnswerModel.fromJson({'id': snapshot.id, ...snapshot.data()!});
+
+    final updated = AnswerModel(
+      id: current.id,
+      content: content,
+      authorId: current.authorId,
+      createdAt: current.createdAt,
+      updatedAt: DateTime.now(),
+    );
+
+    await document.update({
+      'content': content,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+
+    return updated;
+  }
+
+  @override
+  Future<void> deleteAnswer(String questionId, String answerId) async {
+    // La suppression et la décrémentation du compteur partent dans le même
+    // batch, pour la même raison que createAnswer : jamais de compteur
+    // désynchronisé du nombre réel de réponses.
+    final batch = _firestore.batch();
+    batch.delete(_answersOf(questionId).doc(answerId));
+    batch.update(_questions.doc(questionId), {
+      'answersCount': FieldValue.increment(-1),
+    });
+    await batch.commit();
+  }
+
+  @override
+  Stream<List<AnswerModel>> watchAnswers(String questionId) {
+    return _answersOf(questionId)
+        .orderBy('createdAt', descending: false)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => AnswerModel.fromJson({'id': doc.id, ...doc.data()}))
+            .toList());
+  }
 }

@@ -41,4 +41,19 @@ abstract class QuestionRepository {
     String questionId,
     AnswerDraft draft,
   );
+  
+  /// Modifie le contenu d'une réponse existante. L'appelant est
+  /// responsable de vérifier que l'utilisateur courant en est bien
+  /// l'auteur avant d'appeler cette méthode.
+  Future<Either<Failure, Answer>> updateAnswer(
+    String questionId,
+    String answerId,
+    String content,
+  );
+
+  /// Supprime une réponse. Même remarque que pour [updateAnswer].
+  Future<Either<Failure, Unit>> deleteAnswer(String questionId, String answerId);
+
+  /// Flux temps réel des réponses d'une question.
+  Stream<Either<Failure, List<Answer>>> watchAnswers(String questionId);
 }
