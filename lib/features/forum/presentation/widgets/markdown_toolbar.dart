@@ -1,3 +1,4 @@
+import 'package:askdev/core/themes/app_tokens.dart';
 import 'package:flutter/material.dart';
 
 /// Barre d'outils Markdown posée au-dessus du champ de description.
@@ -10,10 +11,16 @@ class MarkdownToolbar extends StatelessWidget {
     super.key,
     required this.controller,
     this.enabled = true,
+    this.borderRadius = const BorderRadius.vertical(
+      top: Radius.circular(AppRadius.md),
+    ),
   });
 
   final TextEditingController controller;
   final bool enabled;
+
+  /// Arrondi du fond : haut seulement quand la barre coiffe un champ.
+  final BorderRadius borderRadius;
 
   @override
   Widget build(BuildContext context) {
@@ -22,11 +29,14 @@ class MarkdownToolbar extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainer,
         border: Border(bottom: BorderSide(color: colors.outlineVariant)),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+        borderRadius: borderRadius,
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xs,
+          vertical: AppSpacing.xxs,
+        ),
         child: Row(
           children: [
             _ToolbarButton(
@@ -156,7 +166,7 @@ class _ToolbarButton extends StatelessWidget {
       disabledColor: colors.outline,
       tooltip: tooltip,
       visualDensity: VisualDensity.compact,
-      constraints: const BoxConstraints.tightFor(width: 34, height: 34),
+      constraints: const BoxConstraints.tightFor(width: 40, height: 40),
       padding: EdgeInsets.zero,
     );
   }

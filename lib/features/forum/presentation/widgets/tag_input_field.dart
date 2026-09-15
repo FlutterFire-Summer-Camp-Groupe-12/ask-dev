@@ -1,3 +1,5 @@
+import 'package:askdev/core/themes/app_tokens.dart';
+import 'package:askdev/core/widgets/tag_chip.dart';
 import 'package:askdev/features/forum/presentation/widgets/question_form_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -77,19 +79,19 @@ class _TagInputFieldState extends State<TagInputField> {
       children: [
         if (widget.tags.isNotEmpty) ...[
           Wrap(
-            spacing: 6,
-            runSpacing: 6,
+            spacing: AppSpacing.xs + 2,
+            runSpacing: AppSpacing.xs + 2,
             children: [
               for (final tag in widget.tags)
-                _SelectedTagChip(
-                  label: tag,
-                  onRemoved: widget.enabled
+                TagChip(
+                  tag,
+                  onDeleted: widget.enabled
                       ? () => widget.onTagRemoved(tag)
                       : null,
                 ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
         ],
         TextField(
           controller: _controller,
@@ -98,7 +100,7 @@ class _TagInputFieldState extends State<TagInputField> {
           onChanged: (_) => setState(() {}),
           onSubmitted: _submit,
           textInputAction: TextInputAction.done,
-          style: TextStyle(color: colors.onSurface, fontSize: 13),
+          style: Theme.of(context).textTheme.bodyMedium,
           inputFormatters: [
             // Un espace ou une virgule valide le tag en cours.
             FilteringTextInputFormatter.deny(
@@ -111,18 +113,10 @@ class _TagInputFieldState extends State<TagInputField> {
                 colors: colors,
                 hintText: _isFull
                     ? '${widget.maxTags} tags maximum atteints'
-                    : 'ex. (flutter dart firebase)',
+                    : 'ex. flutter, firebase, bloc',
                 hasError: widget.hasError,
               ).copyWith(
-                prefixIcon: Icon(
-                  Icons.search,
-                  size: 18,
-                  color: colors.onSurfaceVariant,
-                ),
-                prefixIconConstraints: const BoxConstraints.tightFor(
-                  width: 38,
-                  height: 20,
-                ),
+                prefixIcon: const Icon(Icons.sell_outlined, size: 18),
                 suffixIcon: _controller.text.trim().isEmpty
                     ? null
                     : IconButton(
@@ -134,83 +128,21 @@ class _TagInputFieldState extends State<TagInputField> {
               ),
         ),
         if (suggestions.isNotEmpty && _focusNode.hasFocus) ...[
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Wrap(
-            spacing: 6,
-            runSpacing: 6,
+            spacing: AppSpacing.xs + 2,
+            runSpacing: AppSpacing.xs + 2,
             children: [
               for (final suggestion in suggestions)
-                _SuggestionChip(
-                  label: suggestion,
+                TagChip(
+                  suggestion,
+                  muted: true,
                   onTap: widget.enabled ? () => _submit(suggestion) : null,
                 ),
             ],
           ),
         ],
       ],
-    );
-  }
-}
-
-class _SelectedTagChip extends StatelessWidget {
-  const _SelectedTagChip({required this.label, required this.onRemoved});
-
-  final String label;
-  final VoidCallback? onRemoved;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.only(left: 10, right: 4, top: 4, bottom: 4),
-      decoration: BoxDecoration(
-        color: colors.primary.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colors.primary.withValues(alpha: 0.45)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(label, style: TextStyle(color: colors.primary, fontSize: 12)),
-          const SizedBox(width: 2),
-          InkWell(
-            onTap: onRemoved,
-            borderRadius: BorderRadius.circular(10),
-            child: Padding(
-              padding: const EdgeInsets.all(2),
-              child: Icon(Icons.close, size: 14, color: colors.primary),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SuggestionChip extends StatelessWidget {
-  const _SuggestionChip({required this.label, required this.onTap});
-
-  final String label;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: colors.surfaceContainer,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: colors.outlineVariant),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(color: colors.onSurfaceVariant, fontSize: 12),
-        ),
-      ),
     );
   }
 }

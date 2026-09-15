@@ -1,3 +1,6 @@
+import 'package:askdev/core/themes/app_palette.dart';
+import 'package:askdev/core/themes/app_theme.dart';
+import 'package:askdev/core/themes/app_tokens.dart';
 import 'package:askdev/core/utils/extensions_context.dart';
 import 'package:askdev/core/widgets/markdown/code_highlighter.dart';
 import 'package:flutter/material.dart';
@@ -25,29 +28,52 @@ class AppMarkdown extends StatelessWidget {
     );
   }
 
-  /// Apparence alignée sur le thème de l'app (corps 14, hauteur confortable,
-  /// palette issue du ColorScheme).
+  /// Apparence alignée sur le thème : texte de lecture en 14 aéré, titres
+  /// sur l'échelle de l'app, code en JetBrains Mono sur fond dédié.
   static MarkdownStyleSheet _styleSheet(ThemeData theme) {
     final colors = theme.colorScheme;
+    final text = theme.textTheme;
+    final palette = theme.extension<AppPalette>() ?? AppPalette.light;
+    final body = text.bodyMedium?.copyWith(height: 1.6);
     return MarkdownStyleSheet.fromTheme(theme).copyWith(
-      p: TextStyle(fontSize: 14, height: 1.5, color: colors.onSurface),
-      blockquote: TextStyle(
-        fontSize: 14,
-        height: 1.5,
-        color: colors.onSurfaceVariant,
-        fontStyle: FontStyle.italic,
+      p: body,
+      listBullet: body,
+      h1: text.headlineSmall,
+      h2: text.titleMedium?.copyWith(fontSize: 16),
+      h3: text.titleSmall,
+      h4: text.titleSmall,
+      a: body?.copyWith(
+        color: colors.primary,
+        decoration: TextDecoration.underline,
+        decorationColor: colors.primary.withValues(alpha: 0.4),
+      ),
+      blockquote: body?.copyWith(color: colors.onSurfaceVariant),
+      blockquotePadding: const EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        AppSpacing.xs,
+        AppSpacing.sm,
+        AppSpacing.xs,
+      ),
+      blockquoteDecoration: BoxDecoration(
+        border: Border(left: BorderSide(color: colors.primary, width: 3)),
       ),
       code: TextStyle(
-        fontFamily: 'monospace',
+        fontFamily: AppTheme.monoFamily,
         fontSize: 13,
-        backgroundColor: colors.surfaceContainerHighest,
+        backgroundColor: palette.codeBackground,
         color: colors.onSurface,
       ),
       codeblockPadding: EdgeInsets.zero,
       codeblockDecoration: BoxDecoration(
-        color: colors.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
+        color: palette.codeBackground,
+        borderRadius: AppRadius.mdAll,
+        border: Border.all(color: colors.outlineVariant),
       ),
+      horizontalRuleDecoration: BoxDecoration(
+        border: Border(top: BorderSide(color: colors.outlineVariant)),
+      ),
+      pPadding: const EdgeInsets.only(bottom: AppSpacing.xxs),
+      blockSpacing: AppSpacing.md,
     );
   }
 }
@@ -105,7 +131,7 @@ class _CodeBlock extends StatelessWidget {
 
     final span = TextSpan(
       style: TextStyle(
-        fontFamily: 'monospace',
+        fontFamily: AppTheme.monoFamily,
         fontSize: 13,
         height: 1.45,
         color: highlightTheme['root']?.color ?? colors.onSurface,
@@ -119,7 +145,7 @@ class _CodeBlock extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Container(
-          padding: const EdgeInsets.only(left: 12),
+          padding: const EdgeInsets.only(left: AppSpacing.md),
           decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: colors.outlineVariant)),
           ),
@@ -128,10 +154,8 @@ class _CodeBlock extends StatelessWidget {
               Expanded(
                 child: Text(
                   label ?? 'code',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: colors.onSurfaceVariant,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    fontFamily: AppTheme.monoFamily,
                   ),
                 ),
               ),
@@ -151,7 +175,7 @@ class _CodeBlock extends StatelessWidget {
         ),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppSpacing.md),
           child: selectable
               ? SelectableText.rich(span)
               : Text.rich(span, softWrap: false),
