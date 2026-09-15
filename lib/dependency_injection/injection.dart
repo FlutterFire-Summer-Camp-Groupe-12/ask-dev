@@ -13,6 +13,8 @@ import 'package:askdev/features/forum/data/sources/question_remote_data_source_i
 import 'package:askdev/features/forum/domain/repositories/question_repository.dart';
 import 'package:askdev/features/forum/domain/usecases/create_question.dart';
 import 'package:askdev/features/forum/domain/usecases/create_answer.dart';
+import 'package:askdev/features/forum/domain/usecases/update_answer.dart';
+import 'package:askdev/features/forum/domain/usecases/delete_answer.dart';
 import 'package:askdev/features/forum/domain/usecases/get_answers.dart';
 import 'package:askdev/features/forum/domain/usecases/get_question_by_id.dart';
 import 'package:askdev/features/forum/domain/usecases/get_recent_questions.dart';
@@ -84,6 +86,12 @@ void configureDependencies() {
   );
   sl.registerLazySingleton<CreateAnswer>(
     () => CreateAnswer(sl<QuestionRepository>()),
+  );
+  sl.registerLazySingleton<UpdateAnswer>(
+    () => UpdateAnswer(sl<QuestionRepository>()),
+  );
+  sl.registerLazySingleton<DeleteAnswer>(
+    () => DeleteAnswer(sl<QuestionRepository>()),
   );
   sl.registerFactory<QuestionListCubit>(
     () => QuestionListCubit(sl<GetRecentQuestions>()),
