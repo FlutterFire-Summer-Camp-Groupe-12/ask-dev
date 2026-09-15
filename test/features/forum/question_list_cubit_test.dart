@@ -6,6 +6,7 @@ import 'package:askdev/features/forum/domain/entities/answer_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question.dart';
 import 'package:askdev/features/forum/domain/entities/question_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question_slice.dart';
+import 'package:askdev/features/forum/domain/entities/user_activity.dart';
 import 'package:askdev/features/forum/domain/repositories/question_repository.dart';
 import 'package:askdev/features/forum/domain/search/search_text.dart';
 import 'package:askdev/features/forum/domain/usecases/get_recent_questions.dart';
@@ -102,6 +103,12 @@ class _FakeQuestionRepository implements QuestionRepository {
   @override
   Future<Either<Failure, Unit>> deleteQuestion(String questionId) =>
       throw UnimplementedError();
+
+  @override
+  Future<Either<Failure, UserActivity>> getUserActivity(
+    String userId, {
+    int recentLimit = 5,
+  }) => throw UnimplementedError();
 }
 
 void main() {

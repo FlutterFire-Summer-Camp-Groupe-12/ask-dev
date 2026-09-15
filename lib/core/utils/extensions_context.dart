@@ -30,6 +30,7 @@ extension BuildContextExtensions on BuildContext {
     Color? background,
     Color? foreground,
     IconData? icon,
+    Color? iconColor,
     Duration duration = const Duration(seconds: 3),
     SnackBarAction? action,
   }) {
@@ -45,7 +46,7 @@ extension BuildContextExtensions on BuildContext {
         content: Row(
           children: [
             if (icon != null) ...[
-              Icon(icon, color: textColor, size: 20),
+              Icon(icon, color: iconColor ?? textColor, size: 20),
               const SizedBox(width: 12),
             ],
             Expanded(
@@ -69,9 +70,12 @@ extension BuildContextExtensions on BuildContext {
   }) {
     return showSnackBar(
       message,
-      background: colors.error,
-      foreground: colors.onError,
-      icon: Icons.error_outline,
+      icon: Icons.error_outline_rounded,
+      // Le fond est inversé : on prend le rouge du thème opposé pour garder
+      // le contraste.
+      iconColor: colors.brightness == Brightness.light
+          ? const Color(0xFFFF8A7E)
+          : const Color(0xFFC8291B),
       duration: duration,
       action: action,
     );
@@ -85,9 +89,8 @@ extension BuildContextExtensions on BuildContext {
   }) {
     return showSnackBar(
       message,
-      background: colors.primary,
-      foreground: colors.onPrimary,
-      icon: Icons.check_circle_outline,
+      icon: Icons.check_circle_rounded,
+      iconColor: colors.inversePrimary,
       duration: duration,
       action: action,
     );

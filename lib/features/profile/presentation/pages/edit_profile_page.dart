@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:askdev/core/themes/app_tokens.dart';
 import 'package:askdev/core/utils/extensions_context.dart';
 import 'package:askdev/core/utils/validators.dart';
+import 'package:askdev/core/widgets/tag_chip.dart';
 import 'package:askdev/features/profile/presentation/manager/profile_cubit.dart';
 import 'package:askdev/features/profile/presentation/manager/profile_state.dart';
 import 'package:askdev/features/profile/presentation/pages/avatar_edit.dart';
@@ -61,130 +63,132 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<ProfileCubit>();
+    final theme = Theme.of(context);
+
     return BlocListener<ProfileCubit, ProfileState>(
       listenWhen: (prev, curr) => prev.isSaving && !curr.isSaving,
       listener: (context, state) {
         if (state.error != null) {
           context.showError(state.error!);
         } else {
+          context.showSuccess('Profil mis à jour.');
           context.router.maybePop();
         }
       },
-      child: Scaffold(
-        appBar: AppBar(title: const Text('Modifier le profil')),
-        body: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 500),
-                child: Card(
-                  margin: EdgeInsets.zero,
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Form(
-                      key: _formKey,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      child: BlocBuilder<ProfileCubit, ProfileState>(
-                        builder: (context, state) {
-                          final isSaving = state.isSaving;
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Center(
-                                child: AvatarPicker(
-                                  enabled: !isSaving,
-                                  initialImagePath: state.profile?.avatarUrl,
-                                  onImageSelected: (image) {
-                                    setState(() => _avatar = image);
-                                  },
-                                ),
-                              ),
-                              const SizedBox(height: 24),
-                              TextFormField(
-                                controller: _pseudoController,
-                                enabled: !isSaving,
-                                autocorrect: false,
-                                decoration: const InputDecoration(
-                                  labelText: 'Pseudo',
-                                  prefixIcon: Icon(Icons.person_outline),
-                                ),
-                                validator: Validators.pseudo,
-                              ),
-                              const SizedBox(height: 16),
-                              TextFormField(
-                                controller: _bioController,
-                                enabled: !isSaving,
-                                maxLines: 3,
-                                decoration: const InputDecoration(
-                                  labelText: 'Bio',
-                                  hintText:
-                                      'Parlez de vous, votre parcours, vos projets…',
-                                  alignLabelWithHint: true,
-                                  prefixIcon: Icon(Icons.info_outline),
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              _TopicInput(
-                                enabled: !isSaving,
-                                initialTopics: _topics,
-                                canAddMore: _topics.length < _maxTopics,
-                                onAdded: (topic) {
-                                  setState(() {
-                                    if (!_topics.contains(topic)) {
-                                      _topics.add(topic);
-                                    }
-                                  });
-                                },
-                                onRemoved: (topic) {
-                                  setState(() {
-                                    _topics.remove(topic);
-                                  });
-                                },
-                              ),
-                              const SizedBox(height: 28),
-                              FilledButton(
-                                onPressed: isSaving
-                                    ? null
-                                    : () => _submit(cubit),
-                                child: isSaving
-                                    ? const SizedBox(
-                                        height: 20,
-                                        width: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                        ),
-                                      )
-                                    : const Text('Enregistrer'),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
+      child: BlocBuilder<ProfileCubit, ProfileState>(
+        builder: (context, state) {
+          final isSaving = state.isSaving;
+          return Scaffold(
+            appBar: AppBar(
+              leading: IconButton(
+                onPressed: () => context.router.maybePop(),
+                icon: const Icon(Icons.close_rounded),
+                tooltip: 'Fermer',
+              ),
+              title: const Text('Modifier le profil'),
+            ),
+            bottomNavigationBar: DecoratedBox(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                border: Border(
+                  top: BorderSide(color: theme.colorScheme.outlineVariant),
+                ),
+              ),
+              child: SafeArea(
+                top: false,
+                child: Padding(
+                  padding: AppLayout.listPadding(
+                    context,
+                    maxWidth: AppLayout.formMaxWidth,
+                    top: AppSpacing.md,
+                    bottom: AppSpacing.md,
+                  ),
+                  child: FilledButton.icon(
+                    onPressed: isSaving ? null : () => _submit(cubit),
+                    icon: isSaving
+                        ? const SizedBox.square(
+                            dimension: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.check_rounded, size: 18),
+                    label: const Text('Enregistrer'),
                   ),
                 ),
               ),
             ),
-          ),
-        ),
+            body: Form(
+              key: _formKey,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              child: ListView(
+                padding: AppLayout.listPadding(
+                  context,
+                  maxWidth: AppLayout.formMaxWidth,
+                ),
+                children: [
+                  Center(
+                    child: AvatarPicker(
+                      enabled: !isSaving,
+                      currentAvatarUrl: state.profile?.avatarUrl,
+                      name: state.profile?.pseudo,
+                      onImageSelected: (image) =>
+                          setState(() => _avatar = image),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                  TextFormField(
+                    controller: _pseudoController,
+                    enabled: !isSaving,
+                    autocorrect: false,
+                    decoration: const InputDecoration(
+                      labelText: 'Pseudo',
+                      prefixIcon: Icon(Icons.person_outline),
+                    ),
+                    validator: Validators.pseudo,
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  TextFormField(
+                    controller: _bioController,
+                    enabled: !isSaving,
+                    minLines: 3,
+                    maxLines: 6,
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: const InputDecoration(
+                      labelText: 'Bio',
+                      hintText: 'Votre parcours, vos technos, vos projets…',
+                      alignLabelWithHint: true,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  _TopicInput(
+                    enabled: !isSaving,
+                    topics: _topics,
+                    canAddMore: _topics.length < _maxTopics,
+                    onAdded: (topic) => setState(() {
+                      if (!_topics.contains(topic)) _topics.add(topic);
+                    }),
+                    onRemoved: (topic) => setState(() => _topics.remove(topic)),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
 }
 
-/// Saisie des topics sous forme de chips ajoutables un à un.
+/// Saisie des topics sous forme de puces ajoutables une à une.
 class _TopicInput extends StatefulWidget {
   const _TopicInput({
-    required this.initialTopics,
+    required this.topics,
     required this.canAddMore,
     required this.onAdded,
     required this.onRemoved,
     this.enabled = true,
   });
 
-  final List<String> initialTopics;
+  final List<String> topics;
   final bool canAddMore;
   final ValueChanged<String> onAdded;
   final ValueChanged<String> onRemoved;
@@ -204,7 +208,11 @@ class _TopicInputState extends State<_TopicInput> {
   }
 
   void _add(String raw) {
-    final topic = _cleaned(raw);
+    final topic = raw
+        .trim()
+        .replaceAll(',', '')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
     if (topic.isEmpty) return;
     _controller.clear();
     widget.onAdded(topic);
@@ -212,48 +220,39 @@ class _TopicInputState extends State<_TopicInput> {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (widget.initialTopics.isNotEmpty) ...[
+        if (widget.topics.isNotEmpty) ...[
           Wrap(
-            spacing: 6,
-            runSpacing: 7,
+            spacing: AppSpacing.xs + 2,
+            runSpacing: AppSpacing.xs + 2,
             children: [
-              for (final topic in widget.initialTopics)
-                InputChip(
-                  label: Text(topic),
+              for (final topic in widget.topics)
+                TagChip(
+                  topic,
                   onDeleted: widget.enabled
                       ? () => widget.onRemoved(topic)
                       : null,
                 ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
         ],
         TextField(
           controller: _controller,
           enabled: widget.enabled && widget.canAddMore,
+          textInputAction: TextInputAction.done,
           decoration: InputDecoration(
             labelText: 'Topics',
             hintText: widget.canAddMore
-                ? 'Ajouter un topic (Entrée)'
+                ? 'Ajouter un topic, puis Entrée'
                 : 'Limite de $_maxTopics topics atteinte',
-            prefixIcon: Icon(Icons.tag, color: colors.onSurfaceVariant),
+            prefixIcon: const Icon(Icons.sell_outlined),
           ),
           onSubmitted: widget.enabled && widget.canAddMore ? _add : null,
         ),
       ],
     );
   }
-}
-
-String _cleaned(String raw) {
-  final trimmed = raw
-      .trim()
-      .replaceAll(',', '')
-      .replaceAll(RegExp(r'\s+'), ' ')
-      .trim();
-  return trimmed;
 }
