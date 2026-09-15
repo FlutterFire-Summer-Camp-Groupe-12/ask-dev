@@ -13,7 +13,7 @@ import 'package:fpdart/fpdart.dart';
 
 class QuestionRepositoryImpl implements QuestionRepository {
   QuestionRepositoryImpl({required QuestionRemoteDataSource remoteDataSource})
-      : _remoteDataSource = remoteDataSource;
+    : _remoteDataSource = remoteDataSource;
 
   final QuestionRemoteDataSource _remoteDataSource;
 
@@ -66,6 +66,28 @@ class QuestionRepositoryImpl implements QuestionRepository {
   Future<Either<Failure, Question>> getQuestionById(String id) async {
     try {
       return right(await _remoteDataSource.getQuestionById(id));
+    } catch (error) {
+      return left(_toFailure(error));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Question>> updateQuestion(
+    String questionId,
+    QuestionDraft draft,
+  ) async {
+    try {
+      return right(await _remoteDataSource.updateQuestion(questionId, draft));
+    } catch (error) {
+      return left(_toFailure(error));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> deleteQuestion(String questionId) async {
+    try {
+      await _remoteDataSource.deleteQuestion(questionId);
+      return right(unit);
     } catch (error) {
       return left(_toFailure(error));
     }

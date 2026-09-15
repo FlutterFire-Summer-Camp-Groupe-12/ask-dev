@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:askdev/features/profile/data/models/user_profile_model.dart';
 import 'package:askdev/features/profile/data/sources/user_remote_data_source.dart';
 import 'package:askdev/features/profile/presentation/manager/profile_cubit.dart';
@@ -18,18 +20,29 @@ class _FakeUserDataSource implements UserRemoteDataSource {
 
   @override
   Future<UserProfileModel?> userProfile(String uid) async => profile;
+
+  @override
+  Future<String> saveAvatar(String uid, File file) async =>
+      'gs://bucket/avatars/$uid.png';
 }
 
 void main() {
-  test('loadProfile falls back to a local profile when the doc is missing', () async {
-    final cubit = ProfileCubit(dataSource: _FakeUserDataSource());
-    await cubit.loadProfile('u1', fallbackPseudo: 'devpro', fallbackEmail: 'dev@example.com');
+  test(
+    'loadProfile falls back to a local profile when the doc is missing',
+    () async {
+      final cubit = ProfileCubit(dataSource: _FakeUserDataSource());
+      await cubit.loadProfile(
+        'u1',
+        fallbackPseudo: 'devpro',
+        fallbackEmail: 'dev@example.com',
+      );
 
-    final profile = cubit.state.profile;
-    expect(profile, isNotNull);
-    expect(profile!.pseudo, 'devpro');
-    expect(profile.email, 'dev@example.com');
-  });
+      final profile = cubit.state.profile;
+      expect(profile, isNotNull);
+      expect(profile!.pseudo, 'devpro');
+      expect(profile.email, 'dev@example.com');
+    },
+  );
 
   test('updateProfile trims topics, drops empties and persists', () async {
     final source = _FakeUserDataSource();

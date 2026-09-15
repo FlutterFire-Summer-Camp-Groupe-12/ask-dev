@@ -53,6 +53,7 @@ class _AvatarPickerState extends State<AvatarPicker> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final imagePath = _selectedImage?.path;
 
     return Semantics(
@@ -66,16 +67,12 @@ class _AvatarPickerState extends State<AvatarPicker> {
           children: [
             CircleAvatar(
               radius: 44,
-              backgroundColor: const Color(0xFF17181B),
+              backgroundColor: scheme.surfaceContainerHighest,
               backgroundImage: imagePath != null
                   ? FileImage(File(imagePath))
                   : null,
               child: imagePath == null
-                  ? const Icon(
-                      Icons.person,
-                      size: 42,
-                      color: Colors.white70,
-                    )
+                  ? Icon(Icons.person, size: 42, color: scheme.onSurfaceVariant)
                   : null,
             ),
             Positioned(
@@ -84,14 +81,14 @@ class _AvatarPickerState extends State<AvatarPicker> {
               child: Container(
                 width: 30,
                 height: 30,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white,
+                  color: scheme.onSurface,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.camera_alt_outlined,
                   size: 17,
-                  color: Color(0xFF0D0D0F),
+                  color: scheme.surface,
                 ),
               ),
             ),

@@ -55,7 +55,8 @@ class _QuestionsHomeViewState extends State<_QuestionsHomeView> {
                   return TextField(
                     controller: _searchController,
                     onChanged: cubit.search,
-                    onSubmitted: (query) => cubit.search(query, immediate: true),
+                    onSubmitted: (query) =>
+                        cubit.search(query, immediate: true),
                     textInputAction: TextInputAction.search,
                     decoration: InputDecoration(
                       hintText: 'Rechercher dans les questions…',

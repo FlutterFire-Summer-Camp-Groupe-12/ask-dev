@@ -33,6 +33,17 @@ abstract class QuestionRepository {
   /// Charge une question par son identifiant.
   Future<Either<Failure, Question>> getQuestionById(String id);
 
+  /// Remplace le contenu d'une question existante. L'appelant est
+  /// responsable de vérifier que l'utilisateur courant en est l'auteur.
+  Future<Either<Failure, Question>> updateQuestion(
+    String questionId,
+    QuestionDraft draft,
+  );
+
+  /// Supprime une question et ses réponses. Même remarque que pour
+  /// [updateQuestion].
+  Future<Either<Failure, Unit>> deleteQuestion(String questionId);
+
   /// Liste des réponses d'une question, de la plus ancienne à la plus récente.
   Future<Either<Failure, List<Answer>>> getAnswers(String questionId);
 
@@ -41,7 +52,7 @@ abstract class QuestionRepository {
     String questionId,
     AnswerDraft draft,
   );
-  
+
   /// Modifie le contenu d'une réponse existante. L'appelant est
   /// responsable de vérifier que l'utilisateur courant en est bien
   /// l'auteur avant d'appeler cette méthode.
@@ -52,7 +63,10 @@ abstract class QuestionRepository {
   );
 
   /// Supprime une réponse. Même remarque que pour [updateAnswer].
-  Future<Either<Failure, Unit>> deleteAnswer(String questionId, String answerId);
+  Future<Either<Failure, Unit>> deleteAnswer(
+    String questionId,
+    String answerId,
+  );
 
   /// Flux temps réel des réponses d'une question.
   Stream<Either<Failure, List<Answer>>> watchAnswers(String questionId);

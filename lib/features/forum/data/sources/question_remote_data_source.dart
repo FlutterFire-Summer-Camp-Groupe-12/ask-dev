@@ -25,14 +25,26 @@ abstract class QuestionRemoteDataSource {
   /// Charge un document question par son identifiant.
   Future<QuestionModel> getQuestionById(String id);
 
+  /// Remplace le contenu d'une question existante (titre, description, type,
+  /// tags). L'auteur et les dates de création sont conservés.
+  Future<QuestionModel> updateQuestion(String questionId, QuestionDraft draft);
+
+  /// Supprime une question et toutes ses réponses.
+  Future<void> deleteQuestion(String questionId);
+
   /// Réponses d'une question (sous-collection), de la plus ancienne à la plus
   /// récente.
   Future<List<AnswerModel>> getAnswers(String questionId);
 
   /// Enregistre une réponse sous la question et incrémente son compteur.
   Future<AnswerModel> createAnswer(String questionId, AnswerDraft draft);
+
   /// Modifie le contenu d'une réponse existante.
-  Future<AnswerModel> updateAnswer(String questionId, String answerId, String content);
+  Future<AnswerModel> updateAnswer(
+    String questionId,
+    String answerId,
+    String content,
+  );
 
   /// Supprime une réponse et décrémente le compteur de la question.
   Future<void> deleteAnswer(String questionId, String answerId);
@@ -41,5 +53,3 @@ abstract class QuestionRemoteDataSource {
   /// sans avoir à rappeler getAnswers()).
   Stream<List<AnswerModel>> watchAnswers(String questionId);
 }
-
-  

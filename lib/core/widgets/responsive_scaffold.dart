@@ -29,8 +29,6 @@ class ResponsiveScaffold extends StatelessWidget {
         return desktop;
       case DeviceType.other:
         return other;
-
     }
   }
 }
-

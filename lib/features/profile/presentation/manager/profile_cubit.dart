@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:askdev/features/profile/data/models/user_profile_model.dart';
 import 'package:askdev/features/profile/data/sources/user_remote_data_source.dart';
 import 'package:askdev/features/profile/presentation/manager/profile_state.dart';
@@ -5,12 +7,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
   ProfileCubit({required UserRemoteDataSource dataSource})
-      : _dataSource = dataSource,
-        super(const ProfileState());
+    : _dataSource = dataSource,
+      super(const ProfileState());
 
   final UserRemoteDataSource _dataSource;
 
-  Future<void> loadProfile(String uid, {String? fallbackPseudo, String? fallbackEmail}) async {
+  Future<void> loadProfile(
+    String uid, {
+    String? fallbackPseudo,
+    String? fallbackEmail,
+  }) async {
     if (state.isLoading) return;
     emit(state.copyWith(isLoading: true, clearError: true));
     try {
@@ -18,7 +24,8 @@ class ProfileCubit extends Cubit<ProfileState> {
       emit(
         state.copyWith(
           isLoading: false,
-          profile: profile ??
+          profile:
+              profile ??
               UserProfileModel(
                 uid: uid,
                 pseudo: fallbackPseudo ?? 'Utilisateur',
@@ -28,7 +35,12 @@ class ProfileCubit extends Cubit<ProfileState> {
         ),
       );
     } catch (_) {
-      emit(state.copyWith(isLoading: false, error: 'Impossible de charger le profil.'));
+      emit(
+        state.copyWith(
+          isLoading: false,
+          error: 'Impossible de charger le profil.',
+        ),
+      );
     }
   }
 
@@ -36,16 +48,21 @@ class ProfileCubit extends Cubit<ProfileState> {
     required String pseudo,
     required String bio,
     required List<String> topics,
+    File? avatar,
   }) async {
     final current = state.profile;
     if (current == null || state.isSaving) return;
     emit(state.copyWith(isSaving: true, clearError: true));
     try {
+      var avatarUrl = current.avatarUrl;
+      if (avatar != null) {
+        avatarUrl = await _dataSource.saveAvatar(current.uid, avatar);
+      }
       final updated = UserProfileModel(
         uid: current.uid,
         pseudo: pseudo.trim(),
         email: current.email,
-        avatarUrl: current.avatarUrl,
+        avatarUrl: avatarUrl,
         createdAt: current.createdAt,
         topics: topics.map((s) => s.trim()).where((s) => s.isNotEmpty).toList(),
         bio: bio.trim(),
@@ -53,7 +70,12 @@ class ProfileCubit extends Cubit<ProfileState> {
       await _dataSource.saveUserProfile(updated);
       emit(state.copyWith(isSaving: false, profile: updated));
     } catch (_) {
-      emit(state.copyWith(isSaving: false, error: 'Impossible d\'enregistrer les modifications.'));
+      emit(
+        state.copyWith(
+          isSaving: false,
+          error: 'Impossible d\'enregistrer les modifications.',
+        ),
+      );
     }
   }
 }

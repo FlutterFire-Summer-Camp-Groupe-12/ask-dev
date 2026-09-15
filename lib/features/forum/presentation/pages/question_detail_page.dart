@@ -1,6 +1,8 @@
 import 'package:askdev/core/session/auth_gateway.dart';
+import 'package:askdev/core/routes/app_router.dart';
 import 'package:askdev/core/utils/extensions_context.dart';
 import 'package:askdev/core/utils/type_extensions.dart';
+import 'package:askdev/core/widgets/author_info.dart';
 import 'package:askdev/core/widgets/markdown/app_markdown.dart';
 import 'package:askdev/core/widgets/empty_state.dart';
 import 'package:askdev/dependency_injection/injection.dart';
@@ -9,8 +11,10 @@ import 'package:askdev/features/forum/domain/entities/question.dart';
 import 'package:askdev/features/forum/domain/repositories/question_repository.dart';
 import 'package:askdev/features/forum/domain/usecases/create_answer.dart';
 import 'package:askdev/features/forum/domain/usecases/delete_answer.dart';
+import 'package:askdev/features/forum/domain/usecases/delete_question.dart';
 import 'package:askdev/features/forum/domain/usecases/get_question_by_id.dart';
 import 'package:askdev/features/forum/domain/usecases/update_answer.dart';
+import 'package:askdev/features/forum/domain/usecases/update_question.dart';
 import 'package:askdev/features/forum/presentation/manager/question_detail_cubit.dart';
 import 'package:askdev/features/forum/presentation/manager/question_detail_state.dart';
 import 'package:auto_route/auto_route.dart';
@@ -32,6 +36,8 @@ class QuestionDetailPage extends StatelessWidget {
         createAnswer: sl<CreateAnswer>(),
         updateAnswer: sl<UpdateAnswer>(),
         deleteAnswer: sl<DeleteAnswer>(),
+        updateQuestion: sl<UpdateQuestion>(),
+        deleteQuestion: sl<DeleteQuestion>(),
         repository: sl<QuestionRepository>(),
         authGateway: sl<AuthGateway>(),
       )..load(),
@@ -62,7 +68,11 @@ class _QuestionDetailViewState extends State<_QuestionDetailView> {
     }
   }
 
-  Future<void> _confirmDelete(BuildContext context, QuestionDetailCubit cubit, String answerId) async {
+  Future<void> _confirmDelete(
+    BuildContext context,
+    QuestionDetailCubit cubit,
+    String answerId,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -85,12 +95,51 @@ class _QuestionDetailViewState extends State<_QuestionDetailView> {
     }
   }
 
+  Future<void> _confirmDeleteQuestion(
+    BuildContext context,
+    QuestionDetailCubit cubit,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Supprimer cette question ?'),
+        content: const Text(
+          'La question et toutes ses réponses seront supprimées. Cette action est irréversible.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Annuler'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Supprimer'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      cubit.deleteQuestion();
+    }
+  }
+
+  Future<void> _editQuestion(BuildContext context, Question question) async {
+    final updated = await context.router.push<Question>(
+      EditQuestionRoute(question: question),
+    );
+    if (updated != null && context.mounted) {
+      // Recharge la question modifiée (contenu, tags, type) depuis Firestore.
+      context.read<QuestionDetailCubit>().load();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final cubit = context.read<QuestionDetailCubit>();
     return BlocListener<QuestionDetailCubit, QuestionDetailState>(
       listenWhen: (previous, current) {
+        if (current is QuestionDetailDeleted) return true;
         if (previous is! QuestionDetailLoaded ||
             current is! QuestionDetailLoaded) {
           return false;
@@ -99,9 +148,16 @@ class _QuestionDetailViewState extends State<_QuestionDetailView> {
             (current.answerError != null &&
                 previous.answerError != current.answerError) ||
             (current.answerActionError != null &&
-                previous.answerActionError != current.answerActionError);
+                previous.answerActionError != current.answerActionError) ||
+            (current.questionActionError != null &&
+                previous.questionActionError != current.questionActionError);
       },
       listener: (context, state) {
+        if (state is QuestionDetailDeleted) {
+          context.showSuccess('Question supprimée.');
+          context.router.maybePop();
+          return;
+        }
         if (state is! QuestionDetailLoaded) return;
         if (state.published != null) {
           _answerController.clear();
@@ -113,7 +169,8 @@ class _QuestionDetailViewState extends State<_QuestionDetailView> {
           context.showError(error);
           return;
         }
-        final actionError = state.answerActionError;
+        final actionError =
+            state.answerActionError ?? state.questionActionError;
         if (actionError != null) context.showError(actionError);
       },
       child: Scaffold(
@@ -125,23 +182,23 @@ class _QuestionDetailViewState extends State<_QuestionDetailView> {
               return switch (state) {
                 QuestionDetailInitial() || QuestionDetailLoading() =>
                   const Center(child: CircularProgressIndicator()),
+                QuestionDetailDeleted() => const SizedBox.shrink(),
                 QuestionDetailError(:final message) => Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: EmptyState(
-                        icon: Icons.error_outline,
-                        title: 'Question indisponible',
-                        message: message,
-                        action: FilledButton.icon(
-                          onPressed: () => context
-                              .read<QuestionDetailCubit>()
-                              .load(),
-                          icon: const Icon(Icons.refresh, size: 18),
-                          label: const Text('Réessayer'),
-                        ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: EmptyState(
+                      icon: Icons.error_outline,
+                      title: 'Question indisponible',
+                      message: message,
+                      action: FilledButton.icon(
+                        onPressed: () =>
+                            context.read<QuestionDetailCubit>().load(),
+                        icon: const Icon(Icons.refresh, size: 18),
+                        label: const Text('Réessayer'),
                       ),
                     ),
                   ),
+                ),
                 QuestionDetailLoaded(
                   :final question,
                   :final answers,
@@ -154,7 +211,14 @@ class _QuestionDetailViewState extends State<_QuestionDetailView> {
                         child: ListView(
                           padding: const EdgeInsets.all(16),
                           children: [
-                            _QuestionCard(question: question),
+                            _QuestionCard(
+                              question: question,
+                              isOwn: cubit.isOwnQuestion(question),
+                              onEditPressed: () =>
+                                  _editQuestion(context, question),
+                              onDeletePressed: () =>
+                                  _confirmDeleteQuestion(context, cubit),
+                            ),
                             const SizedBox(height: 24),
                             Text(
                               'Réponses (${question.answersCount})',
@@ -182,11 +246,17 @@ class _QuestionDetailViewState extends State<_QuestionDetailView> {
                                     answer: answer,
                                     isOwn: cubit.isOwnAnswer(answer),
                                     isEditing: editingAnswerId == answer.id,
-                                    onEditPressed: () => cubit.startEditing(answer.id),
-                                    onCancelEdit: () => cubit.startEditing(null),
-                                    onSaveEdit: (content) => cubit.editAnswer(answer.id, content),
-                                    onDeletePressed: () =>
-                                        _confirmDelete(context, cubit, answer.id),
+                                    onEditPressed: () =>
+                                        cubit.startEditing(answer.id),
+                                    onCancelEdit: () =>
+                                        cubit.startEditing(null),
+                                    onSaveEdit: (content) =>
+                                        cubit.editAnswer(answer.id, content),
+                                    onDeletePressed: () => _confirmDelete(
+                                      context,
+                                      cubit,
+                                      answer.id,
+                                    ),
                                   ),
                                 ),
                           ],
@@ -209,9 +279,17 @@ class _QuestionDetailViewState extends State<_QuestionDetailView> {
 }
 
 class _QuestionCard extends StatelessWidget {
-  const _QuestionCard({required this.question});
+  const _QuestionCard({
+    required this.question,
+    this.isOwn = false,
+    this.onEditPressed,
+    this.onDeletePressed,
+  });
 
   final Question question;
+  final bool isOwn;
+  final VoidCallback? onEditPressed;
+  final VoidCallback? onDeletePressed;
 
   @override
   Widget build(BuildContext context) {
@@ -222,13 +300,34 @@ class _QuestionCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              question.title,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: colors.onSurface,
-              ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    question.title,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: colors.onSurface,
+                    ),
+                  ),
+                ),
+                if (isOwn) ...[
+                  IconButton(
+                    icon: const Icon(Icons.edit_outlined, size: 18),
+                    tooltip: 'Modifier',
+                    onPressed: onEditPressed,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline, size: 18),
+                    tooltip: 'Supprimer',
+                    onPressed: onDeletePressed,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ],
+              ],
             ),
             const SizedBox(height: 10),
             Row(
@@ -243,6 +342,12 @@ class _QuestionCard extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 8),
+            AuthorInfo(
+              name: question.authorName ?? 'Utilisateur',
+              avatarUrl: question.authorPhoto,
+              avatarRadius: 11,
             ),
             if (question.tags.isNotEmpty) ...[
               const SizedBox(height: 12),
@@ -322,12 +427,19 @@ class _AnswerCardState extends State<_AnswerCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-Row(
+            Row(
               children: [
-                Expanded(
-                  child: Text(
-                    widget.answer.createdAt.timeAgo(),
-                    style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
+                AuthorInfo(
+                  name: widget.answer.authorName ?? 'Utilisateur',
+                  avatarUrl: widget.answer.authorPhoto,
+                  avatarRadius: 10,
+                ),
+                const Spacer(),
+                Text(
+                  widget.answer.createdAt.timeAgo(),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: colors.onSurfaceVariant,
                   ),
                 ),
                 if (widget.isOwn && !widget.isEditing) ...[

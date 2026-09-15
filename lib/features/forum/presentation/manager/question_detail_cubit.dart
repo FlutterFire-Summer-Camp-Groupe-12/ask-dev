@@ -3,11 +3,16 @@ import 'dart:async';
 import 'package:askdev/core/session/auth_gateway.dart';
 import 'package:askdev/features/forum/domain/entities/answer.dart';
 import 'package:askdev/features/forum/domain/entities/answer_draft.dart';
+import 'package:askdev/features/forum/domain/entities/question.dart';
+import 'package:askdev/features/forum/domain/entities/question_draft.dart';
+import 'package:askdev/features/forum/domain/entities/question_type.dart';
 import 'package:askdev/features/forum/domain/repositories/question_repository.dart';
 import 'package:askdev/features/forum/domain/usecases/create_answer.dart';
 import 'package:askdev/features/forum/domain/usecases/delete_answer.dart';
+import 'package:askdev/features/forum/domain/usecases/delete_question.dart';
 import 'package:askdev/features/forum/domain/usecases/get_question_by_id.dart';
 import 'package:askdev/features/forum/domain/usecases/update_answer.dart';
+import 'package:askdev/features/forum/domain/usecases/update_question.dart';
 import 'package:askdev/features/forum/presentation/manager/question_detail_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -18,22 +23,28 @@ class QuestionDetailCubit extends Cubit<QuestionDetailState> {
     required CreateAnswer createAnswer,
     required UpdateAnswer updateAnswer,
     required DeleteAnswer deleteAnswer,
+    required UpdateQuestion updateQuestion,
+    required DeleteQuestion deleteQuestion,
     required QuestionRepository repository,
     required AuthGateway authGateway,
-  })  : _questionId = questionId,
-        _getQuestionById = getQuestionById,
-        _createAnswer = createAnswer,
-        _updateAnswer = updateAnswer,
-        _deleteAnswer = deleteAnswer,
-        _repository = repository,
-        _authGateway = authGateway,
-        super(const QuestionDetailInitial());
+  }) : _questionId = questionId,
+       _getQuestionById = getQuestionById,
+       _createAnswer = createAnswer,
+       _updateAnswer = updateAnswer,
+       _deleteAnswer = deleteAnswer,
+       _updateQuestion = updateQuestion,
+       _deleteQuestion = deleteQuestion,
+       _repository = repository,
+       _authGateway = authGateway,
+       super(const QuestionDetailInitial());
 
   final String _questionId;
   final GetQuestionById _getQuestionById;
   final CreateAnswer _createAnswer;
   final UpdateAnswer _updateAnswer;
   final DeleteAnswer _deleteAnswer;
+  final UpdateQuestion _updateQuestion;
+  final DeleteQuestion _deleteQuestion;
   final QuestionRepository _repository;
   final AuthGateway _authGateway;
 
@@ -46,19 +57,18 @@ class QuestionDetailCubit extends Cubit<QuestionDetailState> {
     emit(const QuestionDetailLoading());
 
     final questionResult = await _getQuestionById(_questionId);
-    final question = questionResult.fold(
-      (failure) {
-        emit(QuestionDetailError(failure.message));
-        return null;
-      },
-      (loaded) => loaded,
-    );
+    final question = questionResult.fold((failure) {
+      emit(QuestionDetailError(failure.message));
+      return null;
+    }, (loaded) => loaded);
     if (question == null) return;
 
     emit(QuestionDetailLoaded(question: question, answers: const []));
 
     await _answersSubscription?.cancel();
-    _answersSubscription = _repository.watchAnswers(_questionId).listen((result) {
+    _answersSubscription = _repository.watchAnswers(_questionId).listen((
+      result,
+    ) {
       final current = state;
       if (current is! QuestionDetailLoaded) return;
 
@@ -80,7 +90,9 @@ class QuestionDetailCubit extends Cubit<QuestionDetailState> {
 
     final trimmed = content.trim();
     if (trimmed.isEmpty) {
-      emit(current.copyWith(answerError: 'Rédigez une réponse avant d’envoyer.'));
+      emit(
+        current.copyWith(answerError: 'Rédigez une réponse avant d’envoyer.'),
+      );
       return;
     }
 
@@ -90,10 +102,19 @@ class QuestionDetailCubit extends Cubit<QuestionDetailState> {
       return;
     }
 
-    emit(current.copyWith(isSubmitting: true, answerError: null, published: null));
+    emit(
+      current.copyWith(isSubmitting: true, answerError: null, published: null),
+    );
+    final author = _authGateway.currentUser;
     final result = await _createAnswer(
       _questionId,
-      AnswerDraft(content: trimmed, authorId: authorId),
+      AnswerDraft(
+        content: trimmed,
+        authorId: authorId,
+        // ponytail: identité dénormalisée comme sur les questions.
+        authorName: author?.displayName ?? author?.email,
+        authorPhoto: author?.photoUrl,
+      ),
     );
 
     final afterCall = state;
@@ -104,7 +125,11 @@ class QuestionDetailCubit extends Cubit<QuestionDetailState> {
         afterCall.copyWith(isSubmitting: false, answerError: failure.message),
       ),
       (answer) => emit(
-        afterCall.copyWith(isSubmitting: false, published: answer, answerError: null),
+        afterCall.copyWith(
+          isSubmitting: false,
+          published: answer,
+          answerError: null,
+        ),
       ),
     );
   }
@@ -124,14 +149,21 @@ class QuestionDetailCubit extends Cubit<QuestionDetailState> {
 
     final trimmed = content.trim();
     if (trimmed.isEmpty) {
-      emit(current.copyWith(answerActionError: 'La réponse ne peut pas être vide.'));
+      emit(
+        current.copyWith(
+          answerActionError: 'La réponse ne peut pas être vide.',
+        ),
+      );
       return;
     }
 
     if (!_isAuthorOf(answerId, current.answers)) {
-      emit(current.copyWith(
-        answerActionError: 'Vous ne pouvez modifier que vos propres réponses.',
-      ));
+      emit(
+        current.copyWith(
+          answerActionError:
+              'Vous ne pouvez modifier que vos propres réponses.',
+        ),
+      );
       return;
     }
 
@@ -154,9 +186,12 @@ class QuestionDetailCubit extends Cubit<QuestionDetailState> {
     if (current is! QuestionDetailLoaded) return;
 
     if (!_isAuthorOf(answerId, current.answers)) {
-      emit(current.copyWith(
-        answerActionError: 'Vous ne pouvez supprimer que vos propres réponses.',
-      ));
+      emit(
+        current.copyWith(
+          answerActionError:
+              'Vous ne pouvez supprimer que vos propres réponses.',
+        ),
+      );
       return;
     }
 
@@ -180,6 +215,96 @@ class QuestionDetailCubit extends Cubit<QuestionDetailState> {
   bool isOwnAnswer(Answer answer) {
     final userId = _authGateway.currentUserId;
     return userId != null && answer.authorId == userId;
+  }
+
+  /// Vrai si l'utilisateur connecté est l'auteur de la question.
+  bool isOwnQuestion(Question question) {
+    final userId = _authGateway.currentUserId;
+    return userId != null && question.authorId == userId;
+  }
+
+  /// Remplace titre/description/tags de la question courante.
+  Future<void> saveQuestion({
+    required String title,
+    required String content,
+    required List<String> tags,
+    required QuestionType type,
+  }) async {
+    final current = state;
+    if (current is! QuestionDetailLoaded || current.isQuestionSaving) return;
+
+    final question = current.question;
+    if (!isOwnQuestion(question)) {
+      emit(
+        current.copyWith(
+          questionActionError:
+              'Vous ne pouvez modifier que vos propres questions.',
+        ),
+      );
+      return;
+    }
+
+    emit(current.copyWith(isQuestionSaving: true, questionActionError: null));
+    final result = await _updateQuestion(
+      _questionId,
+      QuestionDraft(
+        authorId: question.authorId,
+        authorName: question.authorName,
+        authorPhoto: question.authorPhoto,
+        title: title.trim(),
+        content: content.trim(),
+        type: type,
+        status: question.status,
+        tags: tags,
+      ),
+    );
+
+    final afterCall = state;
+    if (afterCall is! QuestionDetailLoaded) return;
+
+    result.fold(
+      (failure) => emit(
+        afterCall.copyWith(
+          isQuestionSaving: false,
+          questionActionError: failure.message,
+        ),
+      ),
+      (updated) =>
+          emit(afterCall.copyWith(isQuestionSaving: false, question: updated)),
+    );
+  }
+
+  /// Supprime la question courante (déclenche l'état [QuestionDetailDeleted])
+  /// puis ferme l'écran dans la page.
+  Future<void> deleteQuestion() async {
+    final current = state;
+    if (current is! QuestionDetailLoaded || current.isQuestionSaving) return;
+
+    if (!isOwnQuestion(current.question)) {
+      emit(
+        current.copyWith(
+          questionActionError:
+              'Vous ne pouvez supprimer que vos propres questions.',
+        ),
+      );
+      return;
+    }
+
+    emit(current.copyWith(isQuestionSaving: true, questionActionError: null));
+    final result = await _deleteQuestion(_questionId);
+
+    final afterCall = state;
+    if (afterCall is! QuestionDetailLoaded) return;
+
+    result.fold(
+      (failure) => emit(
+        afterCall.copyWith(
+          isQuestionSaving: false,
+          questionActionError: failure.message,
+        ),
+      ),
+      (_) => emit(const QuestionDetailDeleted()),
+    );
   }
 
   bool _isAuthorOf(String answerId, List<Answer> answers) {

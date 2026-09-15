@@ -10,8 +10,8 @@ import 'package:fpdart/fpdart.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit({required AuthRepository repository})
-      : _repository = repository,
-        super(const AuthState()) {
+    : _repository = repository,
+      super(const AuthState()) {
     _watchStatus();
   }
 
@@ -26,7 +26,9 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> signIn({required String identifier, required String password}) {
-    return _apply(() => _repository.signIn(identifier: identifier, password: password));
+    return _apply(
+      () => _repository.signIn(identifier: identifier, password: password),
+    );
   }
 
   Future<void> signUp({
@@ -35,7 +37,8 @@ class AuthCubit extends Cubit<AuthState> {
     required String password,
   }) {
     return _apply(
-      () => _repository.signUp(pseudo: pseudo, email: email, password: password),
+      () =>
+          _repository.signUp(pseudo: pseudo, email: email, password: password),
     );
   }
 
@@ -46,21 +49,33 @@ class AuthCubit extends Cubit<AuthState> {
     emit(state.copyWith(isSubmitting: true, clearError: true));
     final result = await _repository.signOut();
     result.fold(
-      (failure) => emit(state.copyWith(isSubmitting: false, error: failure.message)),
+      (failure) =>
+          emit(state.copyWith(isSubmitting: false, error: failure.message)),
       (_) => emit(
-        state.copyWith(isSubmitting: false, status: AuthStatus.unauthenticated, user: null),
+        state.copyWith(
+          isSubmitting: false,
+          status: AuthStatus.unauthenticated,
+          user: null,
+        ),
       ),
     );
   }
 
-  Future<void> _apply(Future<Either<Failure, AuthUser>> Function() action) async {
+  Future<void> _apply(
+    Future<Either<Failure, AuthUser>> Function() action,
+  ) async {
     if (state.isSubmitting) return;
     emit(state.copyWith(isSubmitting: true, clearError: true));
     final result = await action();
     result.fold(
-      (failure) => emit(state.copyWith(isSubmitting: false, error: failure.message)),
+      (failure) =>
+          emit(state.copyWith(isSubmitting: false, error: failure.message)),
       (user) => emit(
-        state.copyWith(isSubmitting: false, status: AuthStatus.authenticated, user: user),
+        state.copyWith(
+          isSubmitting: false,
+          status: AuthStatus.authenticated,
+          user: user,
+        ),
       ),
     );
   }

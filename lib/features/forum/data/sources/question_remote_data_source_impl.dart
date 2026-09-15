@@ -10,7 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class QuestionRemoteDataSourceImpl implements QuestionRemoteDataSource {
   QuestionRemoteDataSourceImpl({required FirebaseFirestore firestore})
-      : _firestore = firestore;
+    : _firestore = firestore;
 
   static const String collectionPath = 'questions';
 
@@ -131,6 +131,8 @@ class QuestionRemoteDataSourceImpl implements QuestionRemoteDataSource {
       createdAt: now,
       updatedAt: now,
       searchKeywords: draft.searchKeywords,
+      authorName: draft.authorName,
+      authorPhoto: draft.authorPhoto,
     );
 
     // Les dates sont posées par le serveur pour rester cohérentes entre
@@ -152,10 +154,60 @@ class QuestionRemoteDataSourceImpl implements QuestionRemoteDataSource {
   }
 
   @override
+  Future<QuestionModel> updateQuestion(
+    String questionId,
+    QuestionDraft draft,
+  ) async {
+    final document = _questions.doc(questionId);
+    final snapshot = await document.get();
+    final current = QuestionModel.fromJson({
+      'id': snapshot.id,
+      ...snapshot.data()!,
+    });
+
+    final updated = QuestionModel(
+      id: current.id,
+      title: draft.title,
+      content: draft.content,
+      authorId: current.authorId,
+      type: draft.type,
+      status: draft.status,
+      tags: draft.tags,
+      createdAt: current.createdAt,
+      updatedAt: DateTime.now(),
+      answersCount: current.answersCount,
+      searchKeywords: draft.searchKeywords,
+      authorName: current.authorName,
+      authorPhoto: current.authorPhoto,
+    );
+
+    await document.update({
+      ...updated.toJson(),
+      'createdAt': current.createdAt,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+
+    return updated;
+  }
+
+  @override
+  Future<void> deleteQuestion(String questionId) async {
+    final batch = _firestore.batch();
+    // Les réponses vivent en sous-collection : on les supprime avec la
+    // question pour ne pas laisser de données orphelines.
+    final answers = await _answersOf(questionId).get();
+    for (final doc in answers.docs) {
+      batch.delete(_answersOf(questionId).doc(doc.id));
+    }
+    batch.delete(_questions.doc(questionId));
+    await batch.commit();
+  }
+
+  @override
   Future<List<AnswerModel>> getAnswers(String questionId) async {
-    final snapshot = await _answersOf(questionId)
-        .orderBy('createdAt', descending: false)
-        .get();
+    final snapshot = await _answersOf(
+      questionId,
+    ).orderBy('createdAt', descending: false).get();
 
     return snapshot.docs
         .map((doc) => AnswerModel.fromJson({'id': doc.id, ...doc.data()}))
@@ -172,6 +224,8 @@ class QuestionRemoteDataSourceImpl implements QuestionRemoteDataSource {
       authorId: draft.authorId,
       createdAt: now,
       updatedAt: now,
+      authorName: draft.authorName,
+      authorPhoto: draft.authorPhoto,
     );
 
     // La réponse et l'incrément du compteur partent dans le même batch pour
@@ -198,7 +252,10 @@ class QuestionRemoteDataSourceImpl implements QuestionRemoteDataSource {
   ) async {
     final document = _answersOf(questionId).doc(answerId);
     final snapshot = await document.get();
-    final current = AnswerModel.fromJson({'id': snapshot.id, ...snapshot.data()!});
+    final current = AnswerModel.fromJson({
+      'id': snapshot.id,
+      ...snapshot.data()!,
+    });
 
     final updated = AnswerModel(
       id: current.id,
@@ -206,6 +263,8 @@ class QuestionRemoteDataSourceImpl implements QuestionRemoteDataSource {
       authorId: current.authorId,
       createdAt: current.createdAt,
       updatedAt: DateTime.now(),
+      authorName: current.authorName,
+      authorPhoto: current.authorPhoto,
     );
 
     await document.update({
@@ -234,8 +293,10 @@ class QuestionRemoteDataSourceImpl implements QuestionRemoteDataSource {
     return _answersOf(questionId)
         .orderBy('createdAt', descending: false)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => AnswerModel.fromJson({'id': doc.id, ...doc.data()}))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => AnswerModel.fromJson({'id': doc.id, ...doc.data()}))
+              .toList(),
+        );
   }
 }

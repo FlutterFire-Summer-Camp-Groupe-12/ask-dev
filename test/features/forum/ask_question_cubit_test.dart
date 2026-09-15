@@ -1,6 +1,7 @@
 import 'package:askdev/core/error/failure.dart';
 import 'package:askdev/core/session/auth_status.dart';
 import 'package:askdev/core/session/auth_gateway.dart';
+import 'package:askdev/features/auth/domain/entities/auth_user.dart';
 import 'package:askdev/features/forum/domain/entities/answer.dart';
 import 'package:askdev/features/forum/domain/entities/answer_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question.dart';
@@ -80,6 +81,19 @@ class _FakeQuestionRepository implements QuestionRepository {
   }
 
   @override
+  Future<Either<Failure, Question>> updateQuestion(
+    String questionId,
+    QuestionDraft draft,
+  ) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, Unit>> deleteQuestion(String questionId) async {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<Either<Failure, Question>> createQuestion(QuestionDraft draft) async {
     lastDraft = draft;
     final error = failure;
@@ -105,14 +119,20 @@ class _FakeQuestionRepository implements QuestionRepository {
 }
 
 class _FakeAuthGateway implements AuthGateway {
-  _FakeAuthGateway(this.currentUserId);
+  _FakeAuthGateway(this.currentUserId, {this.user});
 
   @override
   final String? currentUserId;
 
+  final AuthUser? user;
+
   @override
-  AuthStatus get status =>
-      currentUserId == null ? AuthStatus.unauthenticated : AuthStatus.authenticated;
+  AuthUser? get currentUser => user;
+
+  @override
+  AuthStatus get status => currentUserId == null
+      ? AuthStatus.unauthenticated
+      : AuthStatus.authenticated;
 
   @override
   Stream<AuthStatus> get statusStream => Stream.value(status);
@@ -125,10 +145,11 @@ void main() {
   AskQuestionCubit buildCubit(
     _FakeQuestionRepository repository, {
     String? userId = 'u1',
+    AuthUser? user,
   }) {
     return AskQuestionCubit(
       createQuestion: CreateQuestion(repository: repository),
-      authGateway: _FakeAuthGateway(userId),
+      authGateway: _FakeAuthGateway(userId, user: user),
     );
   }
 
@@ -212,17 +233,20 @@ void main() {
   });
 
   group('AskQuestionCubit submit', () {
-    test('reveals errors and skips the call when the form is incomplete', () async {
-      final repository = _FakeQuestionRepository();
-      final cubit = buildCubit(repository)..titleChanged('trop court');
+    test(
+      'reveals errors and skips the call when the form is incomplete',
+      () async {
+        final repository = _FakeQuestionRepository();
+        final cubit = buildCubit(repository)..titleChanged('trop court');
 
-      await cubit.submit();
+        await cubit.submit();
 
-      expect(cubit.state.showErrors, isTrue);
-      expect(cubit.state.titleError, isNotNull);
-      expect(cubit.state.tagsError, isNotNull);
-      expect(repository.lastDraft, isNull);
-    });
+        expect(cubit.state.showErrors, isTrue);
+        expect(cubit.state.titleError, isNotNull);
+        expect(cubit.state.tagsError, isNotNull);
+        expect(repository.lastDraft, isNull);
+      },
+    );
 
     test('sends a trimmed draft and resets the form on success', () async {
       final repository = _FakeQuestionRepository();
@@ -265,6 +289,26 @@ void main() {
 
       expect(repository.lastDraft, isNull);
       expect(cubit.state.error, isNotNull);
+    });
+
+    test('denormalizes the author identity into the draft', () async {
+      final repository = _FakeQuestionRepository();
+      final cubit = buildCubit(
+        repository,
+        userId: 'u1',
+        user: AuthUser(
+          uid: 'u1',
+          email: 'alice@example.com',
+          displayName: 'Alice',
+          photoUrl: 'https://example.com/a.png',
+        ),
+      );
+      fillValidForm(cubit);
+
+      await cubit.submit();
+
+      expect(repository.lastDraft?.authorName, 'Alice');
+      expect(repository.lastDraft?.authorPhoto, 'https://example.com/a.png');
     });
   });
 }

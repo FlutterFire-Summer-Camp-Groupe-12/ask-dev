@@ -3,10 +3,26 @@
 /// La valeur persistée dans Firestore est [storageKey] : elle reste stable
 /// même si le libellé affiché change.
 enum QuestionType {
-  howTo('how-to', 'Comment faire / Dépannage', 'Un problème concret à résoudre.'),
-  concept('concept', 'Explication / Concept', 'Comprendre comment ou pourquoi ça marche.'),
-  comparison('comparison', 'Comparaison / Choix', 'Départager plusieurs approches ou outils.'),
-  bestPractice('best-practice', 'Bonne pratique', 'Chercher la façon recommandée de faire.');
+  howTo(
+    'how-to',
+    'Comment faire / Dépannage',
+    'Un problème concret à résoudre.',
+  ),
+  concept(
+    'concept',
+    'Explication / Concept',
+    'Comprendre comment ou pourquoi ça marche.',
+  ),
+  comparison(
+    'comparison',
+    'Comparaison / Choix',
+    'Départager plusieurs approches ou outils.',
+  ),
+  bestPractice(
+    'best-practice',
+    'Bonne pratique',
+    'Chercher la façon recommandée de faire.',
+  );
 
   const QuestionType(this.storageKey, this.label, this.description);
 

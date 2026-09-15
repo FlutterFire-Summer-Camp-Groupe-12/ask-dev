@@ -11,16 +11,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required FirebaseAuth firebaseAuth,
     required GoogleSignIn googleSignIn,
     required UserRemoteDataSource userDataSource,
-  })  : _firebaseAuth = firebaseAuth,
-        _googleSignIn = googleSignIn,
-        _userDataSource = userDataSource;
+  }) : _firebaseAuth = firebaseAuth,
+       _googleSignIn = googleSignIn,
+       _userDataSource = userDataSource;
 
   final FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
   final UserRemoteDataSource _userDataSource;
 
   @override
-  Stream<AuthUser?> userChanges() => _firebaseAuth.authStateChanges().map(_mapUser);
+  Stream<AuthUser?> userChanges() =>
+      _firebaseAuth.authStateChanges().map(_mapUser);
 
   @override
   Future<AuthUser> signInWithEmail(String email, String password) async {
@@ -32,7 +33,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<AuthUser> signInWithIdentifier(String identifier, String password) async {
+  Future<AuthUser> signInWithIdentifier(
+    String identifier,
+    String password,
+  ) async {
     final email = await _resolveEmail(identifier);
     return signInWithEmail(email, password);
   }
@@ -49,11 +53,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<AuthUser> signUpWithEmail(String email, String password, String pseudo) async {
+  Future<AuthUser> signUpWithEmail(
+    String email,
+    String password,
+    String pseudo,
+  ) async {
     final credentials = await _firebaseAuth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
+    // Le pseudo sert de nom d'auteur dénormalisé sur les questions/réponses.
+    await credentials.user!.updateProfile(displayName: pseudo);
     final user = _requireUser(credentials.user);
     await _userDataSource.saveUserProfile(
       UserProfileModel(

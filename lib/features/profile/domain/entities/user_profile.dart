@@ -20,5 +20,13 @@ class UserProfile extends Equatable {
   final String? bio;
 
   @override
-  List<Object?> get props => [uid, pseudo, email, avatarUrl, createdAt, topics, bio];
+  List<Object?> get props => [
+    uid,
+    pseudo,
+    email,
+    avatarUrl,
+    createdAt,
+    topics,
+    bio,
+  ];
 }

@@ -7,27 +7,30 @@ void main() {
   final timestamp = Timestamp.fromMillisecondsSinceEpoch(1700000000000);
 
   group('QuestionModel', () {
-    test('fromJson maps all fields including answersCount and searchKeywords', () {
-      final model = QuestionModel.fromJson({
-        'id': 'q1',
-        'title': 'How to use Firebase?',
-        'content': 'Body',
-        'authorId': 'u1',
-        'createdAt': timestamp,
-        'updatedAt': timestamp,
-        'answersCount': 2,
-        'searchKeywords': ['how', 'to', 'use', 'firebase'],
-      });
+    test(
+      'fromJson maps all fields including answersCount and searchKeywords',
+      () {
+        final model = QuestionModel.fromJson({
+          'id': 'q1',
+          'title': 'How to use Firebase?',
+          'content': 'Body',
+          'authorId': 'u1',
+          'createdAt': timestamp,
+          'updatedAt': timestamp,
+          'answersCount': 2,
+          'searchKeywords': ['how', 'to', 'use', 'firebase'],
+        });
 
-      expect(model.id, 'q1');
-      expect(model.title, 'How to use Firebase?');
-      expect(model.content, 'Body');
-      expect(model.authorId, 'u1');
-      expect(model.createdAt, timestamp.toDate());
-      expect(model.updatedAt, timestamp.toDate());
-      expect(model.answersCount, 2);
-      expect(model.searchKeywords, ['how', 'to', 'use', 'firebase']);
-    });
+        expect(model.id, 'q1');
+        expect(model.title, 'How to use Firebase?');
+        expect(model.content, 'Body');
+        expect(model.authorId, 'u1');
+        expect(model.createdAt, timestamp.toDate());
+        expect(model.updatedAt, timestamp.toDate());
+        expect(model.answersCount, 2);
+        expect(model.searchKeywords, ['how', 'to', 'use', 'firebase']);
+      },
+    );
 
     test('fromJson defaults answersCount and searchKeywords when missing', () {
       final model = QuestionModel.fromJson({

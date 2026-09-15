@@ -1,11 +1,6 @@
 import '../constants/breakpoints.dart';
 
-enum DeviceType {
-  mobile,
-  tablet,
-  desktop,
-  other,
-}
+enum DeviceType { mobile, tablet, desktop, other }
 
 abstract final class Responsive {
   static DeviceType getDeviceType(double width) {
@@ -32,7 +27,7 @@ abstract final class Responsive {
         return 4;
     }
   }
-  
+
   static double getHorizontalMargin(double width) {
     switch (getDeviceType(width)) {
       case DeviceType.mobile:
@@ -43,8 +38,9 @@ abstract final class Responsive {
         return 24.0;
       case DeviceType.other:
         return 32.0;
-    }  
+    }
   }
+
   static double getVerticalMargin(double width) {
     switch (getDeviceType(width)) {
       case DeviceType.mobile:
@@ -55,7 +51,7 @@ abstract final class Responsive {
         return 24.0;
       case DeviceType.other:
         return 32.0;
-    }  
+    }
   }
 
   static double getGridSpacing(double width) {

@@ -10,7 +10,7 @@ import 'package:fpdart/fpdart.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({required AuthRemoteDataSource remoteDataSource})
-      : _remoteDataSource = remoteDataSource;
+    : _remoteDataSource = remoteDataSource;
 
   final AuthRemoteDataSource _remoteDataSource;
 
@@ -48,7 +48,9 @@ class AuthRepositoryImpl implements AuthRepository {
     required String identifier,
     required String password,
   }) {
-    return _run(() => _remoteDataSource.signInWithIdentifier(identifier, password));
+    return _run(
+      () => _remoteDataSource.signInWithIdentifier(identifier, password),
+    );
   }
 
   @override
@@ -57,7 +59,9 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String password,
   }) {
-    return _run(() => _remoteDataSource.signUpWithEmail(email, password, pseudo));
+    return _run(
+      () => _remoteDataSource.signUpWithEmail(email, password, pseudo),
+    );
   }
 
   @override
@@ -76,7 +80,9 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-  Future<Either<Failure, AuthUser>> _run(Future<AuthUser?> Function() action) async {
+  Future<Either<Failure, AuthUser>> _run(
+    Future<AuthUser?> Function() action,
+  ) async {
     try {
       final user = await action();
       if (user == null) {
@@ -91,7 +97,9 @@ class AuthRepositoryImpl implements AuthRepository {
 
   void _setUser(AuthUser? user) {
     _currentUser = user;
-    _status = user == null ? AuthStatus.unauthenticated : AuthStatus.authenticated;
+    _status = user == null
+        ? AuthStatus.unauthenticated
+        : AuthStatus.authenticated;
     final controller = _controller;
     if (controller != null && !controller.isClosed) {
       controller.add(_status);
@@ -104,17 +112,23 @@ class AuthRepositoryImpl implements AuthRepository {
         case 'email-already-in-use':
           return const Failure(message: 'Cet email est déjà utilisé.');
         case 'weak-password':
-          return const Failure(message: 'Le mot de passe est trop faible (6 caractères minimum).');
+          return const Failure(
+            message: 'Le mot de passe est trop faible (6 caractères minimum).',
+          );
         case 'invalid-email':
         case 'invalid-credential':
         case 'invalid-login-credentials':
         case 'user-not-found':
         case 'wrong-password':
-          return const Failure(message: 'Identifiant ou mot de passe incorrect.');
+          return const Failure(
+            message: 'Identifiant ou mot de passe incorrect.',
+          );
         case 'network-request-failed':
           return const Failure(message: 'Connexion réseau impossible.');
         case 'too-many-requests':
-          return const Failure(message: 'Trop de tentatives. Réessayez plus tard.');
+          return const Failure(
+            message: 'Trop de tentatives. Réessayez plus tard.',
+          );
         default:
           return Failure(message: error.message ?? 'Une erreur est survenue.');
       }

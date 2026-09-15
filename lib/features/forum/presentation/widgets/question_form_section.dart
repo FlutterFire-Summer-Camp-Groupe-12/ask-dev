@@ -66,11 +66,7 @@ class QuestionFormSection extends StatelessWidget {
           const SizedBox(height: 6),
           Row(
             children: [
-              Icon(
-                Icons.error_outline,
-                size: 14,
-                color: colors.error,
-              ),
+              Icon(Icons.error_outline, size: 14, color: colors.error),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -91,12 +87,15 @@ InputDecoration questionFieldDecoration({
   required ColorScheme colors,
   String? hintText,
   bool hasError = false,
-  EdgeInsets contentPadding = const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+  EdgeInsets contentPadding = const EdgeInsets.symmetric(
+    horizontal: 14,
+    vertical: 14,
+  ),
 }) {
   OutlineInputBorder border(Color color, double width) => OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: color, width: width),
-      );
+    borderRadius: BorderRadius.circular(12),
+    borderSide: BorderSide(color: color, width: width),
+  );
 
   return InputDecoration(
     hintText: hintText,
@@ -105,14 +104,8 @@ InputDecoration questionFieldDecoration({
     fillColor: colors.surfaceContainerHighest,
     isDense: true,
     contentPadding: contentPadding,
-    enabledBorder: border(
-      hasError ? colors.error : colors.outlineVariant,
-      1,
-    ),
-    focusedBorder: border(
-      hasError ? colors.error : colors.primary,
-      1.6,
-    ),
+    enabledBorder: border(hasError ? colors.error : colors.outlineVariant, 1),
+    focusedBorder: border(hasError ? colors.error : colors.primary, 1.6),
     disabledBorder: border(colors.outlineVariant, 1),
     errorStyle: const TextStyle(height: 0, fontSize: 0),
   );

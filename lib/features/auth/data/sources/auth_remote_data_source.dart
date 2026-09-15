@@ -7,7 +7,11 @@ abstract class AuthRemoteDataSource {
 
   Future<AuthUser> signInWithIdentifier(String identifier, String password);
 
-  Future<AuthUser> signUpWithEmail(String email, String password, String pseudo);
+  Future<AuthUser> signUpWithEmail(
+    String email,
+    String password,
+    String pseudo,
+  );
 
   Future<AuthUser?> signInWithGoogle();
 

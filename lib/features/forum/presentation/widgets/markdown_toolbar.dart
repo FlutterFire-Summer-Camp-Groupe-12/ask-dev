@@ -117,9 +117,7 @@ class MarkdownToolbar extends StatelessWidget {
 
     controller.value = value.copyWith(
       text: text,
-      selection: TextSelection.collapsed(
-        offset: selection.end + prefix.length,
-      ),
+      selection: TextSelection.collapsed(offset: selection.end + prefix.length),
       composing: TextRange.empty,
     );
   }

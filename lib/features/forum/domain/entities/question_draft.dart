@@ -15,6 +15,8 @@ class QuestionDraft extends Equatable {
     required this.type,
     required this.status,
     required this.tags,
+    this.authorName,
+    this.authorPhoto,
   });
 
   final String authorId;
@@ -24,14 +26,25 @@ class QuestionDraft extends Equatable {
   final QuestionStatus status;
   final List<String> tags;
 
+  /// Identité dénormalisée de l'auteur, portée par le brouillon pour être
+  /// écrite une seule fois au moment de la création.
+  final String? authorName;
+  final String? authorPhoto;
+
   /// Mots-clés utilisés par la recherche Firestore (`array-contains`),
   /// tirés du titre, des tags et de la description. Voir [SearchText].
-  List<String> get searchKeywords => SearchText.buildKeywords(
-        title: title,
-        tags: tags,
-        content: content,
-      );
+  List<String> get searchKeywords =>
+      SearchText.buildKeywords(title: title, tags: tags, content: content);
 
   @override
-  List<Object?> get props => [authorId, title, content, type, status, tags];
+  List<Object?> get props => [
+    authorId,
+    title,
+    content,
+    type,
+    status,
+    tags,
+    authorName,
+    authorPhoto,
+  ];
 }
