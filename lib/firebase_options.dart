@@ -62,7 +62,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '410116228746',
     projectId: 'askdev-9dba1',
     storageBucket: 'askdev-9dba1.firebasestorage.app',
-    iosClientId: '410116228746-dfctbrlrn69vcd34evc6ibfojjml7vcc.apps.googleusercontent.com',
+    iosClientId:
+        '410116228746-dfctbrlrn69vcd34evc6ibfojjml7vcc.apps.googleusercontent.com',
     iosBundleId: 'com.example.askdev',
   );
 }

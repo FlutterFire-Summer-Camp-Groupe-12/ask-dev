@@ -114,7 +114,9 @@ class _PasswordFieldState extends State<PasswordField> {
         suffixIcon: IconButton(
           onPressed: () => setState(() => _obscureText = !_obscureText),
           icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility),
-          tooltip: _obscureText ? 'Afficher le mot de passe' : 'Masquer le mot de passe',
+          tooltip: _obscureText
+              ? 'Afficher le mot de passe'
+              : 'Masquer le mot de passe',
         ),
       ),
       validator: Validators.password,

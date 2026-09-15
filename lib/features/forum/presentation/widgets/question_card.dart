@@ -1,5 +1,6 @@
 import 'package:askdev/core/utils/markdown.dart';
 import 'package:askdev/core/utils/type_extensions.dart';
+import 'package:askdev/core/widgets/author_info.dart';
 import 'package:flutter/material.dart';
 
 import '../../domain/entities/question.dart';
@@ -50,9 +51,22 @@ class QuestionCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              Text(
-                '$replies · ${question.createdAt.timeAgo()}',
-                style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
+              Row(
+                children: [
+                  AuthorInfo(
+                    name: question.authorName ?? 'Utilisateur',
+                    avatarUrl: question.authorPhoto,
+                    avatarRadius: 10,
+                  ),
+                  const Spacer(),
+                  Text(
+                    '$replies · ${question.createdAt.timeAgo()}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: colors.onSurfaceVariant,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

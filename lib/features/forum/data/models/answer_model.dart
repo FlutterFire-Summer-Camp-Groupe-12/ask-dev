@@ -8,6 +8,8 @@ class AnswerModel extends Answer {
     required super.authorId,
     required super.createdAt,
     required super.updatedAt,
+    super.authorName,
+    super.authorPhoto,
   });
 
   factory AnswerModel.fromJson(Map<String, dynamic> json) {
@@ -17,14 +19,18 @@ class AnswerModel extends Answer {
       authorId: json['authorId'] as String,
       createdAt: requireFirestoreDate(json['createdAt'], 'createdAt'),
       updatedAt: requireFirestoreDate(json['updatedAt'], 'updatedAt'),
+      authorName: json['authorName'] as String?,
+      authorPhoto: json['authorPhoto'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'content': content,
-        'authorId': authorId,
-        'createdAt': createdAt,
-        'updatedAt': updatedAt,
-      };
+    'id': id,
+    'content': content,
+    'authorId': authorId,
+    'createdAt': createdAt,
+    'updatedAt': updatedAt,
+    'authorName': authorName,
+    'authorPhoto': authorPhoto,
+  };
 }

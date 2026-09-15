@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:askdev/core/utils/extensions_context.dart';
 import 'package:askdev/core/utils/validators.dart';
 import 'package:askdev/features/profile/presentation/manager/profile_cubit.dart';
 import 'package:askdev/features/profile/presentation/manager/profile_state.dart';
+import 'package:askdev/features/profile/presentation/pages/avatar_edit.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 
 const _maxTopics = 15;
 
@@ -21,6 +25,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final _pseudoController = TextEditingController();
   final _bioController = TextEditingController();
   List<String> _topics = <String>[];
+  XFile? _avatar;
   bool _initialized = false;
 
   @override
@@ -49,6 +54,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       pseudo: _pseudoController.text,
       bio: _bioController.text,
       topics: _topics,
+      avatar: _avatar != null ? File(_avatar!.path) : null,
     );
   }
 
@@ -86,6 +92,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
+                              Center(
+                                child: AvatarPicker(
+                                  enabled: !isSaving,
+                                  initialImagePath: state.profile?.avatarUrl,
+                                  onImageSelected: (image) {
+                                    setState(() => _avatar = image);
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 24),
                               TextFormField(
                                 controller: _pseudoController,
                                 enabled: !isSaving,

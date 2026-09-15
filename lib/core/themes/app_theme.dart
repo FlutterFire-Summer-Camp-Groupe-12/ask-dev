@@ -122,10 +122,7 @@ class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           shape: rounded12,
-          textStyle: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -138,9 +135,7 @@ class AppTheme {
         backgroundColor: scheme.surfaceContainerHighest,
         labelStyle: TextStyle(color: scheme.onSurface, fontSize: 12),
         side: BorderSide(color: scheme.outlineVariant),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         deleteIconColor: scheme.onSurfaceVariant,
       ),
       dividerTheme: DividerThemeData(color: scheme.outlineVariant),

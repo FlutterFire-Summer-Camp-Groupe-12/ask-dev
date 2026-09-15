@@ -33,7 +33,9 @@ abstract final class Validators {
     final pseudo = value?.trim() ?? '';
     if (pseudo.isEmpty) return 'Pseudo requis';
     if (pseudo.length < 3) return '3 caractères minimum';
-    if (pseudo.contains(RegExp(r'\s'))) return 'Le pseudo ne doit pas contenir d\'espaces';
+    if (pseudo.contains(RegExp(r'\s'))) {
+      return 'Le pseudo ne doit pas contenir d\'espaces';
+    }
     return null;
   }
 

@@ -83,8 +83,9 @@ class _TagInputFieldState extends State<TagInputField> {
               for (final tag in widget.tags)
                 _SelectedTagChip(
                   label: tag,
-                  onRemoved:
-                      widget.enabled ? () => widget.onTagRemoved(tag) : null,
+                  onRemoved: widget.enabled
+                      ? () => widget.onTagRemoved(tag)
+                      : null,
                 ),
             ],
           ),
@@ -105,31 +106,32 @@ class _TagInputFieldState extends State<TagInputField> {
               replacementString: '',
             ),
           ],
-          decoration: questionFieldDecoration(
-            colors: colors,
-            hintText: _isFull
-                ? '${widget.maxTags} tags maximum atteints'
-                : 'ex. (flutter dart firebase)',
-            hasError: widget.hasError,
-          ).copyWith(
-            prefixIcon: Icon(
-              Icons.search,
-              size: 18,
-              color: colors.onSurfaceVariant,
-            ),
-            prefixIconConstraints: const BoxConstraints.tightFor(
-              width: 38,
-              height: 20,
-            ),
-            suffixIcon: _controller.text.trim().isEmpty
-                ? null
-                : IconButton(
-                    onPressed: () => _submit(_controller.text),
-                    icon: const Icon(Icons.add, size: 18),
-                    color: colors.primary,
-                    tooltip: 'Ajouter ce tag',
-                  ),
-          ),
+          decoration:
+              questionFieldDecoration(
+                colors: colors,
+                hintText: _isFull
+                    ? '${widget.maxTags} tags maximum atteints'
+                    : 'ex. (flutter dart firebase)',
+                hasError: widget.hasError,
+              ).copyWith(
+                prefixIcon: Icon(
+                  Icons.search,
+                  size: 18,
+                  color: colors.onSurfaceVariant,
+                ),
+                prefixIconConstraints: const BoxConstraints.tightFor(
+                  width: 38,
+                  height: 20,
+                ),
+                suffixIcon: _controller.text.trim().isEmpty
+                    ? null
+                    : IconButton(
+                        onPressed: () => _submit(_controller.text),
+                        icon: const Icon(Icons.add, size: 18),
+                        color: colors.primary,
+                        tooltip: 'Ajouter ce tag',
+                      ),
+              ),
         ),
         if (suggestions.isNotEmpty && _focusNode.hasFocus) ...[
           const SizedBox(height: 8),
@@ -169,10 +171,7 @@ class _SelectedTagChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            label,
-            style: TextStyle(color: colors.primary, fontSize: 12),
-          ),
+          Text(label, style: TextStyle(color: colors.primary, fontSize: 12)),
           const SizedBox(width: 2),
           InkWell(
             onTap: onRemoved,

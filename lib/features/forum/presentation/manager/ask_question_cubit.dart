@@ -10,9 +10,9 @@ class AskQuestionCubit extends Cubit<AskQuestionState> {
   AskQuestionCubit({
     required CreateQuestion createQuestion,
     required AuthGateway authGateway,
-  })  : _createQuestion = createQuestion,
-        _authGateway = authGateway,
-        super(const AskQuestionState());
+  }) : _createQuestion = createQuestion,
+       _authGateway = authGateway,
+       super(const AskQuestionState());
 
   final CreateQuestion _createQuestion;
   final AuthGateway _authGateway;
@@ -50,11 +50,16 @@ class AskQuestionCubit extends Cubit<AskQuestionState> {
       emit(state.copyWith(error: 'Connectez-vous pour publier une question.'));
       return;
     }
+    final author = _authGateway.currentUser;
 
     emit(state.copyWith(isSubmitting: true, error: null, published: null));
     final result = await _createQuestion(
       QuestionDraft(
         authorId: authorId,
+        // ponytail: identité dénormalisée pour l'affichage sans relecture ;
+        // ré-écrite à la prochaine modification de la question.
+        authorName: author?.displayName ?? author?.email,
+        authorPhoto: author?.photoUrl,
         title: state.title.trim(),
         content: state.content.trim(),
         type: state.type,
@@ -65,12 +70,10 @@ class AskQuestionCubit extends Cubit<AskQuestionState> {
     );
 
     result.fold(
-      (failure) => emit(
-        state.copyWith(isSubmitting: false, error: failure.message),
-      ),
-      (question) => emit(
-        const AskQuestionState().copyWith(published: question),
-      ),
+      (failure) =>
+          emit(state.copyWith(isSubmitting: false, error: failure.message)),
+      (question) =>
+          emit(const AskQuestionState().copyWith(published: question)),
     );
   }
 

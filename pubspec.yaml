@@ -17,11 +17,15 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
+  flutter_highlight: ^0.7.0
   flutter_markdown: ^0.7.7+1
   fpdart: ^1.2.0
   get_it: ^9.2.1
   google_sign_in: 6.2.0
+  highlight: ^0.7.0
+  image_picker: ^1.1.2
   logger: ^2.8.0
+  markdown: ^7.3.1
 
 dev_dependencies:
   auto_route_generator: ^10.5.0

@@ -81,20 +81,21 @@ class AskQuestionState extends Equatable {
       showErrors: showErrors ?? this.showErrors,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       error: identical(error, _unset) ? this.error : error as String?,
-      published:
-          identical(published, _unset) ? this.published : published as Question?,
+      published: identical(published, _unset)
+          ? this.published
+          : published as Question?,
     );
   }
 
   @override
   List<Object?> get props => [
-        type,
-        title,
-        content,
-        tags,
-        showErrors,
-        isSubmitting,
-        error,
-        published,
-      ];
+    type,
+    title,
+    content,
+    tags,
+    showErrors,
+    isSubmitting,
+    error,
+    published,
+  ];
 }

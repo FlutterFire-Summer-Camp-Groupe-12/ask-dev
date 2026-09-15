@@ -16,7 +16,10 @@ final RegExp _strikeRegExp = RegExp(r'~~([^~]+)~~');
 final RegExp _blockquoteRegExp = RegExp(r'^\s*>\s?', multiLine: true);
 final RegExp _bulletRegExp = RegExp(r'^\s*[-*+]\s+', multiLine: true);
 final RegExp _listRegExp = RegExp(r'^\s*\d+\.\s+', multiLine: true);
-final RegExp _ruleRegExp = RegExp(r'^\s*([-*_])\s*(\1\s*){2,}\s*$', multiLine: true);
+final RegExp _ruleRegExp = RegExp(
+  r'^\s*([-*_])\s*(\1\s*){2,}\s*$',
+  multiLine: true,
+);
 final RegExp _htmlRegExp = RegExp(r'<[^>]+>');
 final RegExp _blankRegExp = RegExp(r'[ \t]+$', multiLine: true);
 final RegExp _newlinesRegExp = RegExp(r'\n{3,}');
@@ -33,7 +36,10 @@ String stripMarkdown(String? source) {
   text = text.replaceAllMapped(_boldRegExp, (m) => m[1]!);
   text = text.replaceAllMapped(_boldUnderRegExp, (m) => m[1]!);
   text = text.replaceAllMapped(_italicRegExp, (m) => m[1]!);
-  text = text.replaceAllMapped(_italicUnderRegExp, (m) => '${m[1]}${m[2]}${m[3]}');
+  text = text.replaceAllMapped(
+    _italicUnderRegExp,
+    (m) => '${m[1]}${m[2]}${m[3]}',
+  );
   text = text.replaceAllMapped(_strikeRegExp, (m) => m[1]!);
   text = text.replaceAllMapped(_inlineCodeRegExp, (m) => m[1]!);
   text = text.replaceAll(_headingRegExp, '');
