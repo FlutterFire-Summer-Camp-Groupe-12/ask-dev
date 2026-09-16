@@ -4,6 +4,7 @@ import 'package:askdev/features/forum/domain/entities/answer_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question.dart';
 import 'package:askdev/features/forum/domain/entities/question_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question_slice.dart';
+import 'package:askdev/features/forum/domain/entities/user_activity.dart';
 import 'package:askdev/features/forum/domain/search/search_text.dart';
 import 'package:fpdart/fpdart.dart';
 
@@ -70,4 +71,10 @@ abstract class QuestionRepository {
 
   /// Flux temps réel des réponses d'une question.
   Stream<Either<Failure, List<Answer>>> watchAnswers(String questionId);
+
+  /// Compteurs et dernières questions d'un utilisateur, pour son profil.
+  Future<Either<Failure, UserActivity>> getUserActivity(
+    String userId, {
+    int recentLimit = 5,
+  });
 }

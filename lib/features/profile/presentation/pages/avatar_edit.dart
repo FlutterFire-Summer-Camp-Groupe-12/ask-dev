@@ -1,17 +1,22 @@
 import 'dart:io';
 
+import 'package:askdev/core/widgets/app_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+/// Avatar cliquable qui ouvre la galerie. Affiche la photo actuelle (une URL
+/// distante) tant que l'utilisateur n'en a pas choisi une nouvelle.
 class AvatarPicker extends StatefulWidget {
   const AvatarPicker({
     super.key,
-    this.initialImagePath,
+    this.currentAvatarUrl,
+    this.name,
     required this.onImageSelected,
     this.enabled = true,
   });
 
-  final String? initialImagePath;
+  final String? currentAvatarUrl;
+  final String? name;
   final ValueChanged<XFile> onImageSelected;
   final bool enabled;
 
@@ -23,16 +28,6 @@ class _AvatarPickerState extends State<AvatarPicker> {
   final ImagePicker _picker = ImagePicker();
   XFile? _selectedImage;
 
-  @override
-  void initState() {
-    super.initState();
-
-    if (widget.initialImagePath != null &&
-        widget.initialImagePath!.isNotEmpty) {
-      _selectedImage = XFile(widget.initialImagePath!);
-    }
-  }
-
   Future<void> _selectImage() async {
     if (!widget.enabled) return;
 
@@ -41,54 +36,49 @@ class _AvatarPickerState extends State<AvatarPicker> {
       imageQuality: 80,
       maxWidth: 800,
     );
-
     if (image == null || !mounted) return;
 
-    setState(() {
-      _selectedImage = image;
-    });
-
+    setState(() => _selectedImage = image);
     widget.onImageSelected(image);
+  }
+
+  ImageProvider? get _image {
+    final picked = _selectedImage;
+    if (picked != null) return FileImage(File(picked.path));
+    final url = widget.currentAvatarUrl;
+    if (url != null && url.trim().isNotEmpty) return NetworkImage(url);
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final imagePath = _selectedImage?.path;
+    final colors = Theme.of(context).colorScheme;
 
     return Semantics(
       button: true,
-      label: 'Changer l’avatar',
+      label: 'Changer la photo de profil',
       child: InkWell(
         onTap: widget.enabled ? _selectImage : null,
         customBorder: const CircleBorder(),
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            CircleAvatar(
-              radius: 44,
-              backgroundColor: scheme.surfaceContainerHighest,
-              backgroundImage: imagePath != null
-                  ? FileImage(File(imagePath))
-                  : null,
-              child: imagePath == null
-                  ? Icon(Icons.person, size: 42, color: scheme.onSurfaceVariant)
-                  : null,
-            ),
+            AppAvatar(image: _image, name: widget.name, size: 96),
             Positioned(
               right: -2,
               bottom: -2,
               child: Container(
-                width: 30,
-                height: 30,
+                width: 32,
+                height: 32,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: scheme.onSurface,
+                  color: colors.primary,
+                  border: Border.all(color: colors.surface, width: 2),
                 ),
                 child: Icon(
-                  Icons.camera_alt_outlined,
-                  size: 17,
-                  color: scheme.surface,
+                  Icons.photo_camera_outlined,
+                  size: 16,
+                  color: colors.onPrimary,
                 ),
               ),
             ),

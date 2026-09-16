@@ -7,6 +7,7 @@ import 'package:askdev/features/forum/domain/entities/answer_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question.dart';
 import 'package:askdev/features/forum/domain/entities/question_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question_slice.dart';
+import 'package:askdev/features/forum/domain/entities/user_activity.dart';
 import 'package:askdev/features/forum/domain/entities/question_status.dart';
 import 'package:askdev/features/forum/domain/entities/question_type.dart';
 import 'package:askdev/features/forum/domain/repositories/question_repository.dart';
@@ -116,6 +117,12 @@ class _FakeQuestionRepository implements QuestionRepository {
       ),
     );
   }
+
+  @override
+  Future<Either<Failure, UserActivity>> getUserActivity(
+    String userId, {
+    int recentLimit = 5,
+  }) => throw UnimplementedError();
 }
 
 class _FakeAuthGateway implements AuthGateway {
@@ -247,6 +254,21 @@ void main() {
         expect(repository.lastDraft, isNull);
       },
     );
+
+    test('an image link alone does not satisfy the minimum length', () async {
+      final repository = _FakeQuestionRepository();
+      final cubit = buildCubit(repository)
+        ..titleChanged(validTitle)
+        ..tagAdded('flutter')
+        ..contentChanged(
+          '![capture](https://firebasestorage.example/post_images/u1/1.png)',
+        );
+
+      await cubit.submit();
+
+      expect(cubit.state.contentError, isNotNull);
+      expect(repository.lastDraft, isNull);
+    });
 
     test('sends a trimmed draft and resets the form on success', () async {
       final repository = _FakeQuestionRepository();

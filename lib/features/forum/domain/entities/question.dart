@@ -68,6 +68,8 @@ class Question extends Equatable {
       updatedAt: updatedAt,
       answersCount: answersCount ?? this.answersCount,
       searchKeywords: searchKeywords,
+      authorName: authorName,
+      authorPhoto: authorPhoto,
     );
   }
 }

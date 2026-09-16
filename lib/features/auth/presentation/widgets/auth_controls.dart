@@ -1,4 +1,5 @@
 import 'package:askdev/core/utils/validators.dart';
+import 'package:askdev/features/auth/presentation/widgets/google_logo.dart';
 import 'package:flutter/material.dart';
 
 class EmailField extends StatelessWidget {
@@ -140,14 +141,7 @@ class GoogleSignInButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return OutlinedButton.icon(
       onPressed: enabled ? onPressed : null,
-      icon: const Text(
-        'G',
-        style: TextStyle(
-          color: Color(0xFF4285F4),
-          fontWeight: FontWeight.bold,
-          fontSize: 18,
-        ),
-      ),
+      icon: const GoogleLogo(),
       label: Text(label),
     );
   }

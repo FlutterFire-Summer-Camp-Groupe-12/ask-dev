@@ -3,6 +3,7 @@ import 'package:askdev/features/forum/data/models/question_model.dart';
 import 'package:askdev/features/forum/domain/entities/answer_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question_slice.dart';
+import 'package:askdev/features/forum/domain/entities/user_activity.dart';
 import 'package:askdev/features/forum/domain/search/search_text.dart';
 
 abstract class QuestionRemoteDataSource {
@@ -52,4 +53,11 @@ abstract class QuestionRemoteDataSource {
   /// Flux temps réel des réponses d'une question (mise à jour en direct,
   /// sans avoir à rappeler getAnswers()).
   Stream<List<AnswerModel>> watchAnswers(String questionId);
+
+  /// Compte les questions et réponses de [userId] (requêtes d'agrégation,
+  /// une lecture chacune) et charge ses [recentLimit] dernières questions.
+  Future<UserActivity> getUserActivity(
+    String userId, {
+    required int recentLimit,
+  });
 }

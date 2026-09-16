@@ -5,6 +5,7 @@ import 'package:askdev/features/forum/domain/entities/answer_draft.dart';
 import 'package:askdev/core/error/exception.dart';
 import 'package:askdev/features/forum/domain/entities/question_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question_slice.dart';
+import 'package:askdev/features/forum/domain/entities/user_activity.dart';
 import 'package:askdev/features/forum/domain/search/search_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -298,5 +299,31 @@ class QuestionRemoteDataSourceImpl implements QuestionRemoteDataSource {
               .map((doc) => AnswerModel.fromJson({'id': doc.id, ...doc.data()}))
               .toList(),
         );
+  }
+
+  @override
+  Future<UserActivity> getUserActivity(
+    String userId, {
+    required int recentLimit,
+  }) async {
+    final ownQuestions = _questions.where('authorId', isEqualTo: userId);
+    final (questionsCount, answersCount, recent) = await (
+      ownQuestions.count().get(),
+      _firestore
+          .collectionGroup('answers')
+          .where('authorId', isEqualTo: userId)
+          .count()
+          .get(),
+      ownQuestions
+          .orderBy('createdAt', descending: true)
+          .limit(recentLimit)
+          .get(),
+    ).wait;
+
+    return UserActivity(
+      questionsCount: questionsCount.count ?? 0,
+      answersCount: answersCount.count ?? 0,
+      recentQuestions: recent.docs.map(_toModel).toList(),
+    );
   }
 }

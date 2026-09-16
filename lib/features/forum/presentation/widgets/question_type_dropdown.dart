@@ -1,3 +1,4 @@
+import 'package:askdev/core/themes/app_tokens.dart';
 import 'package:askdev/features/forum/domain/entities/question_type.dart';
 import 'package:askdev/features/forum/presentation/widgets/question_form_section.dart';
 import 'package:flutter/material.dart';
@@ -26,9 +27,9 @@ class QuestionTypeDropdown extends StatelessWidget {
           : null,
       isExpanded: true,
       dropdownColor: colors.surfaceContainer,
-      borderRadius: BorderRadius.circular(12),
-      icon: Icon(Icons.unfold_more, size: 18, color: colors.onSurfaceVariant),
-      style: TextStyle(color: colors.onSurface, fontSize: 13),
+      borderRadius: AppRadius.mdAll,
+      icon: Icon(Icons.expand_more_rounded, color: colors.onSurfaceVariant),
+      style: Theme.of(context).textTheme.bodyMedium,
       decoration: questionFieldDecoration(colors: colors),
       items: [
         for (final type in QuestionType.values)
@@ -38,7 +39,7 @@ class QuestionTypeDropdown extends StatelessWidget {
               type.label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: colors.onSurface, fontSize: 13),
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
       ],
@@ -50,7 +51,7 @@ class QuestionTypeDropdown extends StatelessWidget {
               type.label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: colors.onSurface, fontSize: 13),
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
       ],

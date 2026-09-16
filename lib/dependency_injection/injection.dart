@@ -7,9 +7,13 @@ import 'package:askdev/features/auth/data/sources/auth_remote_data_source.dart';
 import 'package:askdev/features/auth/data/sources/auth_remote_data_source_impl.dart';
 import 'package:askdev/features/auth/domain/repositories/auth_repository.dart';
 import 'package:askdev/features/auth/presentation/manager/auth_cubit.dart';
+import 'package:askdev/features/forum/data/repositories/media_repository_impl.dart';
 import 'package:askdev/features/forum/data/repositories/question_repository_impl.dart';
+import 'package:askdev/features/forum/data/sources/media_remote_data_source.dart';
+import 'package:askdev/features/forum/data/sources/media_remote_data_source_impl.dart';
 import 'package:askdev/features/forum/data/sources/question_remote_data_source.dart';
 import 'package:askdev/features/forum/data/sources/question_remote_data_source_impl.dart';
+import 'package:askdev/features/forum/domain/repositories/media_repository.dart';
 import 'package:askdev/features/forum/domain/repositories/question_repository.dart';
 import 'package:askdev/features/forum/domain/usecases/create_question.dart';
 import 'package:askdev/features/forum/domain/usecases/create_answer.dart';
@@ -18,11 +22,14 @@ import 'package:askdev/features/forum/domain/usecases/delete_answer.dart';
 import 'package:askdev/features/forum/domain/usecases/get_answers.dart';
 import 'package:askdev/features/forum/domain/usecases/get_question_by_id.dart';
 import 'package:askdev/features/forum/domain/usecases/get_recent_questions.dart';
+import 'package:askdev/features/forum/domain/usecases/get_user_activity.dart';
+import 'package:askdev/features/forum/domain/usecases/upload_image.dart';
 import 'package:askdev/features/forum/domain/usecases/search_questions.dart';
 import 'package:askdev/features/forum/domain/usecases/update_question.dart';
 import 'package:askdev/features/forum/domain/usecases/delete_question.dart';
 import 'package:askdev/features/forum/presentation/manager/ask_question_cubit.dart';
 import 'package:askdev/features/forum/presentation/manager/question_list_cubit.dart';
+import 'package:askdev/features/forum/presentation/manager/user_activity_cubit.dart';
 import 'package:askdev/features/profile/data/sources/user_remote_data_source.dart';
 import 'package:askdev/features/profile/data/sources/user_remote_data_source_impl.dart';
 import 'package:askdev/features/profile/presentation/manager/profile_cubit.dart';
@@ -109,6 +116,24 @@ void configureDependencies() {
   );
   sl.registerLazySingleton<DeleteQuestion>(
     () => DeleteQuestion(sl<QuestionRepository>()),
+  );
+  sl.registerLazySingleton<MediaRemoteDataSource>(
+    () => MediaRemoteDataSourceImpl(storage: FirebaseStorage.instance),
+  );
+  sl.registerLazySingleton<MediaRepository>(
+    () => MediaRepositoryImpl(
+      remoteDataSource: sl<MediaRemoteDataSource>(),
+      authGateway: sl<AuthGateway>(),
+    ),
+  );
+  sl.registerLazySingleton<UploadImage>(
+    () => UploadImage(sl<MediaRepository>()),
+  );
+  sl.registerLazySingleton<GetUserActivity>(
+    () => GetUserActivity(sl<QuestionRepository>()),
+  );
+  sl.registerFactory<UserActivityCubit>(
+    () => UserActivityCubit(sl<GetUserActivity>()),
   );
   sl.registerFactory<QuestionListCubit>(
     () => QuestionListCubit(

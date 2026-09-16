@@ -9,6 +9,7 @@ import 'package:askdev/features/forum/domain/entities/answer_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question.dart';
 import 'package:askdev/features/forum/domain/entities/question_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question_slice.dart';
+import 'package:askdev/features/forum/domain/entities/user_activity.dart';
 import 'package:askdev/features/forum/domain/repositories/question_repository.dart';
 import 'package:askdev/features/forum/domain/search/search_text.dart';
 import 'package:askdev/features/forum/domain/usecases/create_answer.dart';
@@ -208,6 +209,12 @@ class _FakeQuestionRepository implements QuestionRepository {
     if (failure != null) return left(failure);
     return right(unit);
   }
+
+  @override
+  Future<Either<Failure, UserActivity>> getUserActivity(
+    String userId, {
+    int recentLimit = 5,
+  }) => throw UnimplementedError();
 }
 
 class _FakeAuthGateway implements AuthGateway {

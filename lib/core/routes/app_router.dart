@@ -39,8 +39,8 @@ class AppRouter extends RootStackRouter {
       guards: [sl<AuthGuard>()],
     ),
     AutoRoute(
-      path: '/profile',
-      page: ProfileRoute.page,
+      path: '/question/new',
+      page: AskQuestionRoute.page,
       guards: [sl<AuthGuard>()],
     ),
     AutoRoute(
@@ -53,7 +53,7 @@ class AppRouter extends RootStackRouter {
           page: QuestionsHomeRoute.page,
           initial: true,
         ),
-        AutoRoute(path: 'publier', page: AskQuestionRoute.page),
+        AutoRoute(path: 'profil', page: ProfileRoute.page),
         AutoRoute(path: 'reglages', page: SettingsRoute.page),
       ],
     ),
