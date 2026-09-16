@@ -46,5 +46,12 @@ service cloud.firestore {
           || (signedIn() && get(/databases/$(database)/documents/questions/$(questionId)).data.authorId == request.auth.uid);
       }
     }
+
+    // Requêtes de groupe collectionGroup('answers') : compteur et réponses
+    // d'un utilisateur à travers toutes les questions. Lecture publique
+    // comme le reste du forum.
+    match /{path=**}/answers/{answerId} {
+      allow read: if true;
+    }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:askdev/core/error/failure.dart';
 import 'package:askdev/features/forum/domain/entities/answer.dart';
 import 'package:askdev/features/forum/domain/entities/answer_draft.dart';
+import 'package:askdev/features/forum/domain/entities/answer_with_question.dart';
 import 'package:askdev/features/forum/domain/entities/question.dart';
 import 'package:askdev/features/forum/domain/entities/question_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question_slice.dart';
@@ -77,4 +78,13 @@ abstract class QuestionRepository {
     String userId, {
     int recentLimit = 5,
   });
+
+  /// Toutes les questions de [userId], de la plus récente à la plus ancienne.
+  Future<Either<Failure, List<Question>>> getQuestionsByAuthor(String userId);
+
+  /// Toutes les réponses de [userId], avec leur question parente, de la plus
+  /// récente à la plus ancienne.
+  Future<Either<Failure, List<AnswerWithQuestion>>> getAnswersByAuthor(
+    String userId,
+  );
 }

@@ -122,6 +122,22 @@ class LoginRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [MyContributionsPage]
+class MyContributionsRoute extends PageRouteInfo<void> {
+  const MyContributionsRoute({List<PageRouteInfo>? children})
+    : super(MyContributionsRoute.name, initialChildren: children);
+
+  static const String name = 'MyContributionsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const MyContributionsPage();
+    },
+  );
+}
+
+/// generated route for
 /// [ProfilePage]
 class ProfileRoute extends PageRouteInfo<void> {
   const ProfileRoute({List<PageRouteInfo>? children})

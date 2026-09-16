@@ -2,6 +2,7 @@ import 'package:askdev/core/routes/app_router.dart';
 import 'package:askdev/core/themes/app_tokens.dart';
 import 'package:askdev/core/utils/type_extensions.dart';
 import 'package:askdev/core/widgets/app_avatar.dart';
+import 'package:askdev/core/widgets/app_navigation_shell.dart';
 import 'package:askdev/core/widgets/empty_state.dart';
 import 'package:askdev/core/widgets/section_header.dart';
 import 'package:askdev/core/widgets/skeleton.dart';
@@ -39,10 +40,34 @@ class _ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<_ProfileView> {
+  /// L'onglet reste vivant quand on navigue : on recharge à chaque retour
+  /// sur l'onglet, sinon une question publiée entre-temps n'apparaît pas.
+  TabsRouter? _tabs;
+
   @override
   void initState() {
     super.initState();
     _load();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final tabs = AutoTabsRouter.of(context);
+    if (!identical(_tabs, tabs)) {
+      _tabs?.removeListener(_onTabsChanged);
+      _tabs = tabs..addListener(_onTabsChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabs?.removeListener(_onTabsChanged);
+    super.dispose();
+  }
+
+  void _onTabsChanged() {
+    if (_tabs?.activeIndex == AppNavigationShellPage.profileTab) _load();
   }
 
   void _load() {
@@ -155,12 +180,18 @@ class _ProfileStats extends StatelessWidget {
                   value: activity?.questionsCount,
                   label: 'Questions',
                   loading: state.isLoading,
+                  onTap: () => context.router.root.push(
+                    const MyContributionsRoute(),
+                  ),
                 ),
                 const _StatDivider(),
                 _Stat(
                   value: activity?.answersCount,
                   label: 'Réponses',
                   loading: state.isLoading,
+                  onTap: () => context.router.root.push(
+                    const MyContributionsRoute(),
+                  ),
                 ),
               ],
             ),
@@ -176,25 +207,34 @@ class _Stat extends StatelessWidget {
     required this.value,
     required this.label,
     required this.loading,
+    this.onTap,
   });
 
   final int? value;
   final String label;
   final bool loading;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Expanded(
-      child: Column(
-        children: [
-          if (loading && value == null)
-            const SkeletonPulse(child: SkeletonBox(width: 28, height: 18))
-          else
-            Text('${value ?? 0}', style: theme.textTheme.titleLarge),
-          const SizedBox(height: AppSpacing.xs),
-          Text(label, style: theme.textTheme.bodySmall),
-        ],
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppRadius.mdAll,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+          child: Column(
+            children: [
+              if (loading && value == null)
+                const SkeletonPulse(child: SkeletonBox(width: 28, height: 18))
+              else
+                Text('${value ?? 0}', style: theme.textTheme.titleLarge),
+              const SizedBox(height: AppSpacing.xs),
+              Text(label, style: theme.textTheme.bodySmall),
+            ],
+          ),
+        ),
       ),
     );
   }

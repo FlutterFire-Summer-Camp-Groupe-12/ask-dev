@@ -6,6 +6,7 @@ import 'package:askdev/core/session/auth_gateway.dart';
 import 'package:askdev/features/auth/domain/entities/auth_user.dart';
 import 'package:askdev/features/forum/domain/entities/answer.dart';
 import 'package:askdev/features/forum/domain/entities/answer_draft.dart';
+import 'package:askdev/features/forum/domain/entities/answer_with_question.dart';
 import 'package:askdev/features/forum/domain/entities/question.dart';
 import 'package:askdev/features/forum/domain/entities/question_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question_slice.dart';
@@ -215,6 +216,16 @@ class _FakeQuestionRepository implements QuestionRepository {
     String userId, {
     int recentLimit = 5,
   }) => throw UnimplementedError();
+
+  @override
+  Future<Either<Failure, List<Question>>> getQuestionsByAuthor(
+    String userId,
+  ) => throw UnimplementedError();
+
+  @override
+  Future<Either<Failure, List<AnswerWithQuestion>>> getAnswersByAuthor(
+    String userId,
+  ) => throw UnimplementedError();
 }
 
 class _FakeAuthGateway implements AuthGateway {

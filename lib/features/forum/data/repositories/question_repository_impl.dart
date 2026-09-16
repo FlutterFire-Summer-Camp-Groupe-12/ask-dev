@@ -3,6 +3,7 @@ import 'package:askdev/core/error/failure.dart';
 import 'package:askdev/features/forum/data/sources/question_remote_data_source.dart';
 import 'package:askdev/features/forum/domain/entities/answer.dart';
 import 'package:askdev/features/forum/domain/entities/answer_draft.dart';
+import 'package:askdev/features/forum/domain/entities/answer_with_question.dart';
 import 'package:askdev/features/forum/domain/entities/question.dart';
 import 'package:askdev/features/forum/domain/entities/question_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question_slice.dart';
@@ -10,6 +11,7 @@ import 'package:askdev/features/forum/domain/entities/user_activity.dart';
 import 'package:askdev/features/forum/domain/search/search_text.dart';
 import 'package:askdev/features/forum/domain/repositories/question_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
 import 'package:fpdart/fpdart.dart';
 
 class QuestionRepositoryImpl implements QuestionRepository {
@@ -167,7 +169,32 @@ class QuestionRepositoryImpl implements QuestionRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, List<Question>>> getQuestionsByAuthor(
+    String userId,
+  ) async {
+    try {
+      return right(await _remoteDataSource.getQuestionsByAuthor(userId));
+    } catch (error) {
+      return left(_toFailure(error));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<AnswerWithQuestion>>> getAnswersByAuthor(
+    String userId,
+  ) async {
+    try {
+      return right(await _remoteDataSource.getAnswersByAuthor(userId));
+    } catch (error) {
+      return left(_toFailure(error));
+    }
+  }
+
   Failure _toFailure(Object error) {
+    // Les agrégations (count) remontent un PlatformException plutôt qu'un
+    // FirebaseException sur Android : on mappe les deux pour afficher le
+    // vrai message au lieu du générique.
     if (error is NotFoundException) {
       return ServerFailure(message: error.toString());
     }
@@ -188,6 +215,20 @@ class QuestionRepositoryImpl implements QuestionRepository {
           return const NetworkFailure(message: 'Connexion réseau impossible.');
         default:
           return ServerFailure(message: error.message ?? "L'action a échoué.");
+      }
+    }
+    if (error is PlatformException) {
+      switch (error.code) {
+        case 'permission-denied':
+          return const ServerFailure(
+            message: "Vous n'avez pas les droits pour effectuer cette action.",
+          );
+        case 'unavailable':
+          return const NetworkFailure(message: 'Connexion réseau impossible.');
+        default:
+          return ServerFailure(
+            message: error.message ?? "L'action a échoué.",
+          );
       }
     }
     return const ServerFailure(

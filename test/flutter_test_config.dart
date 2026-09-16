@@ -4,10 +4,10 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 
-/// Tolérance pour les captures golden. L'anti-aliasing des polices varie d'une
-/// machine à l'autre ; au-delà, on retombe sur le comportement par défaut
-/// (échec + fichiers de comparaison).
-const double _tolerancePercent = 1.0;
+/// Tolérance pour les captures golden, en fraction de pixels (0.01 = 1 %).
+/// L'anti-aliasing des polices varie d'une machine à l'autre ; au-delà, on
+/// retombe sur le comportement par défaut (échec + fichiers de comparaison).
+const double _toleranceFraction = 0.01;
 
 class _TolerantFileComparator extends LocalFileComparator {
   _TolerantFileComparator(super.testFile);
@@ -19,7 +19,7 @@ class _TolerantFileComparator extends LocalFileComparator {
       imageBytes,
       goldenBytes,
     );
-    if (result.diffPercent <= _tolerancePercent) {
+    if (result.diffPercent <= _toleranceFraction) {
       return true;
     }
     return super.compare(imageBytes, golden);

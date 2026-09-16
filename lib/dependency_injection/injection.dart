@@ -28,6 +28,7 @@ import 'package:askdev/features/forum/domain/usecases/search_questions.dart';
 import 'package:askdev/features/forum/domain/usecases/update_question.dart';
 import 'package:askdev/features/forum/domain/usecases/delete_question.dart';
 import 'package:askdev/features/forum/presentation/manager/ask_question_cubit.dart';
+import 'package:askdev/features/forum/presentation/manager/my_contributions_cubit.dart';
 import 'package:askdev/features/forum/presentation/manager/question_list_cubit.dart';
 import 'package:askdev/features/forum/presentation/manager/user_activity_cubit.dart';
 import 'package:askdev/features/profile/data/sources/user_remote_data_source.dart';
@@ -161,5 +162,8 @@ Future<void> configureDependencies() async {
       createQuestion: sl<CreateQuestion>(),
       authGateway: sl<AuthGateway>(),
     ),
+  );
+  sl.registerFactory<MyContributionsCubit>(
+    () => MyContributionsCubit(sl<QuestionRepository>()),
   );
 }

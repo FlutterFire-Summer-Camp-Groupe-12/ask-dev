@@ -1,6 +1,7 @@
 import 'package:askdev/features/forum/data/models/answer_model.dart';
 import 'package:askdev/features/forum/data/models/question_model.dart';
 import 'package:askdev/features/forum/domain/entities/answer_draft.dart';
+import 'package:askdev/features/forum/domain/entities/answer_with_question.dart';
 import 'package:askdev/features/forum/domain/entities/question_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question_slice.dart';
 import 'package:askdev/features/forum/domain/entities/user_activity.dart';
@@ -60,4 +61,11 @@ abstract class QuestionRemoteDataSource {
     String userId, {
     required int recentLimit,
   });
+
+  /// Toutes les questions de [userId], de la plus récente à la plus ancienne.
+  Future<List<QuestionModel>> getQuestionsByAuthor(String userId);
+
+  /// Toutes les réponses de [userId], avec leur question parente, de la plus
+  /// récente à la plus ancienne.
+  Future<List<AnswerWithQuestion>> getAnswersByAuthor(String userId);
 }

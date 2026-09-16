@@ -1,46 +1,78 @@
 # ASK-DEV
-Une app mobile de questions/réponses minimaliste, inspirée de StackOverflow, permettant aux utilisateurs de poser des questions, d'y répondre et de retrouver l'information facilement.
 
-**Début :** 2 septembre 2026
+Application mobile de questions/réponses inspirée de StackOverflow, pensée pour les développeurs. Posez une question technique, obtenez des réponses de la communauté, et retrouvez l'information facilement grâce à la recherche full-text.
 
-**Fin prévue :** 16 septembre 2026
+## Stack technique
 
+| Couche | Technologie |
+|---|---|
+| Mobile | Flutter / Dart |
+| Backend | Firebase (Firestore, Auth) |
+| Stockage fichiers | Supabase  |
+| État | flutter_bloc + get_it |
+| Navigation | auto_route |
+| Éditeur | flutter_markdown + coloration syntaxique (highlight) |
 
-## Membres de l’équipe :
-- NCUTI Abdoul
-- OUEDRAOGO Maïmounata
-- Ouattara Lacina Levi 
-- Elana Stacy
-- Darius Yassi HOUESSOU-KODE
-- DOMINICK Randriamanantena Grégoire
-- Diallo Thiernosadou
+## Architecture
 
-**Chef d'équipe :** DOMINICK Randriamanantena Grégoire
+Les fonctionnalités sont organisées par domaine, chacune suivant une structure `data / domain / presentation` :
 
-**Mentor :** David BONGOUADE
+```
+lib/
+├── core/                  # thèmes, routes, utilitaires, widgets partagés
+├── dependency_injection/  # câblage get_it
+└── features/
+    ├── auth/              # authentification
+    ├── forum/             # questions & réponses
+    ├── profile/           # profil utilisateur
+    └── settings/          # paramètres
+```
 
-## Périmètre :
+## Fonctionnalités
 
 ### Comptes utilisateurs
-- Création de compte
-- Connexion / déconnexion
-- Consultation de son profil (pseudo, avatar, date d'inscription)
+- Création de compte, connexion / déconnexion
+- Profil : pseudo, avatar, date d'inscription
 
-### Questions
+### Forum
 - Publication d'une question (titre + description)
-- Liste des questions récentes
-- Consultation du détail d'une question
-- Modification / suppression de sa propre question
+- Liste des questions récentes et détail d'une question
+- Publication, modification et suppression de réponses
+- Gestion de ses propres questions et réponses
 
-### Réponses
-- Publication d'une réponse à une question
-- Consultation de toutes les réponses d'une question
-- Modification / suppression de sa propre réponse
+### Avancé
+- **Recherche full-text** : recherche par mot-clé sur titre et contenu
+- **Éditeur enrichi** : markdown et coloration syntaxique du code dans les questions/réponses
+- **Temps réel** : les nouvelles réponses apparaissent sans rechargement (Streams)
 
-### Fonctionnalités avancées incluses
-- **Recherche full-text** : recherche de questions par mot-clé sur titre/contenu
-- **Éditeur enrichi** : support du markdown et coloration syntaxique du code dans les questions/réponses
-- **Temps réel** : affichage des nouvelles réponses sans rechargement de page (Stream)
+## Installation
 
-## Utilisateurs cibles
-Toute personne souhaitant poser une question technique ou en général, et la communauté répondant à ces questions.
+```bash
+flutter pub get
+dart run build_runner build    # génère le routing auto_route
+```
+
+La configuration des services se fait dans `.env` :
+
+```
+SUPABASE_URL=...
+SUPABASE_ANON_KEY=...
+BUCKET_ID=askdev_files
+```
+
+Copiez `.env.example` vers `.env` et renseignez vos clés, puis lancez l'application :
+
+```bash
+flutter run
+```
+
+## Équipe
+
+- **Chef d'équipe :** DOMINICK Randriamanantena Grégoire
+- **Mentor :** David BONGOUADE
+- NCUTI Abdoul
+- OUEDRAOGO Maïmounata
+- Ouattara Lacina Levi
+- Elana Stacy
+- Darius Yassi HOUESSOU-KODE
+- Diallo Thiernosadou

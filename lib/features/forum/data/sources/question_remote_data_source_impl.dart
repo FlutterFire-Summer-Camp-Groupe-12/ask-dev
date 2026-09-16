@@ -2,6 +2,7 @@ import 'package:askdev/features/forum/data/models/answer_model.dart';
 import 'package:askdev/features/forum/data/models/question_model.dart';
 import 'package:askdev/features/forum/data/sources/question_remote_data_source.dart';
 import 'package:askdev/features/forum/domain/entities/answer_draft.dart';
+import 'package:askdev/features/forum/domain/entities/answer_with_question.dart';
 import 'package:askdev/core/error/exception.dart';
 import 'package:askdev/features/forum/domain/entities/question_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question_slice.dart';
@@ -307,7 +308,10 @@ class QuestionRemoteDataSourceImpl implements QuestionRemoteDataSource {
     required int recentLimit,
   }) async {
     final ownQuestions = _questions.where('authorId', isEqualTo: userId);
-    final (questionsCount, answersCount, recent) = await (
+    // Future.wait plutôt que .wait sur record : en cas d'échec, l'erreur
+    // d'origine remonte telle quelle au lieu d'être emballée dans un
+    // ParallelWaitError que le repository ne saurait pas mapper.
+    final results = await Future.wait([
       ownQuestions.count().get(),
       _firestore
           .collectionGroup('answers')
@@ -318,12 +322,56 @@ class QuestionRemoteDataSourceImpl implements QuestionRemoteDataSource {
           .orderBy('createdAt', descending: true)
           .limit(recentLimit)
           .get(),
-    ).wait;
+    ]);
+    final questionsCount = results[0] as AggregateQuerySnapshot;
+    final answersCount = results[1] as AggregateQuerySnapshot;
+    final recent = results[2] as QuerySnapshot<Map<String, dynamic>>;
 
     return UserActivity(
       questionsCount: questionsCount.count ?? 0,
       answersCount: answersCount.count ?? 0,
       recentQuestions: recent.docs.map(_toModel).toList(),
     );
+  }
+
+  @override
+  Future<List<QuestionModel>> getQuestionsByAuthor(String userId) async {
+    final snapshot = await _questions
+        .where('authorId', isEqualTo: userId)
+        .orderBy('createdAt', descending: true)
+        .get();
+    return snapshot.docs.map(_toModel).toList();
+  }
+
+  @override
+  Future<List<AnswerWithQuestion>> getAnswersByAuthor(String userId) async {
+    final snapshot = await _firestore
+        .collectionGroup('answers')
+        .where('authorId', isEqualTo: userId)
+        .orderBy('createdAt', descending: true)
+        .get();
+
+    // Charge le titre de chaque question parente. Le document réponse vit
+    // sous questions/{questionId}/answers/{answerId} : on extrait l'identifiant
+    // du chemin, puis on lit les questions par lots pour limiter les lectures.
+    final questionIds = snapshot.docs
+        .map((doc) => doc.reference.parent.parent!.id)
+        .toSet();
+    final titles = <String, String>{};
+    for (final id in questionIds) {
+      final question = await _questions.doc(id).get();
+      if (question.exists) {
+        titles[id] = (question.data()?['title'] as String?) ?? '';
+      }
+    }
+
+    return snapshot.docs.map((doc) {
+      final questionId = doc.reference.parent.parent!.id;
+      return AnswerWithQuestion(
+        answer: AnswerModel.fromJson({'id': doc.id, ...doc.data()}),
+        questionId: questionId,
+        questionTitle: titles[questionId] ?? '',
+      );
+    }).toList();
   }
 }

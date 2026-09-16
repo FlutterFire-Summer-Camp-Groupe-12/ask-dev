@@ -7,6 +7,7 @@ import 'package:askdev/features/auth/presentation/pages/welcome_page.dart';
 import 'package:askdev/features/forum/domain/entities/question.dart';
 import 'package:askdev/features/forum/presentation/pages/ask_question_page.dart';
 import 'package:askdev/features/forum/presentation/pages/edit_question_page.dart';
+import 'package:askdev/features/forum/presentation/pages/my_contributions_page.dart';
 import 'package:askdev/features/forum/presentation/pages/question_detail_page.dart';
 import 'package:askdev/features/forum/presentation/pages/questions_home_page.dart';
 import 'package:askdev/features/profile/presentation/pages/edit_profile_page.dart';
@@ -28,6 +29,7 @@ class AppRouter extends RootStackRouter {
     AutoRoute(path: '/login', page: LoginRoute.page),
     AutoRoute(path: '/register', page: RegisterRoute.page),
     AutoRoute(path: '/edit-profile', page: EditProfileRoute.page),
+    AutoRoute(path: '/my-contributions', page: MyContributionsRoute.page, guards: [sl<AuthGuard>()]),
     AutoRoute(
       path: '/question/:questionId',
       page: QuestionDetailRoute.page,
