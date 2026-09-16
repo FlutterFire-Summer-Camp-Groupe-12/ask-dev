@@ -26,13 +26,34 @@ void main() {
 
   test('timeAgo', () {
     final now = DateTime(2026, 9, 9, 12);
-    expect(now.subtract(const Duration(seconds: 1)).timeAgo(now), "à l'instant");
-    expect(now.subtract(const Duration(seconds: 10)).timeAgo(now), 'il y a 10 secondes');
-    expect(now.subtract(const Duration(minutes: 1)).timeAgo(now), 'il y a une minute');
-    expect(now.subtract(const Duration(hours: 5)).timeAgo(now), 'il y a 5 heures');
-    expect(now.subtract(const Duration(days: 1)).timeAgo(now), 'il y a un jour');
-    expect(now.subtract(const Duration(days: 40)).timeAgo(now), 'il y a un mois');
-    expect(now.subtract(const Duration(days: 400)).timeAgo(now), 'il y a un an');
+    expect(
+      now.subtract(const Duration(seconds: 1)).timeAgo(now),
+      "à l'instant",
+    );
+    expect(
+      now.subtract(const Duration(seconds: 10)).timeAgo(now),
+      'il y a 10 secondes',
+    );
+    expect(
+      now.subtract(const Duration(minutes: 1)).timeAgo(now),
+      'il y a une minute',
+    );
+    expect(
+      now.subtract(const Duration(hours: 5)).timeAgo(now),
+      'il y a 5 heures',
+    );
+    expect(
+      now.subtract(const Duration(days: 1)).timeAgo(now),
+      'il y a un jour',
+    );
+    expect(
+      now.subtract(const Duration(days: 40)).timeAgo(now),
+      'il y a un mois',
+    );
+    expect(
+      now.subtract(const Duration(days: 400)).timeAgo(now),
+      'il y a un an',
+    );
     expect(now.add(const Duration(days: 3)).timeAgo(now), 'dans 3 jours');
   });
 
@@ -56,9 +77,21 @@ void main() {
     expect(Validators.password(''), 'Mot de passe requis');
     expect(Validators.password('12345'), '6 caractères minimum');
     expect(Validators.password('123456'), isNull);
-    expect(Validators.password('abcdef', requireStrong: true), 'Le mot de passe doit contenir un chiffre');
-    expect(Validators.confirmPassword('a', 'b'), 'Les mots de passe ne correspondent pas');
+    expect(
+      Validators.password('abcdef', requireStrong: true),
+      'Le mot de passe doit contenir un chiffre',
+    );
+    expect(
+      Validators.confirmPassword('a', 'b'),
+      'Les mots de passe ne correspondent pas',
+    );
     expect(Validators.required(' ', label: 'Nom'), 'Nom requis');
-    expect(Validators.combine([(v) => Validators.required(v), (v) => Validators.maxLength(v, 2)])('abc'), '2 caractères maximum');
+    expect(
+      Validators.combine([
+        (v) => Validators.required(v),
+        (v) => Validators.maxLength(v, 2),
+      ])('abc'),
+      '2 caractères maximum',
+    );
   });
 }

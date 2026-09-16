@@ -74,6 +74,7 @@ class _AvatarPickerState extends State<AvatarPicker> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final imagePath = _selectedImage?.path;
     final ImageProvider<Object>? imageProvider = imagePath == null
         ? null
@@ -108,14 +109,14 @@ class _AvatarPickerState extends State<AvatarPicker> {
               child: Container(
                 width: 30,
                 height: 30,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white,
+                  color: scheme.onSurface,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.camera_alt_outlined,
                   size: 17,
-                  color: Color(0xFF0D0D0F),
+                  color: scheme.surface,
                 ),
               ),
             ),

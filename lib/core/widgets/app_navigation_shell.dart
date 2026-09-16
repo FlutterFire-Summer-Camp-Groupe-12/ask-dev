@@ -22,7 +22,8 @@ class AppNavigationShellPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocListener<AuthCubit, AuthState>(
       listenWhen: (previous, current) {
-        final signedOut = current.status == AuthStatus.unauthenticated &&
+        final signedOut =
+            current.status == AuthStatus.unauthenticated &&
             previous.status != AuthStatus.unauthenticated;
         final failed = current.error != null && previous.error != current.error;
         return signedOut || failed;

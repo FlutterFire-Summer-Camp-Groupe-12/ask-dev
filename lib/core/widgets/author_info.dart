@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+/// Identité compacte d'un auteur (avatar + pseudo), affichée sur les
+/// questions et réponses. Les couleurs suivent le thème de l'app.
 class AuthorInfo extends StatelessWidget {
   const AuthorInfo({
     super.key,
@@ -16,6 +18,7 @@ class AuthorInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final hasAvatar = avatarUrl != null && avatarUrl!.trim().isNotEmpty;
 
     return Row(
@@ -23,13 +26,13 @@ class AuthorInfo extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: avatarRadius,
-          backgroundColor: const Color(0xFF17181B),
+          backgroundColor: scheme.surfaceContainerHighest,
           backgroundImage: hasAvatar ? NetworkImage(avatarUrl!) : null,
           child: hasAvatar
               ? null
               : Icon(
                   Icons.person,
-                  color: Colors.white70,
+                  color: scheme.onSurfaceVariant,
                   size: avatarRadius + 3,
                 ),
         ),
@@ -43,8 +46,8 @@ class AuthorInfo extends StatelessWidget {
                 name,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: scheme.onSurface,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
@@ -55,8 +58,8 @@ class AuthorInfo extends StatelessWidget {
                   subtitle!,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white54,
+                  style: TextStyle(
+                    color: scheme.onSurfaceVariant,
                     fontSize: 10,
                   ),
                 ),

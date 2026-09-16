@@ -59,6 +59,53 @@ class EditProfileRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [EditQuestionPage]
+class EditQuestionRoute extends PageRouteInfo<EditQuestionRouteArgs> {
+  EditQuestionRoute({
+    Key? key,
+    required Question question,
+    List<PageRouteInfo>? children,
+  }) : super(
+         EditQuestionRoute.name,
+         args: EditQuestionRouteArgs(key: key, question: question),
+         initialChildren: children,
+       );
+
+  static const String name = 'EditQuestionRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<EditQuestionRouteArgs>();
+      return EditQuestionPage(key: args.key, question: args.question);
+    },
+  );
+}
+
+class EditQuestionRouteArgs {
+  const EditQuestionRouteArgs({this.key, required this.question});
+
+  final Key? key;
+
+  final Question question;
+
+  @override
+  String toString() {
+    return 'EditQuestionRouteArgs{key: $key, question: $question}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! EditQuestionRouteArgs) return false;
+    return key == other.key && question == other.question;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ question.hashCode;
+}
+
+/// generated route for
 /// [LoginPage]
 class LoginRoute extends PageRouteInfo<void> {
   const LoginRoute({List<PageRouteInfo>? children})

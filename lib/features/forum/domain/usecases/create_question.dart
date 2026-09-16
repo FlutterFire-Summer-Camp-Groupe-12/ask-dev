@@ -7,7 +7,7 @@ import 'package:fpdart/fpdart.dart';
 
 class CreateQuestion implements UseCase<Question, QuestionDraft> {
   const CreateQuestion({required QuestionRepository repository})
-      : _repository = repository;
+    : _repository = repository;
 
   final QuestionRepository _repository;
 

@@ -1,15 +1,7 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 
-enum AppLogLevel {
-  trace,
-  debug,
-  info,
-  warning,
-  error,
-  fatal,
-}
+enum AppLogLevel { trace, debug, info, warning, error, fatal }
 
 extension on AppLogLevel {
   Level toLevel() {
@@ -31,11 +23,9 @@ extension on AppLogLevel {
 }
 
 class AppLogger {
-  AppLogger._({
-    required Logger logger,
-    AppLogLevel level = AppLogLevel.debug,
-  })  : _logger = logger,
-        _level = level;
+  AppLogger._({required Logger logger, AppLogLevel level = AppLogLevel.debug})
+    : _logger = logger,
+      _level = level;
 
   static AppLogger? _instance;
 
@@ -79,11 +69,21 @@ class AppLogger {
   final Logger _logger;
   final AppLogLevel _level;
 
-
   AppLogLevel get level => _level;
 
-  void trace(String tag, String message, {Object? error, StackTrace? stackTrace}) {
-    _logger.log(Level.trace, message, error: error, stackTrace: stackTrace, time: DateTime.now());
+  void trace(
+    String tag,
+    String message, {
+    Object? error,
+    StackTrace? stackTrace,
+  }) {
+    _logger.log(
+      Level.trace,
+      message,
+      error: error,
+      stackTrace: stackTrace,
+      time: DateTime.now(),
+    );
   }
 
   void debug(String tag, String message) {
@@ -94,8 +94,18 @@ class AppLogger {
     _logger.i('[$tag] $message', time: DateTime.now());
   }
 
-  void warning(String tag, String message, {Object? error, StackTrace? stackTrace}) {
-    _logger.w('[$tag] $message', error: error, stackTrace: stackTrace, time: DateTime.now());
+  void warning(
+    String tag,
+    String message, {
+    Object? error,
+    StackTrace? stackTrace,
+  }) {
+    _logger.w(
+      '[$tag] $message',
+      error: error,
+      stackTrace: stackTrace,
+      time: DateTime.now(),
+    );
   }
 
   void error(
@@ -137,7 +147,12 @@ class AppLogger {
     };
 
     PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
-      this.error('PlatformDispatcher', 'Unhandled error', error: error, stackTrace: stack);
+      this.error(
+        'PlatformDispatcher',
+        'Unhandled error',
+        error: error,
+        stackTrace: stack,
+      );
       return true;
     };
   }
@@ -152,10 +167,37 @@ class AppLog {
       AppLogger.instance.debug(tag, message);
   static void i(String tag, String message) =>
       AppLogger.instance.info(tag, message);
-  static void w(String tag, String message, {Object? error, StackTrace? stackTrace}) =>
-      AppLogger.instance.warning(tag, message, error: error, stackTrace: stackTrace);
-  static void e(String tag, String message, {Object? error, StackTrace? stackTrace}) =>
-      AppLogger.instance.error(tag, message, error: error, stackTrace: stackTrace);
-  static void f(String tag, String message, {Object? error, StackTrace? stackTrace}) =>
-      AppLogger.instance.fatal(tag, message, error: error, stackTrace: stackTrace);
+  static void w(
+    String tag,
+    String message, {
+    Object? error,
+    StackTrace? stackTrace,
+  }) => AppLogger.instance.warning(
+    tag,
+    message,
+    error: error,
+    stackTrace: stackTrace,
+  );
+  static void e(
+    String tag,
+    String message, {
+    Object? error,
+    StackTrace? stackTrace,
+  }) => AppLogger.instance.error(
+    tag,
+    message,
+    error: error,
+    stackTrace: stackTrace,
+  );
+  static void f(
+    String tag,
+    String message, {
+    Object? error,
+    StackTrace? stackTrace,
+  }) => AppLogger.instance.fatal(
+    tag,
+    message,
+    error: error,
+    stackTrace: stackTrace,
+  );
 }

@@ -38,10 +38,7 @@ class QuestionTypeDropdown extends StatelessWidget {
               type.label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: colors.onSurface,
-                fontSize: 13,
-              ),
+              style: TextStyle(color: colors.onSurface, fontSize: 13),
             ),
           ),
       ],
@@ -53,10 +50,7 @@ class QuestionTypeDropdown extends StatelessWidget {
               type.label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: colors.onSurface,
-                fontSize: 13,
-              ),
+              style: TextStyle(color: colors.onSurface, fontSize: 13),
             ),
           ),
       ],

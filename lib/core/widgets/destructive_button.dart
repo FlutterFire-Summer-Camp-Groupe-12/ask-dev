@@ -26,9 +26,7 @@ class DestructiveButton extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         foregroundColor: colors.error,
         side: BorderSide(color: colors.error.withValues(alpha: 0.4)),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       icon: Icon(icon, size: 18),
       label: Text(label),

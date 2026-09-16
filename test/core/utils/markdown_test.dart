@@ -8,7 +8,10 @@ void main() {
     });
 
     test('retire italique, barré et code en ligne', () {
-      expect(stripMarkdown('*en italique* et ~~barré~~ et `code`'), 'en italique et barré et code');
+      expect(
+        stripMarkdown('*en italique* et ~~barré~~ et `code`'),
+        'en italique et barré et code',
+      );
     });
 
     test('extrait le texte des liens', () {
