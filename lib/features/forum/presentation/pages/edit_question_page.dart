@@ -6,7 +6,6 @@ import 'package:askdev/features/forum/domain/entities/question.dart';
 import 'package:askdev/features/forum/domain/entities/question_draft.dart';
 import 'package:askdev/features/forum/domain/entities/question_type.dart';
 import 'package:askdev/features/forum/domain/usecases/update_question.dart';
-import 'package:askdev/features/forum/presentation/manager/ask_question_state.dart';
 import 'package:askdev/features/forum/presentation/widgets/image_attachment.dart';
 import 'package:askdev/features/forum/presentation/widgets/question_form.dart';
 import 'package:auto_route/auto_route.dart';
@@ -52,18 +51,12 @@ class _EditQuestionPageState extends State<EditQuestionPage> {
   String? get _titleError {
     final length = _titleController.text.trim().length;
     if (length == 0) return 'Titre requis';
-    if (length < AskQuestionState.titleMinLength) {
-      return '${AskQuestionState.titleMinLength} caractères minimum';
-    }
     return null;
   }
 
   String? get _contentError {
     final length = stripMarkdown(_contentController.text).trim().length;
     if (length == 0) return 'Description requise';
-    if (length < AskQuestionState.contentMinLength) {
-      return '${AskQuestionState.contentMinLength} caractères minimum';
-    }
     return null;
   }
 
@@ -75,9 +68,7 @@ class _EditQuestionPageState extends State<EditQuestionPage> {
         .toLowerCase()
         .replaceAll(RegExp(r'\s+'), '-')
         .replaceAll(RegExp(r'[^a-z0-9+#.\-]'), '');
-    if (tag.isEmpty ||
-        _tags.contains(tag) ||
-        _tags.length >= AskQuestionState.maxTags) {
+    if (tag.isEmpty || _tags.contains(tag)) {
       return;
     }
     setState(() => _tags.add(tag));

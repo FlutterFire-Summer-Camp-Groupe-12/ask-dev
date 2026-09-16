@@ -46,3 +46,6 @@ app.*.map.json
 
 # Diffs produits par un test golden en échec
 test/**/failures/
+
+# Environment variables
+.env

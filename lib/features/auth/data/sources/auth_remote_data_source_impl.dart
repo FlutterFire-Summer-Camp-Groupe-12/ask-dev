@@ -1,3 +1,4 @@
+import 'package:askdev/core/utils/app_logger.dart';
 import 'package:askdev/core/utils/type_extensions.dart';
 import 'package:askdev/features/auth/data/sources/auth_remote_data_source.dart';
 import 'package:askdev/features/auth/domain/entities/auth_user.dart';
@@ -78,15 +79,36 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<AuthUser?> signInWithGoogle() async {
-    final account = await _googleSignIn.signIn();
-    if (account == null) return null;
-    final authentication = await account.authentication;
-    final credential = GoogleAuthProvider.credential(
-      idToken: authentication.idToken,
-      accessToken: authentication.accessToken,
-    );
-    final result = await _firebaseAuth.signInWithCredential(credential);
-    return _mapUser(result.user);
+    const tag = 'GoogleSignIn';
+    AppLog.i(tag, 'Début connexion Google');
+    try {
+      final account = await _googleSignIn.signIn();
+      if (account == null) {
+        AppLog.i(tag, 'Connexion annulée par l’utilisateur');
+        return null;
+      }
+      AppLog.d(tag, 'Compte Google sélectionné (${account.email})');
+      final authentication = await account.authentication;
+      // ponytail: présence des tokens seulement, jamais leur valeur.
+      AppLog.d(
+        tag,
+        'Tokens récupérés '
+        '(idToken: ${authentication.idToken != null}, '
+        'accessToken: ${authentication.accessToken != null})',
+      );
+      final credential = GoogleAuthProvider.credential(
+        idToken: authentication.idToken,
+        accessToken: authentication.accessToken,
+      );
+      AppLog.d(tag, 'Connexion à Firebase en cours');
+      final result = await _firebaseAuth.signInWithCredential(credential);
+      final user = _mapUser(result.user);
+      AppLog.i(tag, 'Connexion Google réussie (uid: ${user?.uid})');
+      return user;
+    } catch (error, stackTrace) {
+      AppLog.e(tag, 'Échec connexion Google', error: error, stackTrace: stackTrace);
+      rethrow;
+    }
   }
 
   @override

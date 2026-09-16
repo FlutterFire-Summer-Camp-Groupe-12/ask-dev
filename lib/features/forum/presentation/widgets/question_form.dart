@@ -1,7 +1,5 @@
 import 'package:askdev/core/themes/app_tokens.dart';
-import 'package:askdev/core/utils/markdown.dart';
 import 'package:askdev/features/forum/domain/entities/question_type.dart';
-import 'package:askdev/features/forum/presentation/manager/ask_question_state.dart';
 import 'package:askdev/features/forum/presentation/widgets/markdown_toolbar.dart';
 import 'package:askdev/features/forum/presentation/widgets/question_form_section.dart';
 import 'package:askdev/features/forum/presentation/widgets/question_type_dropdown.dart';
@@ -87,10 +85,6 @@ class QuestionFormFields extends StatelessWidget {
           label: 'Titre',
           hint: 'Soyez précis, comme si vous posiez la question à un collègue.',
           error: titleError,
-          trailing: _CharacterCounter(
-            controller: titleController,
-            minimum: AskQuestionState.titleMinLength,
-          ),
           child: TextField(
             controller: titleController,
             enabled: enabled,
@@ -115,12 +109,6 @@ class QuestionFormFields extends StatelessWidget {
               'Ce que vous avez essayé, le code et le message d\'erreur. '
               'Le Markdown est pris en charge.',
           error: contentError,
-          trailing: _CharacterCounter(
-            controller: contentController,
-            minimum: AskQuestionState.contentMinLength,
-            // Même mesure que la validation : sans la syntaxe Markdown.
-            measure: (text) => stripMarkdown(text).trim().length,
-          ),
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: colors.surfaceContainer,
@@ -165,19 +153,12 @@ class QuestionFormFields extends StatelessWidget {
         const SizedBox(height: AppSpacing.xl),
         QuestionFormSection(
           label: 'Tags',
-          hint:
-              'Jusqu\'à ${AskQuestionState.maxTags} tags. Validez avec '
-              'Entrée, un espace ou une virgule.',
+          hint: 'Validez avec Entrée, un espace ou une virgule.',
           error: tagsError,
-          trailing: Text(
-            '${tags.length}/${AskQuestionState.maxTags}',
-            style: theme.textTheme.labelSmall,
-          ),
           child: TagInputField(
             tags: tags,
             onTagAdded: onTagAdded,
             onTagRemoved: onTagRemoved,
-            maxTags: AskQuestionState.maxTags,
             suggestions: questionTagSuggestions,
             enabled: enabled,
             hasError: tagsError != null,
@@ -188,40 +169,6 @@ class QuestionFormFields extends StatelessWidget {
   }
 }
 
-/// Compteur « saisis / minimum » qui suit le contrôleur sans reconstruire
-/// le formulaire.
-class _CharacterCounter extends StatelessWidget {
-  const _CharacterCounter({
-    required this.controller,
-    required this.minimum,
-    this.measure,
-  });
-
-  final TextEditingController controller;
-  final int minimum;
-
-  /// Par défaut, le texte saisi tel quel.
-  final int Function(String text)? measure;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return ValueListenableBuilder<TextEditingValue>(
-      valueListenable: controller,
-      builder: (context, value, _) {
-        final current = measure?.call(value.text) ?? value.text.trim().length;
-        final reached = current >= minimum;
-        return Text(
-          reached ? '$current' : '$current/$minimum',
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: reached ? theme.colorScheme.primary : null,
-            fontWeight: reached ? FontWeight.w600 : null,
-          ),
-        );
-      },
-    );
-  }
-}
 
 /// Rappel repliable des règles d'une bonne question.
 class QuestionWritingTips extends StatelessWidget {

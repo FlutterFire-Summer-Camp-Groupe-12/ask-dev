@@ -25,8 +25,7 @@ class AskQuestionCubit extends Cubit<AskQuestionState> {
 
   /// Ajoute un tag normalisé (minuscules, espaces remplacés par des tirets).
   ///
-  /// Les doublons, les entrées vides et tout ajout au-delà de
-  /// [AskQuestionState.maxTags] sont ignorés.
+  /// Les doublons et les entrées vides sont ignorés.
   void tagAdded(String value) {
     final tag = _normalizeTag(value);
     if (tag.isEmpty || !state.canAddTag || state.tags.contains(tag)) return;

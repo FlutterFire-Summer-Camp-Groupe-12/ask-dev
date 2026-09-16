@@ -12,7 +12,6 @@ class TagInputField extends StatefulWidget {
     required this.tags,
     required this.onTagAdded,
     required this.onTagRemoved,
-    required this.maxTags,
     this.suggestions = const [],
     this.enabled = true,
     this.hasError = false,
@@ -21,7 +20,6 @@ class TagInputField extends StatefulWidget {
   final List<String> tags;
   final ValueChanged<String> onTagAdded;
   final ValueChanged<String> onTagRemoved;
-  final int maxTags;
   final List<String> suggestions;
   final bool enabled;
   final bool hasError;
@@ -47,8 +45,6 @@ class _TagInputFieldState extends State<TagInputField> {
     super.dispose();
   }
 
-  bool get _isFull => widget.tags.length >= widget.maxTags;
-
   void _submit(String value) {
     if (value.trim().isEmpty) return;
     widget.onTagAdded(value);
@@ -57,10 +53,7 @@ class _TagInputFieldState extends State<TagInputField> {
     _focusNode.requestFocus();
   }
 
-  /// Suggestions restantes : celles qui contiennent la saisie courante et qui
-  /// ne sont pas déjà sélectionnées.
   List<String> get _visibleSuggestions {
-    if (_isFull) return const [];
     final query = _controller.text.trim().toLowerCase();
     return widget.suggestions
         .where((tag) => !widget.tags.contains(tag))
@@ -96,7 +89,7 @@ class _TagInputFieldState extends State<TagInputField> {
         TextField(
           controller: _controller,
           focusNode: _focusNode,
-          enabled: widget.enabled && !_isFull,
+          enabled: widget.enabled,
           onChanged: (_) => setState(() {}),
           onSubmitted: _submit,
           textInputAction: TextInputAction.done,
@@ -111,9 +104,7 @@ class _TagInputFieldState extends State<TagInputField> {
           decoration:
               questionFieldDecoration(
                 colors: colors,
-                hintText: _isFull
-                    ? '${widget.maxTags} tags maximum atteints'
-                    : 'ex. flutter, firebase, bloc',
+                hintText: 'ex. flutter, firebase, bloc',
                 hasError: widget.hasError,
               ).copyWith(
                 prefixIcon: const Icon(Icons.sell_outlined, size: 18),

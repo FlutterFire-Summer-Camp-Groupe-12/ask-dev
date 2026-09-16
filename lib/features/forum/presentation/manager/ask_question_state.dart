@@ -15,11 +15,6 @@ class AskQuestionState extends Equatable {
     this.published,
   });
 
-  /// Longueurs minimales reprises du formulaire Stack Overflow.
-  static const int titleMinLength = 15;
-  static const int contentMinLength = 220;
-  static const int maxTags = 5;
-
   final QuestionType type;
   final String title;
   final String content;
@@ -37,22 +32,12 @@ class AskQuestionState extends Equatable {
   String? get titleError {
     final value = title.trim();
     if (value.isEmpty) return 'Titre requis';
-    if (value.length < titleMinLength) {
-      return '$titleMinLength caractères minimum';
-    }
     return null;
   }
-
-  /// Longueur utile de la description : la syntaxe Markdown et les liens
-  /// d'images ne comptent pas dans le minimum.
-  int get contentLength => stripMarkdown(content).trim().length;
 
   String? get contentError {
     final value = stripMarkdown(content).trim();
     if (value.isEmpty) return 'Description requise';
-    if (value.length < contentMinLength) {
-      return '$contentMinLength caractères minimum';
-    }
     return null;
   }
 
@@ -64,7 +49,8 @@ class AskQuestionState extends Equatable {
   bool get isValid =>
       titleError == null && contentError == null && tagsError == null;
 
-  bool get canAddTag => tags.length < maxTags;
+  /// Toujours vrai : le nombre de tags n'est plus borné.
+  bool get canAddTag => true;
 
   static const Object _unset = Object();
 

@@ -2,14 +2,16 @@ import 'dart:io';
 
 import 'package:askdev/core/error/exception.dart';
 import 'package:askdev/features/forum/data/sources/media_remote_data_source.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MediaRemoteDataSourceImpl implements MediaRemoteDataSource {
-  MediaRemoteDataSourceImpl({required FirebaseStorage storage})
-    : _storage = storage;
+  MediaRemoteDataSourceImpl({
+    required SupabaseClient supabase,
+    required String bucketId,
+  }) : _supabase = supabase,
+       _bucketId = bucketId;
 
-  /// Dossier racine des images jointes aux questions et aux réponses. Les
-  /// règles de sécurité limitent l'écriture au dossier de chaque auteur.
+  /// Dossier racine des images jointes aux questions et aux réponses.
   static const String folder = 'post_images';
 
   /// Les images sont déjà réduites à la sélection ; au-delà, on refuse plutôt
@@ -25,7 +27,8 @@ class MediaRemoteDataSourceImpl implements MediaRemoteDataSource {
     'heic': 'image/heic',
   };
 
-  final FirebaseStorage _storage;
+  final SupabaseClient _supabase;
+  final String _bucketId;
 
   @override
   Future<String> uploadImage({
@@ -42,15 +45,15 @@ class MediaRemoteDataSourceImpl implements MediaRemoteDataSource {
     }
 
     final extension = _extensionOf(file.path);
-    final reference = _storage
-        .ref(folder)
-        .child('$userId/${DateTime.now().millisecondsSinceEpoch}.$extension');
+    final path =
+        '$folder/$userId/${DateTime.now().millisecondsSinceEpoch}.$extension';
 
-    await reference.putFile(
+    await _supabase.storage.from(_bucketId).upload(
+      path,
       file,
-      SettableMetadata(contentType: _contentTypes[extension]),
+      fileOptions: FileOptions(contentType: _contentTypes[extension]),
     );
-    return reference.getDownloadURL();
+    return _supabase.storage.from(_bucketId).getPublicUrl(path);
   }
 
   String _extensionOf(String path) {

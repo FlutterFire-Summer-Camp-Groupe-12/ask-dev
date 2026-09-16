@@ -14,7 +14,6 @@ import 'package:askdev/features/forum/domain/repositories/question_repository.da
 import 'package:askdev/features/forum/domain/search/search_text.dart';
 import 'package:askdev/features/forum/domain/usecases/create_question.dart';
 import 'package:askdev/features/forum/presentation/manager/ask_question_cubit.dart';
-import 'package:askdev/features/forum/presentation/manager/ask_question_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 
@@ -147,7 +146,7 @@ class _FakeAuthGateway implements AuthGateway {
 
 void main() {
   const validTitle = 'Comment injecter un cubit avec get_it ?';
-  final validContent = 'x' * AskQuestionState.contentMinLength;
+  const validContent = 'Le BlocProvider renvoie une erreur inattendue.';
 
   AskQuestionCubit buildCubit(
     _FakeQuestionRepository repository, {
@@ -219,14 +218,14 @@ void main() {
       expect(cubit.state.tags, ['clean-architecture']);
     });
 
-    test('stops accepting tags past the maximum', () {
+    test('accepts an unlimited number of tags', () {
       final cubit = buildCubit(_FakeQuestionRepository());
-      for (var i = 0; i < AskQuestionState.maxTags + 3; i++) {
+      for (var i = 0; i < 12; i++) {
         cubit.tagAdded('tag$i');
       }
 
-      expect(cubit.state.tags, hasLength(AskQuestionState.maxTags));
-      expect(cubit.state.canAddTag, isFalse);
+      expect(cubit.state.tags, hasLength(12));
+      expect(cubit.state.canAddTag, isTrue);
     });
 
     test('tagRemoved drops the tag', () {
@@ -249,13 +248,13 @@ void main() {
         await cubit.submit();
 
         expect(cubit.state.showErrors, isTrue);
-        expect(cubit.state.titleError, isNotNull);
+        expect(cubit.state.contentError, isNotNull);
         expect(cubit.state.tagsError, isNotNull);
         expect(repository.lastDraft, isNull);
       },
     );
 
-    test('an image link alone does not satisfy the minimum length', () async {
+    test('an image link alone leaves an empty content', () async {
       final repository = _FakeQuestionRepository();
       final cubit = buildCubit(repository)
         ..titleChanged(validTitle)

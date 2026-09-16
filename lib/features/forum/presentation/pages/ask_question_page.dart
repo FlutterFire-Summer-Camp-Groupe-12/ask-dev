@@ -10,8 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-/// Formulaire de création d'une question, ouvert en plein écran depuis
-/// l'accueil. Se ferme avec la question publiée.
+
 @RoutePage()
 class AskQuestionPage extends StatelessWidget {
   const AskQuestionPage({super.key});

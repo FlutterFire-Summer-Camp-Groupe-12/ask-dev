@@ -36,20 +36,30 @@ import 'package:askdev/features/profile/presentation/manager/profile_cubit.dart'
 import 'package:askdev/features/settings/presentation/manager/settings_cubit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../firebase_options.dart';
 
 final sl = GetIt.instance;
 
-void services() {
+Future<void> services() async {
+  await dotenv.load(fileName: '.env');
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Supabase.initialize(
+    url: dotenv.env['SUPABASE_URL']!,
+    publishableKey: dotenv.env['SUPABASE_ANON_KEY']!,
+  );
   final logger = AppLogger.init();
   logger.installGlobalHandlers();
   logger.info('Bootstrap', 'App starting');
 }
 
-void configureDependencies() {
-  services();
+Future<void> configureDependencies() async {
+  await services();
   sl.registerLazySingleton<AppRouter>(AppRouter.new);
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(
@@ -61,7 +71,8 @@ void configureDependencies() {
   sl.registerLazySingleton<UserRemoteDataSource>(
     () => UserRemoteDataSourceImpl(
       firestore: FirebaseFirestore.instance,
-      storage: FirebaseStorage.instance,
+      supabase: Supabase.instance.client,
+      bucketId: dotenv.env['BUCKET_ID']!,
       auth: FirebaseAuth.instance,
     ),
   );
@@ -118,7 +129,10 @@ void configureDependencies() {
     () => DeleteQuestion(sl<QuestionRepository>()),
   );
   sl.registerLazySingleton<MediaRemoteDataSource>(
-    () => MediaRemoteDataSourceImpl(storage: FirebaseStorage.instance),
+    () => MediaRemoteDataSourceImpl(
+      supabase: Supabase.instance.client,
+      bucketId: dotenv.env['BUCKET_ID']!,
+    ),
   );
   sl.registerLazySingleton<MediaRepository>(
     () => MediaRepositoryImpl(

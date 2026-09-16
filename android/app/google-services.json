@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "410116228746-08prp4k3b80p2bpdd7rgm9gr293ks6it.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.askdev",
+            "certificate_hash": "736ff1a120a5418129cc1405eae3504b168b1ef0"
+          }
+        },
+        {
+          "client_id": "410116228746-0c7npqqvddoh67uf6vshp61sa85kukgp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.askdev",
+            "certificate_hash": "5c88ce9392a0a49af1b33e9c6d5ea35f5feb1963"
+          }
+        },
+        {
           "client_id": "410116228746-v0b0uvcmbq8poeg54hr4l0hp1a9c67c6.apps.googleusercontent.com",
           "client_type": 3
         }
