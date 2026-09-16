@@ -7,11 +7,13 @@ class AvatarPicker extends StatefulWidget {
   const AvatarPicker({
     super.key,
     this.initialImagePath,
+    this.initialImageUrl,
     required this.onImageSelected,
     this.enabled = true,
   });
 
   final String? initialImagePath;
+  final String? initialImageUrl;
   final ValueChanged<XFile> onImageSelected;
   final bool enabled;
 
@@ -26,11 +28,30 @@ class _AvatarPickerState extends State<AvatarPicker> {
   @override
   void initState() {
     super.initState();
+    _syncInitialImage();
+  }
 
-    if (widget.initialImagePath != null &&
-        widget.initialImagePath!.isNotEmpty) {
-      _selectedImage = XFile(widget.initialImagePath!);
+  @override
+  void didUpdateWidget(covariant AvatarPicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialImagePath != widget.initialImagePath ||
+        oldWidget.initialImageUrl != widget.initialImageUrl) {
+      setState(_syncInitialImage);
     }
+  }
+
+  void _syncInitialImage() {
+    if (widget.initialImagePath != null && widget.initialImagePath!.isNotEmpty) {
+      _selectedImage = XFile(widget.initialImagePath!);
+      return;
+    }
+
+    if (widget.initialImageUrl != null && widget.initialImageUrl!.isNotEmpty) {
+      _selectedImage = XFile(widget.initialImageUrl!);
+      return;
+    }
+
+    _selectedImage = null;
   }
 
   Future<void> _selectImage() async {
@@ -54,6 +75,11 @@ class _AvatarPickerState extends State<AvatarPicker> {
   @override
   Widget build(BuildContext context) {
     final imagePath = _selectedImage?.path;
+    final ImageProvider<Object>? imageProvider = imagePath == null
+        ? null
+        : (imagePath.startsWith('http://') || imagePath.startsWith('https://'))
+            ? NetworkImage(imagePath)
+            : FileImage(File(imagePath));
 
     return Semantics(
       button: true,
@@ -67,10 +93,8 @@ class _AvatarPickerState extends State<AvatarPicker> {
             CircleAvatar(
               radius: 44,
               backgroundColor: const Color(0xFF17181B),
-              backgroundImage: imagePath != null
-                  ? FileImage(File(imagePath))
-                  : null,
-              child: imagePath == null
+              backgroundImage: imageProvider,
+              child: imageProvider == null
                   ? const Icon(
                       Icons.person,
                       size: 42,
