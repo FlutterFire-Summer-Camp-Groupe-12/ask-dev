@@ -1,5 +1,6 @@
 import 'package:askdev/features/forum/domain/entities/question.dart';
 import 'package:askdev/features/forum/domain/entities/question_type.dart';
+import 'package:askdev/core/utils/markdown.dart';
 import 'package:equatable/equatable.dart';
 
 class AskQuestionState extends Equatable {
@@ -42,8 +43,12 @@ class AskQuestionState extends Equatable {
     return null;
   }
 
+  /// Longueur utile de la description : la syntaxe Markdown et les liens
+  /// d'images ne comptent pas dans le minimum.
+  int get contentLength => stripMarkdown(content).trim().length;
+
   String? get contentError {
-    final value = content.trim();
+    final value = stripMarkdown(content).trim();
     if (value.isEmpty) return 'Description requise';
     if (value.length < contentMinLength) {
       return '$contentMinLength caractères minimum';
@@ -81,20 +86,21 @@ class AskQuestionState extends Equatable {
       showErrors: showErrors ?? this.showErrors,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       error: identical(error, _unset) ? this.error : error as String?,
-      published:
-          identical(published, _unset) ? this.published : published as Question?,
+      published: identical(published, _unset)
+          ? this.published
+          : published as Question?,
     );
   }
 
   @override
   List<Object?> get props => [
-        type,
-        title,
-        content,
-        tags,
-        showErrors,
-        isSubmitting,
-        error,
-        published,
-      ];
+    type,
+    title,
+    content,
+    tags,
+    showErrors,
+    isSubmitting,
+    error,
+    published,
+  ];
 }

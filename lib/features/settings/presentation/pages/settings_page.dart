@@ -1,4 +1,7 @@
-import 'package:askdev/core/routes/app_router.dart';
+import 'package:askdev/core/themes/app_tokens.dart';
+import 'package:askdev/core/widgets/app_avatar.dart';
+import 'package:askdev/core/widgets/app_navigation_shell.dart';
+import 'package:askdev/core/widgets/confirm_dialog.dart';
 import 'package:askdev/core/widgets/destructive_button.dart';
 import 'package:askdev/core/widgets/section_header.dart';
 import 'package:askdev/features/auth/presentation/manager/auth_cubit.dart';
@@ -11,82 +14,105 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
+  Future<void> _signOut(BuildContext context) async {
+    final cubit = context.read<AuthCubit>();
+    final confirmed = await showConfirmDialog(
+      context,
+      icon: Icons.logout_rounded,
+      title: 'Se déconnecter ?',
+      message: 'Vous devrez saisir vos identifiants à la prochaine ouverture.',
+      confirmLabel: 'Se déconnecter',
+      destructive: true,
+    );
+    if (confirmed) await cubit.signOut();
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final user = context.watch<AuthCubit>().state.user;
     final themeMode = context.watch<SettingsCubit>().state;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Réglages')),
-      body: SafeArea(
-        top: false,
-        child: ListView(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          children: [
-            _SectionCard(
-              header: 'Votre compte',
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: colors.surfaceContainerHighest,
-                  backgroundImage: user?.photoUrl != null
-                      ? NetworkImage(user!.photoUrl!)
-                      : null,
-                  child: user?.photoUrl == null
-                      ? Icon(Icons.person, color: colors.onSurfaceVariant)
-                      : null,
+      body: ListView(
+        padding: AppLayout.listPadding(context),
+        children: [
+          SectionCard(
+            title: 'Votre compte',
+            child: ListTile(
+              leading: AppAvatar.url(
+                user?.photoUrl,
+                name: user?.displayName ?? user?.email,
+                size: 40,
+              ),
+              title: Text(user?.displayName ?? user?.email ?? 'Utilisateur'),
+              subtitle: user?.email != null ? Text(user!.email!) : null,
+              trailing: Icon(
+                Icons.chevron_right_rounded,
+                color: colors.onSurfaceVariant,
+              ),
+              onTap: () => AutoTabsRouter.of(
+                context,
+              ).setActiveIndex(AppNavigationShellPage.profileTab),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          SectionCard(
+            title: 'Apparence',
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+                AppSpacing.lg,
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                child: SegmentedButton<ThemeMode>(
+                  segments: const [
+                    ButtonSegment(
+                      value: ThemeMode.system,
+                      icon: Icon(Icons.brightness_auto_rounded, size: 18),
+                      label: Text('Système'),
+                    ),
+                    ButtonSegment(
+                      value: ThemeMode.light,
+                      icon: Icon(Icons.light_mode_outlined, size: 18),
+                      label: Text('Clair'),
+                    ),
+                    ButtonSegment(
+                      value: ThemeMode.dark,
+                      icon: Icon(Icons.dark_mode_outlined, size: 18),
+                      label: Text('Sombre'),
+                    ),
+                  ],
+                  selected: {themeMode},
+                  showSelectedIcon: false,
+                  onSelectionChanged: (selection) => context
+                      .read<SettingsCubit>()
+                      .setThemeMode(selection.first),
                 ),
-                title: Text(user?.displayName ?? user?.email ?? 'Utilisateur'),
-                subtitle: user?.email != null ? Text(user!.email!) : null,
-                trailing: Icon(
-                  Icons.chevron_right,
-                  color: colors.onSurfaceVariant,
-                ),
-                onTap: () => context.router.root.push(const ProfileRoute()),
               ),
             ),
-            _SectionCard(
-              header: 'Apparence',
-              child: SwitchListTile(
-                secondary: Icon(
-                  Icons.dark_mode_outlined,
-                  color: colors.onSurfaceVariant,
-                ),
-                title: const Text('Mode sombre'),
-                value: themeMode == ThemeMode.dark,
-                onChanged: (enabled) =>
-                    context.read<SettingsCubit>().toggleDark(enabled: enabled),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          SectionCard(
+            title: 'Session',
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+                AppSpacing.lg,
+              ),
+              child: DestructiveButton(
+                label: 'Se déconnecter',
+                onPressed: () => _signOut(context),
               ),
             ),
-            _SectionCard(
-              header: 'Session',
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                child: DestructiveButton(
-                  label: 'Se déconnecter',
-                  onPressed: () => context.read<AuthCubit>().signOut(),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SectionCard extends StatelessWidget {
-  const _SectionCard({required this.header, required this.child});
-
-  final String header;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [SectionHeader(header), child],
+          ),
+        ],
       ),
     );
   }

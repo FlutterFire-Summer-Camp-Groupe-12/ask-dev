@@ -1,8 +1,11 @@
 import 'dart:io';
 
+import 'package:askdev/core/widgets/app_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+/// Avatar cliquable qui ouvre la galerie. Affiche la photo actuelle (une URL
+/// distante) tant que l'utilisateur n'en a pas choisi une nouvelle.
 class AvatarPicker extends StatefulWidget {
   const AvatarPicker({
     super.key,
@@ -62,14 +65,18 @@ class _AvatarPickerState extends State<AvatarPicker> {
       imageQuality: 80,
       maxWidth: 800,
     );
-
     if (image == null || !mounted) return;
 
-    setState(() {
-      _selectedImage = image;
-    });
-
+    setState(() => _selectedImage = image);
     widget.onImageSelected(image);
+  }
+
+  ImageProvider? get _image {
+    final picked = _selectedImage;
+    if (picked != null) return FileImage(File(picked.path));
+    final url = widget.currentAvatarUrl;
+    if (url != null && url.trim().isNotEmpty) return NetworkImage(url);
+    return null;
   }
 
   @override
@@ -83,7 +90,7 @@ class _AvatarPickerState extends State<AvatarPicker> {
 
     return Semantics(
       button: true,
-      label: 'Changer l’avatar',
+      label: 'Changer la photo de profil',
       child: InkWell(
         onTap: widget.enabled ? _selectImage : null,
         customBorder: const CircleBorder(),
@@ -106,16 +113,17 @@ class _AvatarPickerState extends State<AvatarPicker> {
               right: -2,
               bottom: -2,
               child: Container(
-                width: 30,
-                height: 30,
-                decoration: const BoxDecoration(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white,
+                  color: colors.primary,
+                  border: Border.all(color: colors.surface, width: 2),
                 ),
-                child: const Icon(
-                  Icons.camera_alt_outlined,
-                  size: 17,
-                  color: Color(0xFF0D0D0F),
+                child: Icon(
+                  Icons.photo_camera_outlined,
+                  size: 16,
+                  color: colors.onPrimary,
                 ),
               ),
             ),

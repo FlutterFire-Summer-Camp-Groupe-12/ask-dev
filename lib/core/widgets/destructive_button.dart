@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
-/// Action destructive rendue comme bouton (contour ou fond rouge doux),
-/// jamais comme simple texte nu. Seul usage du rouge dans l'application.
+/// Action destructive rendue comme bouton à contour rouge, jamais comme
+/// simple texte. Seul usage du rouge hors erreurs.
 class DestructiveButton extends StatelessWidget {
   const DestructiveButton({
     super.key,
     required this.label,
     required this.onPressed,
-    this.icon = Icons.logout,
+    this.icon = Icons.logout_rounded,
     this.expanded = true,
   });
 
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final IconData icon;
 
   /// Pleine largeur (par défaut), ou contenu au plus juste.
@@ -25,10 +25,7 @@ class DestructiveButton extends StatelessWidget {
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
         foregroundColor: colors.error,
-        side: BorderSide(color: colors.error.withValues(alpha: 0.4)),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        side: BorderSide(color: colors.error.withValues(alpha: 0.45)),
       ),
       icon: Icon(icon, size: 18),
       label: Text(label),

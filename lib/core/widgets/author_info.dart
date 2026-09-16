@@ -1,39 +1,33 @@
+import 'package:askdev/core/themes/app_tokens.dart';
+import 'package:askdev/core/widgets/app_avatar.dart';
 import 'package:flutter/material.dart';
 
+/// Identité compacte d'un auteur : avatar, pseudo et sous-titre optionnel
+/// (« a demandé il y a 2 h »).
 class AuthorInfo extends StatelessWidget {
   const AuthorInfo({
     super.key,
     required this.name,
     this.subtitle,
     this.avatarUrl,
-    this.avatarRadius = 14,
+    this.avatarSize = 28,
   });
 
   final String name;
   final String? subtitle;
   final String? avatarUrl;
-  final double avatarRadius;
+  final double avatarSize;
 
   @override
   Widget build(BuildContext context) {
-    final hasAvatar = avatarUrl != null && avatarUrl!.trim().isNotEmpty;
+    final text = Theme.of(context).textTheme;
+    final hasSubtitle = subtitle != null && subtitle!.trim().isNotEmpty;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        CircleAvatar(
-          radius: avatarRadius,
-          backgroundColor: const Color(0xFF17181B),
-          backgroundImage: hasAvatar ? NetworkImage(avatarUrl!) : null,
-          child: hasAvatar
-              ? null
-              : Icon(
-                  Icons.person,
-                  color: Colors.white70,
-                  size: avatarRadius + 3,
-                ),
-        ),
-        const SizedBox(width: 8),
+        AppAvatar.url(avatarUrl, name: name, size: avatarSize),
+        const SizedBox(width: AppSpacing.sm),
         Flexible(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -43,24 +37,15 @@ class AuthorInfo extends StatelessWidget {
                 name,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: text.labelMedium,
               ),
-              if (subtitle != null && subtitle!.trim().isNotEmpty) ...[
-                const SizedBox(height: 2),
+              if (hasSubtitle)
                 Text(
                   subtitle!,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white54,
-                    fontSize: 10,
-                  ),
+                  style: text.labelSmall?.copyWith(letterSpacing: 0),
                 ),
-              ],
             ],
           ),
         ),

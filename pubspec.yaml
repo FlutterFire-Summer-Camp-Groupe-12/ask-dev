@@ -17,12 +17,15 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
+  flutter_highlight: ^0.7.0
   flutter_markdown: ^0.7.7+1
   fpdart: ^1.2.0
   get_it: ^9.2.1
   google_sign_in: 6.2.0
-  image_picker: ^1.2.3
+  highlight: ^0.7.0
+  image_picker: ^1.1.2
   logger: ^2.8.0
+  markdown: ^7.3.1
 
 dev_dependencies:
   auto_route_generator: ^10.5.0
@@ -36,10 +39,29 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/images/askdev_logo.png"
+  image_path: "assets/images/app_icon.png"
+  adaptive_icon_background: "#0F172A"
+  adaptive_icon_foreground: "assets/images/app_icon_foreground.png"
   remove_alpha_ios: true
+  background_color_ios: "#0F172A"
 
 flutter:
   uses-material-design: true
   assets:
     - assets/images/askdev_logo.png
+    - assets/images/askdev_wordmark.png
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
+    - family: JetBrainsMono
+      fonts:
+        - asset: assets/fonts/JetBrainsMono-Regular.ttf
+        - asset: assets/fonts/JetBrainsMono-Medium.ttf
+          weight: 500

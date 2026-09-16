@@ -16,6 +16,8 @@ class QuestionModel extends Question {
     super.tags,
     super.answersCount = 0,
     super.searchKeywords = const [],
+    super.authorName,
+    super.authorPhoto,
   });
 
   factory QuestionModel.fromJson(Map<String, dynamic> json) {
@@ -30,22 +32,27 @@ class QuestionModel extends Question {
       createdAt: requireFirestoreDate(json['createdAt'], 'createdAt'),
       updatedAt: requireFirestoreDate(json['updatedAt'], 'updatedAt'),
       answersCount: json['answersCount'] as int? ?? 0,
-      searchKeywords:
-          List<String>.from(json['searchKeywords'] as List? ?? const []),
+      searchKeywords: List<String>.from(
+        json['searchKeywords'] as List? ?? const [],
+      ),
+      authorName: json['authorName'] as String?,
+      authorPhoto: json['authorPhoto'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'content': content,
-        'authorId': authorId,
-        'type': type.storageKey,
-        'status': status.storageKey,
-        'tags': tags,
-        'createdAt': createdAt,
-        'updatedAt': updatedAt,
-        'answersCount': answersCount,
-        'searchKeywords': searchKeywords,
-      };
+    'id': id,
+    'title': title,
+    'content': content,
+    'authorId': authorId,
+    'type': type.storageKey,
+    'status': status.storageKey,
+    'tags': tags,
+    'createdAt': createdAt,
+    'updatedAt': updatedAt,
+    'answersCount': answersCount,
+    'searchKeywords': searchKeywords,
+    'authorName': authorName,
+    'authorPhoto': authorPhoto,
+  };
 }

@@ -27,12 +27,12 @@ class UserProfileModel extends UserProfile {
   }
 
   Map<String, dynamic> toJson() => {
-        'uid': uid,
-        'pseudo': pseudo,
-        'email': email,
-        'avatarUrl': avatarUrl,
-        'createdAt': createdAt,
-        'topics': topics,
-        'bio': bio,
-      };
+    'uid': uid,
+    'pseudo': pseudo,
+    'email': email,
+    'avatarUrl': avatarUrl,
+    'createdAt': createdAt,
+    'topics': topics,
+    'bio': bio,
+  };
 }

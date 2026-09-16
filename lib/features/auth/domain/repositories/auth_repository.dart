@@ -4,6 +4,7 @@ import 'package:askdev/features/auth/domain/entities/auth_user.dart';
 import 'package:fpdart/fpdart.dart';
 
 abstract class AuthRepository implements AuthGateway {
+  @override
   AuthUser? get currentUser;
 
   Future<Either<Failure, AuthUser>> signIn({

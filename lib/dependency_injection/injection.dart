@@ -7,23 +7,36 @@ import 'package:askdev/features/auth/data/sources/auth_remote_data_source.dart';
 import 'package:askdev/features/auth/data/sources/auth_remote_data_source_impl.dart';
 import 'package:askdev/features/auth/domain/repositories/auth_repository.dart';
 import 'package:askdev/features/auth/presentation/manager/auth_cubit.dart';
+import 'package:askdev/features/forum/data/repositories/media_repository_impl.dart';
 import 'package:askdev/features/forum/data/repositories/question_repository_impl.dart';
+import 'package:askdev/features/forum/data/sources/media_remote_data_source.dart';
+import 'package:askdev/features/forum/data/sources/media_remote_data_source_impl.dart';
 import 'package:askdev/features/forum/data/sources/question_remote_data_source.dart';
 import 'package:askdev/features/forum/data/sources/question_remote_data_source_impl.dart';
+import 'package:askdev/features/forum/domain/repositories/media_repository.dart';
 import 'package:askdev/features/forum/domain/repositories/question_repository.dart';
 import 'package:askdev/features/forum/domain/usecases/create_question.dart';
 import 'package:askdev/features/forum/domain/usecases/create_answer.dart';
+import 'package:askdev/features/forum/domain/usecases/update_answer.dart';
+import 'package:askdev/features/forum/domain/usecases/delete_answer.dart';
 import 'package:askdev/features/forum/domain/usecases/get_answers.dart';
 import 'package:askdev/features/forum/domain/usecases/get_question_by_id.dart';
 import 'package:askdev/features/forum/domain/usecases/get_recent_questions.dart';
+import 'package:askdev/features/forum/domain/usecases/get_user_activity.dart';
+import 'package:askdev/features/forum/domain/usecases/upload_image.dart';
+import 'package:askdev/features/forum/domain/usecases/search_questions.dart';
+import 'package:askdev/features/forum/domain/usecases/update_question.dart';
+import 'package:askdev/features/forum/domain/usecases/delete_question.dart';
 import 'package:askdev/features/forum/presentation/manager/ask_question_cubit.dart';
 import 'package:askdev/features/forum/presentation/manager/question_list_cubit.dart';
+import 'package:askdev/features/forum/presentation/manager/user_activity_cubit.dart';
 import 'package:askdev/features/profile/data/sources/user_remote_data_source.dart';
 import 'package:askdev/features/profile/data/sources/user_remote_data_source_impl.dart';
 import 'package:askdev/features/profile/presentation/manager/profile_cubit.dart';
 import 'package:askdev/features/settings/presentation/manager/settings_cubit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -46,7 +59,11 @@ void configureDependencies() {
     ),
   );
   sl.registerLazySingleton<UserRemoteDataSource>(
-    () => UserRemoteDataSourceImpl(firestore: FirebaseFirestore.instance),
+    () => UserRemoteDataSourceImpl(
+      firestore: FirebaseFirestore.instance,
+      storage: FirebaseStorage.instance,
+      auth: FirebaseAuth.instance,
+    ),
   );
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(remoteDataSource: sl<AuthRemoteDataSource>()),
@@ -85,8 +102,44 @@ void configureDependencies() {
   sl.registerLazySingleton<CreateAnswer>(
     () => CreateAnswer(sl<QuestionRepository>()),
   );
+  sl.registerLazySingleton<SearchQuestions>(
+    () => SearchQuestions(sl<QuestionRepository>()),
+  );
+  sl.registerLazySingleton<UpdateAnswer>(
+    () => UpdateAnswer(sl<QuestionRepository>()),
+  );
+  sl.registerLazySingleton<DeleteAnswer>(
+    () => DeleteAnswer(sl<QuestionRepository>()),
+  );
+  sl.registerLazySingleton<UpdateQuestion>(
+    () => UpdateQuestion(sl<QuestionRepository>()),
+  );
+  sl.registerLazySingleton<DeleteQuestion>(
+    () => DeleteQuestion(sl<QuestionRepository>()),
+  );
+  sl.registerLazySingleton<MediaRemoteDataSource>(
+    () => MediaRemoteDataSourceImpl(storage: FirebaseStorage.instance),
+  );
+  sl.registerLazySingleton<MediaRepository>(
+    () => MediaRepositoryImpl(
+      remoteDataSource: sl<MediaRemoteDataSource>(),
+      authGateway: sl<AuthGateway>(),
+    ),
+  );
+  sl.registerLazySingleton<UploadImage>(
+    () => UploadImage(sl<MediaRepository>()),
+  );
+  sl.registerLazySingleton<GetUserActivity>(
+    () => GetUserActivity(sl<QuestionRepository>()),
+  );
+  sl.registerFactory<UserActivityCubit>(
+    () => UserActivityCubit(sl<GetUserActivity>()),
+  );
   sl.registerFactory<QuestionListCubit>(
-    () => QuestionListCubit(sl<GetRecentQuestions>()),
+    () => QuestionListCubit(
+      getRecentQuestions: sl<GetRecentQuestions>(),
+      searchQuestions: sl<SearchQuestions>(),
+    ),
   );
   // Un cubit par ouverture du formulaire : chaque brouillon repart vide.
   sl.registerFactory<AskQuestionCubit>(

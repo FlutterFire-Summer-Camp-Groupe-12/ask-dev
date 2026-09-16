@@ -1,3 +1,4 @@
+import 'package:askdev/core/themes/app_tokens.dart';
 import 'package:flutter/material.dart';
 
 /// Bloc « libellé + consigne + champ » répété tout au long du formulaire.
@@ -21,25 +22,23 @@ class QuestionFormSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Expanded(
               child: Text.rich(
                 TextSpan(
                   text: label,
-                  style: TextStyle(
-                    color: colors.onSurface,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: theme.textTheme.titleSmall,
                   children: [
                     if (isRequired)
                       TextSpan(
-                        text: '*',
+                        text: ' *',
                         style: TextStyle(color: colors.error),
                       ),
                   ],
@@ -50,70 +49,60 @@ class QuestionFormSection extends StatelessWidget {
           ],
         ),
         if (hint != null) ...[
-          const SizedBox(height: 4),
-          Text(
-            hint!,
-            style: TextStyle(
-              color: colors.onSurfaceVariant,
-              fontSize: 12,
-              height: 1.4,
-            ),
-          ),
+          const SizedBox(height: AppSpacing.xxs),
+          Text(hint!, style: theme.textTheme.bodySmall),
         ],
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         child,
-        if (error != null) ...[
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 14,
-                color: colors.error,
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  error!,
-                  style: TextStyle(color: colors.error, fontSize: 12),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 180),
+          alignment: Alignment.topLeft,
+          child: error == null
+              ? const SizedBox(width: double.infinity)
+              : Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.xs + 2),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.error_outline_rounded,
+                        size: 16,
+                        color: colors.error,
+                      ),
+                      const SizedBox(width: AppSpacing.xs + 2),
+                      Expanded(
+                        child: Text(
+                          error!,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colors.error,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+        ),
       ],
     );
   }
 }
 
-/// Décoration commune aux champs texte du formulaire.
+/// Décoration des champs du formulaire : celle du thème, bordure rouge en
+/// cas d'erreur (le message est affiché par [QuestionFormSection]).
 InputDecoration questionFieldDecoration({
   required ColorScheme colors,
   String? hintText,
   bool hasError = false,
-  EdgeInsets contentPadding = const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
 }) {
-  OutlineInputBorder border(Color color, double width) => OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: color, width: width),
-      );
-
+  if (!hasError) return InputDecoration(hintText: hintText);
+  final border = OutlineInputBorder(
+    borderRadius: AppRadius.mdAll,
+    borderSide: BorderSide(color: colors.error),
+  );
   return InputDecoration(
     hintText: hintText,
-    hintStyle: TextStyle(color: colors.outline, fontSize: 13),
-    filled: true,
-    fillColor: colors.surfaceContainerHighest,
-    isDense: true,
-    contentPadding: contentPadding,
-    enabledBorder: border(
-      hasError ? colors.error : colors.outlineVariant,
-      1,
+    enabledBorder: border,
+    focusedBorder: border.copyWith(
+      borderSide: BorderSide(color: colors.error, width: 1.6),
     ),
-    focusedBorder: border(
-      hasError ? colors.error : colors.primary,
-      1.6,
-    ),
-    disabledBorder: border(colors.outlineVariant, 1),
-    errorStyle: const TextStyle(height: 0, fontSize: 0),
   );
 }

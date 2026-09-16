@@ -1,10 +1,18 @@
 /// Statut de visibilité d'une question publiée.
 enum QuestionStatus {
   /// Relecture privée : la question n'apparaît pas encore dans le fil public.
-  review('review', 'Relecture privée', 'Recevoir des retours avant la publication.'),
+  review(
+    'review',
+    'Relecture privée',
+    'Recevoir des retours avant la publication.',
+  ),
 
   /// Publication immédiate dans le fil public.
-  published('published', 'Publier maintenant', 'La question est visible par tous.');
+  published(
+    'published',
+    'Publier maintenant',
+    'La question est visible par tous.',
+  );
 
   const QuestionStatus(this.storageKey, this.label, this.description);
 

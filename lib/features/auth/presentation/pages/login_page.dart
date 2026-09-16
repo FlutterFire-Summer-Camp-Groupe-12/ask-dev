@@ -1,9 +1,11 @@
 import 'package:askdev/core/routes/app_router.dart';
-import 'package:askdev/core/utils/extensions_context.dart';
 import 'package:askdev/core/session/auth_status.dart';
+import 'package:askdev/core/themes/app_tokens.dart';
+import 'package:askdev/core/utils/extensions_context.dart';
 import 'package:askdev/features/auth/presentation/manager/auth_cubit.dart';
 import 'package:askdev/features/auth/presentation/manager/auth_state.dart';
 import 'package:askdev/features/auth/presentation/widgets/auth_controls.dart';
+import 'package:askdev/features/auth/presentation/widgets/auth_scaffold.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -54,77 +56,56 @@ class _LoginPageState extends State<LoginPage> {
           context.showError(state.error!);
         }
       },
-      child: Scaffold(
-        appBar: AppBar(title: const Text('Connexion')),
-        body: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 420),
-                child: Card(
-                  margin: EdgeInsets.zero,
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Form(
-                      key: _formKey,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      child: BlocBuilder<AuthCubit, AuthState>(
-                        builder: (context, state) {
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              IdentifierField(
-                                controller: _identifierController,
-                                enabled: !state.isSubmitting,
-                              ),
-                              const SizedBox(height: 16),
-                              PasswordField(
-                                controller: _passwordController,
-                                enabled: !state.isSubmitting,
-                                onSubmitted: () => _submit(cubit),
-                              ),
-                              const SizedBox(height: 24),
-                              FilledButton(
-                                onPressed: state.isSubmitting
-                                    ? null
-                                    : () => _submit(cubit),
-                                child: state.isSubmitting
-                                    ? const SizedBox(
-                                        height: 20,
-                                        width: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                        ),
-                                      )
-                                    : const Text('Se connecter'),
-                              ),
-                              const SizedBox(height: 12),
-                              GoogleSignInButton(
-                                onPressed: cubit.signInWithGoogle,
-                                enabled: !state.isSubmitting,
-                              ),
-                              const SizedBox(height: 12),
-                              TextButton(
-                                onPressed: state.isSubmitting
-                                    ? null
-                                    : () => context.router.push(
-                                        const RegisterRoute(),
-                                      ),
-                                child: const Text(
-                                  "Pas encore de compte ? Inscrivez-vous",
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
+      child: AuthScaffold(
+        title: 'Bon retour',
+        subtitle: 'Connectez-vous pour poser vos questions et répondre.',
+        form: Form(
+          key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          child: BlocBuilder<AuthCubit, AuthState>(
+            builder: (context, state) {
+              final busy = state.isSubmitting;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  IdentifierField(
+                    controller: _identifierController,
+                    enabled: !busy,
                   ),
-                ),
-              ),
-            ),
+                  const SizedBox(height: AppSpacing.lg),
+                  PasswordField(
+                    controller: _passwordController,
+                    enabled: !busy,
+                    onSubmitted: () => _submit(cubit),
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                  FilledButton(
+                    onPressed: busy ? null : () => _submit(cubit),
+                    child: busy
+                        ? const SizedBox.square(
+                            dimension: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Se connecter'),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  const AuthDivider(),
+                  const SizedBox(height: AppSpacing.lg),
+                  GoogleSignInButton(
+                    onPressed: cubit.signInWithGoogle,
+                    enabled: !busy,
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+        footer: BlocBuilder<AuthCubit, AuthState>(
+          builder: (context, state) => TextButton(
+            onPressed: state.isSubmitting
+                ? null
+                : () => context.router.replace(const RegisterRoute()),
+            child: const Text('Pas encore de compte ? Inscrivez-vous'),
           ),
         ),
       ),

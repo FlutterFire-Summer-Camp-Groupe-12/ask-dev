@@ -4,7 +4,9 @@ import 'package:askdev/dependency_injection/injection.dart';
 import 'package:askdev/features/auth/presentation/pages/login_page.dart';
 import 'package:askdev/features/auth/presentation/pages/register_page.dart';
 import 'package:askdev/features/auth/presentation/pages/welcome_page.dart';
+import 'package:askdev/features/forum/domain/entities/question.dart';
 import 'package:askdev/features/forum/presentation/pages/ask_question_page.dart';
+import 'package:askdev/features/forum/presentation/pages/edit_question_page.dart';
 import 'package:askdev/features/forum/presentation/pages/question_detail_page.dart';
 import 'package:askdev/features/forum/presentation/pages/questions_home_page.dart';
 import 'package:askdev/features/profile/presentation/pages/edit_profile_page.dart';
@@ -22,29 +24,38 @@ class AppRouter extends RootStackRouter {
 
   @override
   List<AutoRoute> get routes => [
-        AutoRoute(path: '/', initial: true, page: WelcomeRoute.page),
-        AutoRoute(path: '/login', page: LoginRoute.page),
-        AutoRoute(path: '/register', page: RegisterRoute.page),
-        AutoRoute(path: '/edit-profile', page: EditProfileRoute.page),
+    AutoRoute(path: '/', initial: true, page: WelcomeRoute.page),
+    AutoRoute(path: '/login', page: LoginRoute.page),
+    AutoRoute(path: '/register', page: RegisterRoute.page),
+    AutoRoute(path: '/edit-profile', page: EditProfileRoute.page),
+    AutoRoute(
+      path: '/question/:questionId',
+      page: QuestionDetailRoute.page,
+      guards: [sl<AuthGuard>()],
+    ),
+    AutoRoute(
+      path: '/question/:questionId/edit',
+      page: EditQuestionRoute.page,
+      guards: [sl<AuthGuard>()],
+    ),
+    AutoRoute(
+      path: '/question/new',
+      page: AskQuestionRoute.page,
+      guards: [sl<AuthGuard>()],
+    ),
+    AutoRoute(
+      path: '/home',
+      page: AppNavigationShellRoute.page,
+      guards: [sl<AuthGuard>()],
+      children: [
         AutoRoute(
-          path: '/question/:questionId',
-          page: QuestionDetailRoute.page,
-          guards: [sl<AuthGuard>()],
+          path: 'accueil',
+          page: QuestionsHomeRoute.page,
+          initial: true,
         ),
-        AutoRoute(
-          path: '/profile',
-          page: ProfileRoute.page,
-          guards: [sl<AuthGuard>()],
-        ),
-        AutoRoute(
-          path: '/home',
-          page: AppNavigationShellRoute.page,
-          guards: [sl<AuthGuard>()],
-          children: [
-            AutoRoute(path: 'accueil', page: QuestionsHomeRoute.page, initial: true),
-            AutoRoute(path: 'publier', page: AskQuestionRoute.page),
-            AutoRoute(path: 'reglages', page: SettingsRoute.page),
-          ],
-        ),
-      ];
+        AutoRoute(path: 'profil', page: ProfileRoute.page),
+        AutoRoute(path: 'reglages', page: SettingsRoute.page),
+      ],
+    ),
+  ];
 }
